@@ -8,7 +8,7 @@ class AuthRepo extends GetxService{
 
 
   Future<dynamic> userRegisterRepo(Map<String, String> body)async{
-    var response = await DI<ApiService>().postMethod(DI<WebService>().BASE_URL, body);
+    var response = await DI<ApiService>().postMethod(DI<WebService>().REGISTER_END_POINT, body);
     return response.data;
   }
 

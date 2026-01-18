@@ -45,8 +45,9 @@ class StringConst{
   String please_enter_confirm_password_text = "please enter confirm password";
   String please_enter_valid_email_text = "please enter valid email";
   String please_enter_valid_mobile_num_text = "please enter valid mobile number";
-  String password__grater_8_digit_text = "password must be grater then 8 digit";
+  String password_grater_8_digit_text = "password must be greater then 8 digit";
   String please_enter_same_password_text = "please enter same password";
+  String please_accept_trems_condition_text = "please accept terms and condition";
 
 
   String pleaseText = "Please";
@@ -81,9 +82,7 @@ class StringConst{
   String your_dashborad_text = "Your Dashboard";
   String newToZozokartText = "New to Zozokart seller?";
   String createAccountText = "Create an seller account";
-  String please_enter_email_Text = "Please enter email";
   String please_enter_phone_Text = "Please enter phone";
-  String please_enter_password_Text = "Please enter password";
   String please_enter_first_name_Text = "Please enter first name";
   String please_enter_last_name_Text = "Please enter last name";
   String please_enter_mobile_number_Text = "Please enter mobile number";

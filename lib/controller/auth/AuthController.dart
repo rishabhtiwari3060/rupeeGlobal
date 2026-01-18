@@ -5,6 +5,7 @@ import 'package:rupeeglobal/repo/auth_repo.dart';
 import 'package:rupeeglobal/util/CommonFunction.dart';
 
 import '../../util/Injection.dart';
+import '../../util/RouteHelper.dart';
 
 class AuthController extends GetxController{
 
@@ -25,10 +26,20 @@ class AuthController extends GetxController{
     print("userRegister :-- $registerMap");
 
     try{
-      var response = DI<AuthRepo>().userRegisterRepo(registerMap);
+      var response = await DI<AuthRepo>().userRegisterRepo(registerMap);
       print("User Register response :-- $response");
       isLoading.value = false;
       DI<CommonFunction>().hideLoader();
+
+      var responseData = response["data"];
+      if(response["success"].toString() == "true"){
+        var data = {
+          "email": email,
+          "screenType": "SIGNUP",
+        };
+        Get.toNamed(DI<RouteHelper>().getVerificationScreen(),
+            parameters: data);
+      }
 
     }catch(e){
       isLoading.value = false;

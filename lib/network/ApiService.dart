@@ -78,9 +78,11 @@ class ApiService extends GetxService {
       print("baseUrl post--- ${DI<WebService>().BASE_URL}$endPoint");
       print("header--- $header");
 
+      final formData = DIO.FormData.fromMap(body??{});
+
       response = await dio.post(
         "${DI<WebService>().BASE_URL}$endPoint",
-        data: body,
+        data: formData,
         options: DIO.Options(
           headers: {
             "Content-Type": "application/json",
