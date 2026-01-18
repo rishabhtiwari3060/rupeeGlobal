@@ -1,0 +1,27 @@
+import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+
+
+  @override
+  void initState() {
+    WidgetsFlutterBinding.ensureInitialized();
+    super.initState();
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text("Home Screen",style: TextStyle(fontSize: 20.sp),),
+    );
+  }
+}
