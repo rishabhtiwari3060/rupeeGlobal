@@ -1,7 +1,9 @@
 
 import 'package:get_it/get_it.dart';
+import 'package:rupeeglobal/network/WebService.dart';
 import 'package:rupeeglobal/repo/auth_repo.dart';
 
+import '../network/ApiService.dart';
 import 'ColorConst.dart';
 import 'CommonFunction.dart';
 import 'CommonWidget.dart';
@@ -21,6 +23,8 @@ void setup() {
   DI.registerLazySingleton<CommonFunction>(() => CommonFunction());
   DI.registerLazySingleton<CommonWidget>(() => CommonWidget());
   DI.registerLazySingleton<MyLocalStorage>(() => MyLocalStorage());
+  DI.registerLazySingleton<ApiService>(() => ApiService());
+  DI.registerLazySingleton<WebService>(() => WebService());
 
 
 
