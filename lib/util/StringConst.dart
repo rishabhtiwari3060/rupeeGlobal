@@ -11,10 +11,16 @@ class StringConst{
   String forgot_password_text = "Forgot Password";
   String verifiy_code_text = "Verify Code";
   String reset_password_text = "Reset Password";
+  String verify_email_text = "Verify Email";
+  String enter_email_mobile_text = "Enter Mobile/Email";
+  String enter_password_text = "Enter Password";
+  String login_text = "Login";
+  String enter_5_digit_verification_code_text = "Enter 5-digit verification code";
   String enter_your_new_password_text = "Enter your new password";
   String enter_new_password_text = "Enter New Password";
   String enter_confirm_new_password_text = "Confirm New Password";
   String back_to_login_text = "Back to login";
+  String send_verifiation_code_text = "Send Verification code";
   String did_not_receive_code_text = "Didn't receive code?";
   String resend_verification_code_text = "Resend Verification Code";
   String verification_successful_text = "Verification successful. Please set your new password.";
@@ -42,12 +48,15 @@ class StringConst{
   String please_enter_mobile_text = "please enter mobile number";
   String please_enter_pan_num_text = "please enter pan number";
   String please_enter_password_text = "please enter password";
+  String please_enter_new_password_text = "please enter new password";
   String please_enter_confirm_password_text = "please enter confirm password";
   String please_enter_valid_email_text = "please enter valid email";
   String please_enter_valid_mobile_num_text = "please enter valid mobile number";
   String password_grater_8_digit_text = "password must be greater then 8 digit";
   String please_enter_same_password_text = "please enter same password";
   String please_accept_trems_condition_text = "please accept terms and condition";
+  String please_enter_verification_code_text = "please enter verification code";
+
 
 
   String pleaseText = "Please";
@@ -57,7 +66,7 @@ class StringConst{
   String select_delivey_address_text = "Select Delivery Address";
   String signInOrCreateAccountText = "Sign in or Create seller account";
   String enterPhoneText = "Enter phone";
-  String enterEmailText = "Enter email";
+
   String enterEmailOrMobileText = "Enter Email/Mobile number";
   String enterFullNameText = "Enter full name";
   String enter_password_Text = "Enter password";

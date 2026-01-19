@@ -12,4 +12,25 @@ class AuthRepo extends GetxService{
     return response.data;
   }
 
+  Future<dynamic> userVerifyCodeRepo(Map<String, String> body)async{
+    var response = await DI<ApiService>().postMethod(DI<WebService>().VERIFY_RESET_CODE_END_POINT, body);
+    return response.data;
+  }
+
+  Future<dynamic> userLoginRepo(Map<String, String> body)async{
+    var response = await DI<ApiService>().postMethod(DI<WebService>().LOGIN_END_POINT, body);
+    return response.data;
+  }
+
+  Future<dynamic> userSendVerificationCodeRepo(Map<String, String> body)async{
+    var response = await DI<ApiService>().postMethod(DI<WebService>().FORGOT_PASSWORD_END_POINT, body);
+    return response.data;
+  }
+
+  Future<dynamic> userResetPasswordRepo(Map<String, String> body)async{
+    var response = await DI<ApiService>().postMethod(DI<WebService>().RESET_END_POINT, body);
+    return response.data;
+  }
+
+
 }

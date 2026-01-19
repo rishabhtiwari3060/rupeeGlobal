@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rupeeglobal/controller/auth/AuthController.dart';
 import 'package:rupeeglobal/util/RouteHelper.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../util/ColorConst.dart';
+import '../../../util/CommonFunction.dart';
 import '../../../util/CommonWidget.dart';
 import '../../../util/ImageConst.dart';
 import '../../../util/Injection.dart';
@@ -18,11 +20,23 @@ class ResetPasswordScreen extends StatefulWidget {
 
 class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
+  AuthController authController = Get.find<AuthController>();
+
+  late TextEditingController newPasswordCtrl;
+  late TextEditingController confirmPasswordCtrl;
+  String email= "";
 
   @override
   void initState() {
     WidgetsFlutterBinding.ensureInitialized();
     super.initState();
+
+    if(Get.parameters["email"] != null){
+      email = Get.parameters["email"]??"";
+    }
+
+    newPasswordCtrl = TextEditingController();
+    confirmPasswordCtrl = TextEditingController();
   }
 
   @override
@@ -74,19 +88,21 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             ),
 
             SizedBox(
-              height: 10,
+              height: 10.w,
             ),
 
 
-
-
-            DI<CommonWidget>().myTextFormField(DI<StringConst>().enter_new_password_text,
+            DI<CommonWidget>().myTextFormField(
+                controller: newPasswordCtrl,
+                DI<StringConst>().enter_new_password_text,
                 icon: Icons.lock,
                 textInputAction: TextInputAction.next),
             SizedBox(
               height: 10,
             ),
-            DI<CommonWidget>().myTextFormField(DI<StringConst>().enter_confirm_new_password_text,
+            DI<CommonWidget>().myTextFormField(
+                controller: confirmPasswordCtrl,
+                DI<StringConst>().enter_confirm_new_password_text,
                 icon: Icons.lock,
                 textInputAction: TextInputAction.done),
             SizedBox(
@@ -96,7 +112,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
             DI<CommonWidget>().myButton(DI<StringConst>().reset_password_text,(){
 
-              Get.offAllNamed(DI<RouteHelper>().getLoginScreen());
+              if(validation()){
+                authController.resetPasswordCode(email, newPasswordCtrl.text.trim(),
+                    confirmPasswordCtrl.text.trim());
+              }
+
+
             }),
             SizedBox(
               height: 20,
@@ -128,5 +149,38 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       ),
 
     );
+  }
+
+  bool validation(){
+    if (newPasswordCtrl.text.trim().isEmpty) {
+      DI<CommonFunction>()
+          .showErrorSnackBar(DI<StringConst>().please_enter_new_password_text);
+
+      return false;
+    } else if (newPasswordCtrl.text.trim().length < 8) {
+      DI<CommonFunction>()
+          .showErrorSnackBar(DI<StringConst>().password_grater_8_digit_text);
+
+      return false;
+    } else if (confirmPasswordCtrl.text.trim().isEmpty) {
+      DI<CommonFunction>()
+          .showErrorSnackBar(DI<StringConst>().please_enter_confirm_password_text);
+
+      return false;
+    } else if (confirmPasswordCtrl.text.trim() != newPasswordCtrl.text.trim()) {
+      DI<CommonFunction>()
+          .showErrorSnackBar(DI<StringConst>().please_enter_same_password_text);
+
+      return false;
+    }
+
+    return true;
+  }
+
+  @override
+  void dispose() {
+    newPasswordCtrl.dispose();
+    confirmPasswordCtrl.dispose();
+    super.dispose();
   }
 }
