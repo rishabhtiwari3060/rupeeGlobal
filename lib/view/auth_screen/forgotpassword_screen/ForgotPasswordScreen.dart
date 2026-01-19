@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rupeeglobal/controller/auth/AuthController.dart';
+import 'package:rupeeglobal/util/CommonFunction.dart';
 import 'package:rupeeglobal/util/RouteHelper.dart';
 import 'package:sizer/sizer.dart';
 
@@ -17,6 +19,8 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+
+  AuthController authController = Get.find<AuthController>();
 
   late TextEditingController emailCtrl;
 
@@ -58,24 +62,25 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().darkGryColor, 18.sp, FontWeight.w400),),
 
             SizedBox(
-              height: 20,
+              height: 15.w,
             ),
 
             DI<CommonWidget>().myTextFormField(
                 controller:emailCtrl,
-                "Enter Email Address",
+                DI<StringConst>().email_address_text,
                 icon: Icons.email,
+                textInputType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.done),
 
             SizedBox(
-              height: 30,
+              height: 15.w,
             ),
-            DI<CommonWidget>().myButton("Send Verification code",(){
-              var data = {
-                "email": emailCtrl.text.trim(),
-                "screenType": "FORGOTPASSWORD",
-              };
-              Get.toNamed(DI<RouteHelper>().getVerificationScreen(),parameters: data);
+            DI<CommonWidget>().myButton(DI<StringConst>().send_verifiation_code_text,(){
+
+              if(validation()){
+                authController.sendForgotPasswordCode(emailCtrl.text.trim());
+              }
+
             }),
 
             SizedBox(
@@ -120,5 +125,21 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         ),
       ),
     );
+  }
+
+
+  bool validation(){
+    if(emailCtrl.text.trim().isEmpty){
+
+      DI<CommonFunction>().showErrorSnackBar(DI<StringConst>().please_enter_email_text);
+
+      return false;
+    }else if (!emailCtrl.text.trim().isEmail){
+      DI<CommonFunction>().showErrorSnackBar(DI<StringConst>().please_enter_valid_email_text);
+
+      return false;
+    }
+
+    return true;
   }
 }

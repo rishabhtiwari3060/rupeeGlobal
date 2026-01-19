@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rupeeglobal/controller/auth/AuthController.dart';
+import 'package:rupeeglobal/util/CommonFunction.dart';
 import 'package:rupeeglobal/util/RouteHelper.dart';
 import 'package:sizer/sizer.dart';
 
@@ -18,8 +20,10 @@ class VerificationScreen extends StatefulWidget {
 
 class _VerificationScreenState extends State<VerificationScreen> {
 
+  AuthController authController = Get.find<AuthController>();
   String email = "";
   String screenType = "";
+  late TextEditingController verifyCodeCtrl;
   @override
   void initState() {
     WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +32,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
       email = Get.parameters["email"]??"";
       screenType = Get.parameters["screenType"]??"";
     }
+
+
+    verifyCodeCtrl = TextEditingController();
 
   }
 
@@ -63,8 +70,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
             SizedBox(
               height: 20,
             ),
-
-
             Container(
               width: 100.w,
               padding: EdgeInsets.symmetric(horizontal: 5,vertical: 10),
@@ -114,12 +119,15 @@ class _VerificationScreenState extends State<VerificationScreen> {
               )
             ),
             SizedBox(
-              height: 20,
+              height: 10.w,
             ),
 
 
-            DI<CommonWidget>().myTextFormField("Enter 5-digit verification code",
+            DI<CommonWidget>().myTextFormField(
+                controller: verifyCodeCtrl,
+                DI<StringConst>().enter_5_digit_verification_code_text,
                 icon: Icons.key,
+                textInputType: TextInputType.phone,
                 textInputAction: TextInputAction.done),
 
             SizedBox(
@@ -146,14 +154,14 @@ class _VerificationScreenState extends State<VerificationScreen> {
               ],
             ),
             SizedBox(
-              height: 30,
+              height: 10.w,
             ),
-            DI<CommonWidget>().myButton("Verify Email",(){
+            DI<CommonWidget>().myButton(DI<StringConst>().verify_email_text,(){
 
-              if(screenType == "FORGOTPASSWORD"){
-                Get.toNamed(DI<RouteHelper>().getResetPasswordScreen());
+              if(verifyCodeCtrl.text.trim().isEmpty){
+                DI<CommonFunction>().showErrorSnackBar(DI<StringConst>().please_enter_verification_code_text);
               }else{
-                Get.toNamed(DI<RouteHelper>().getHomeTabScreen());
+                authController.userVerifyCode(email, verifyCodeCtrl.text.trim(),screenType);
               }
 
 

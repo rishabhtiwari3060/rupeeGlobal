@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rupeeglobal/controller/auth/AuthController.dart';
 import 'package:rupeeglobal/util/ColorConst.dart';
+import 'package:rupeeglobal/util/CommonFunction.dart';
 import 'package:rupeeglobal/util/CommonWidget.dart';
 import 'package:rupeeglobal/util/StringConst.dart';
 import 'package:sizer/sizer.dart';
@@ -17,11 +19,16 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
- var checkBoxValue = false.obs;
+ AuthController authController = Get.find<AuthController>();
+
+ late TextEditingController emailCtrl;
+ late TextEditingController passwordCtrl;
   @override
   void initState() {
-    // TODO: implement initState
+   WidgetsFlutterBinding.ensureInitialized();
     super.initState();
+    emailCtrl = TextEditingController();
+    passwordCtrl = TextEditingController();
   }
 
   @override
@@ -52,15 +59,20 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
 
 
-            DI<CommonWidget>().myTextFormField("Enter Mobile/Email",
+            DI<CommonWidget>().myTextFormField(
+                controller: emailCtrl,
+                DI<StringConst>().enter_email_mobile_text,
             icon: Icons.person,
+              textInputType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next),
 
             SizedBox(
               height: 10,
             ),
 
-            DI<CommonWidget>().myTextFormField("Enter Password",
+            DI<CommonWidget>().myTextFormField(
+                controller: passwordCtrl,
+                DI<StringConst>().enter_password_Text,
                 icon: Icons.password,
                 textInputAction: TextInputAction.done),
             SizedBox(
@@ -87,8 +99,11 @@ class _LoginScreenState extends State<LoginScreen> {
             SizedBox(
               height: 12.w,
             ),
-            DI<CommonWidget>().myButton("Login",(){
-              Get.offAllNamed(DI<RouteHelper>().getHomeTabScreen());
+            DI<CommonWidget>().myButton(DI<StringConst>().login_text,(){
+
+              if(validation()){
+                authController.userLogin(emailCtrl.text.trim(), passwordCtrl.text.trim());
+              }
             }),
 
             SizedBox(
@@ -147,10 +162,31 @@ class _LoginScreenState extends State<LoginScreen> {
       controlAffinity: ListTileControlAffinity.leading,
       activeColor: DI<ColorConst>().redColor,
       contentPadding: EdgeInsets.zero,
-      value: checkBoxValue.value,
+      value: authController.checkBoxValue.value,
       onChanged: (value) {
-        checkBoxValue.value = value!;
+        authController.checkBoxValue.value = value!;
       },
     ));
+  }
+
+
+  bool validation(){
+    if(emailCtrl.text.trim().isEmpty){
+      DI<CommonFunction>().showErrorSnackBar("please ${DI<StringConst>().enter_email_mobile_text}");
+
+      return false;
+    }  else if(passwordCtrl.text.trim().isEmpty){
+      DI<CommonFunction>().showErrorSnackBar(DI<StringConst>().please_enter_password_text);
+
+      return false;
+    }
+    return true;
+  }
+
+  @override
+  void dispose() {
+    emailCtrl.dispose();
+    passwordCtrl.dispose();
+    super.dispose();
   }
 }
