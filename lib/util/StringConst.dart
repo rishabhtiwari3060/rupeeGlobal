@@ -56,6 +56,9 @@ class StringConst{
   String please_enter_same_password_text = "please enter same password";
   String please_accept_trems_condition_text = "please accept terms and condition";
   String please_enter_verification_code_text = "please enter verification code";
+  String support_ticket_text = "Support Ticket";
+  String pms_text = "PMS";
+  String news_text = "News";
 
 
 

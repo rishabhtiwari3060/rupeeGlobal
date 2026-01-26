@@ -6,6 +6,7 @@ import '../../util/ColorConst.dart';
 import '../../util/ImageConst.dart';
 import '../../util/Injection.dart';
 import '../../util/RouteHelper.dart';
+import '../../util/local_storage.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -24,8 +25,8 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   void initState() {
     WidgetsFlutterBinding.ensureInitialized();
     super.initState();
-    //isLogin = DI<MyLocalStorage>().getBoolValue(DI<MyLocalStorage>().isLogin);
-    //print(isLogin);
+    isLogin = DI<MyLocalStorage>().getBoolValue(DI<MyLocalStorage>().isLogin);
+    print(isLogin);
     controller =
     AnimationController(
       vsync: this,
