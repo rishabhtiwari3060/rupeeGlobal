@@ -6,9 +6,12 @@ import 'package:rupeeglobal/view/orders_screen/OrderScreen.dart';
 import 'package:rupeeglobal/view/portfolio_screen/PortfolioScreen.dart';
 import 'package:rupeeglobal/view/watchlist_screen/WatchListScreen.dart';
 
+import '../view/account_screen/edit_profile/EditProfileScreen.dart';
 import '../view/account_screen/news_screen/NewsScreen.dart';
+import '../view/account_screen/news_screen/news_detail_screen.dart';
 import '../view/account_screen/pms_screen/PmsScreen.dart';
 import '../view/account_screen/support_ticket_screen/SupportTicketScreen.dart';
+import '../view/account_screen/webview_screen/WebViewScreen.dart';
 import '../view/auth_screen/forgotpassword_screen/ForgotPasswordScreen.dart';
 import '../view/auth_screen/login_screen/LoginScreen.dart';
 import '../view/auth_screen/reset_password_screen/ResetPasswordScreen.dart';
@@ -37,6 +40,9 @@ class RouteHelper{
   String newsScreen = "/NewsScreen";
   String supportTicketScreen = "/SupportTicketScreen";
   String pmsScreen = "/PmsScreen";
+  String newsDetailScreen = "/NewsDetailScreen";
+  String webViewScreen = "/WebViewScreen";
+  String editProfileScreen = "/EditProfileScreen";
 
 
 
@@ -59,6 +65,9 @@ String getResetPasswordScreen() => resetPasswordScreen;
 String getNewsScreen() => newsScreen;
 String getSupportTicketScreen() => supportTicketScreen;
 String getPmsScreen() => pmsScreen;
+String getNewsDetailScreen() => newsDetailScreen;
+String getWebViewScreen() => webViewScreen;
+String getEditProfileScreen() => editProfileScreen;
 
 
 
@@ -83,6 +92,9 @@ List<GetPage> get routes =>[
   GetPage(name: newsScreen, page: () =>  SafeArea(child:NewsScreen()),),
   GetPage(name: supportTicketScreen, page: () =>  SafeArea(child:SupportTicketScreen()),),
   GetPage(name: pmsScreen, page: () =>  SafeArea(child:PmsScreen()),),
+  GetPage(name: newsDetailScreen, page: () =>  SafeArea(child:NewsDetailScreen()),),
+  GetPage(name: webViewScreen, page: () =>  SafeArea(child:WebViewScreen()),),
+  GetPage(name: editProfileScreen, page: () =>  SafeArea(child:EditProfileScreen()),),
 
 
 

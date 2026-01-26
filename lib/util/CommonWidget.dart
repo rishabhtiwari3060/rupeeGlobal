@@ -15,7 +15,7 @@ class CommonWidget {
         color: txtColor,
         fontSize: size,
         fontWeight: fw,
-        fontFamily: "WinkyRough",
+        fontFamily: "Roboto",
         overflow: TextOverflow.ellipsis);
   }
 

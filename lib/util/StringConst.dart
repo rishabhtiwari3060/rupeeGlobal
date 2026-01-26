@@ -59,6 +59,10 @@ class StringConst{
   String support_ticket_text = "Support Ticket";
   String pms_text = "PMS";
   String news_text = "News";
+  String view_all_text = "View All";
+  String privacy_policy_text = "Privacy & Policy";
+  String terms_conditions_text = "Terms & Conditions";
+  String save_text = "Save";
 
 
 
