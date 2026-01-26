@@ -6,11 +6,11 @@ class MyLocalStorage {
   //Keys
   String isLogin = "isLogin";
   String emailOrPhone = "emailOrPhone";
-  String roleId = "roleId";
-  String userId = "userId";
   String authToken = "authToken";
   String userName = "userName";
   String userProfile = "userProfile";
+  String userPhone = "userPhone";
+  String userBalance = "userBalance";
 
 
   //For Storing String value

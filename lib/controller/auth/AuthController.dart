@@ -6,6 +6,7 @@ import 'package:rupeeglobal/util/CommonFunction.dart';
 
 import '../../util/Injection.dart';
 import '../../util/RouteHelper.dart';
+import '../../util/local_storage.dart';
 
 class AuthController extends GetxController{
 
@@ -78,6 +79,8 @@ class AuthController extends GetxController{
 
           Get.toNamed(DI<RouteHelper>().getResetPasswordScreen(),parameters: data);
         }else{
+
+          DI<MyLocalStorage>().setBoolValue(DI<MyLocalStorage>().isLogin,true);
           Get.toNamed(DI<RouteHelper>().getHomeTabScreen());
         }
 
@@ -111,8 +114,17 @@ class AuthController extends GetxController{
       DI<CommonFunction>().hideLoader();
 
       var responseData = response["data"];
+      var userData = responseData["user"];
       if(response["success"].toString() == "true"){
         DI<CommonFunction>().showSuccessSnackBar(response["success"].toString().toLowerCase());
+
+        DI<MyLocalStorage>().setBoolValue(DI<MyLocalStorage>().isLogin,true);
+        DI<MyLocalStorage>().setStringValue(DI<MyLocalStorage>().userName,userData["name"]);
+        DI<MyLocalStorage>().setStringValue(DI<MyLocalStorage>().emailOrPhone,userData["email"]);
+        DI<MyLocalStorage>().setStringValue(DI<MyLocalStorage>().userPhone,userData["phone"]);
+        DI<MyLocalStorage>().setStringValue(DI<MyLocalStorage>().userBalance,userData["balance"]);
+        DI<MyLocalStorage>().setStringValue(DI<MyLocalStorage>().authToken,responseData["access_token"]);
+
         Get.toNamed(DI<RouteHelper>().getHomeTabScreen());
       }
 
@@ -188,4 +200,31 @@ class AuthController extends GetxController{
     }
   }
 
+
+  Future<void> resendVerificationCode(String email)async{
+    isLoading.value = true;
+    DI<CommonFunction>().showLoading();
+    Map<String, String> resendCodeMap = {
+      "email" : email,
+    };
+
+    print("resendVerificationCode :-- $resendCodeMap");
+
+    try{
+      var response = await DI<AuthRepo>().resendVerificationCodeRepo(resendCodeMap);
+      print("resendVerificationCode response :-- $response");
+      isLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+
+      var responseData = response["data"];
+      if(response["success"].toString() == "true"){
+        DI<CommonFunction>().showSuccessSnackBar(response["message"].toString().toLowerCase());
+      }
+
+    }catch(e){
+      isLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+      log("resendVerificationCode exception :- ",error: e.toString());
+    }
+  }
 }

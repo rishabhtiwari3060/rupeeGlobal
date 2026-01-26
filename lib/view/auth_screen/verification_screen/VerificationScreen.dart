@@ -180,6 +180,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
             InkWell(
               onTap: (){
 
+                authController.resendVerificationCode(email);
               },
               child: Container(
                 width: 100.w,

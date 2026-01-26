@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:rupeeglobal/util/local_storage.dart';
 import 'package:sizer/sizer.dart';
+
+import '../../util/Injection.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,6 +18,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     WidgetsFlutterBinding.ensureInitialized();
     super.initState();
+
+    print("token :-- ${DI<MyLocalStorage>().getStringValue(DI<MyLocalStorage>().authToken)}");
   }
 
 

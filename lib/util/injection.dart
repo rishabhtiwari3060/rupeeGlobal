@@ -4,6 +4,7 @@ import 'package:rupeeglobal/network/WebService.dart';
 import 'package:rupeeglobal/repo/auth_repo.dart';
 
 import '../network/ApiService.dart';
+import '../repo/account_repo.dart';
 import 'ColorConst.dart';
 import 'CommonFunction.dart';
 import 'CommonWidget.dart';
@@ -29,6 +30,7 @@ void setup() {
 
 
   DI.registerLazySingleton<AuthRepo>(() => AuthRepo());
+  DI.registerLazySingleton<AccountRepo>(() => AccountRepo());
 
 
 
