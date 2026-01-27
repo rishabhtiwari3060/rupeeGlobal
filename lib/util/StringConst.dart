@@ -17,6 +17,7 @@ class StringConst{
   String login_text = "Login";
   String enter_5_digit_verification_code_text = "Enter 5-digit verification code";
   String enter_your_new_password_text = "Enter your new password";
+  String enter_your_profile_detail_text = "Enter your profile detail";
   String enter_new_password_text = "Enter New Password";
   String enter_confirm_new_password_text = "Confirm New Password";
   String back_to_login_text = "Back to login";
@@ -63,6 +64,9 @@ class StringConst{
   String privacy_policy_text = "Privacy & Policy";
   String terms_conditions_text = "Terms & Conditions";
   String save_text = "Save";
+  String create_new_ticket_text = "Create new ticket";
+  String please_select_prority_text = "please select priority";
+  String please_enter_message_text = "please enter message";
 
 
 

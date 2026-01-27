@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rupeeglobal/controller/account/account_controller.dart';
 import 'package:rupeeglobal/util/ColorConst.dart';
 import 'package:rupeeglobal/util/RouteHelper.dart';
 import 'package:rupeeglobal/util/local_storage.dart';
@@ -20,6 +21,8 @@ class AccountScreen extends StatefulWidget {
 
 class _AccountScreenState extends State<AccountScreen> {
 
+  AccountController accountController = Get.find<AccountController>();
+
   late List<Color> cardColors;
   String firstLetter = "";
 
@@ -29,10 +32,12 @@ class _AccountScreenState extends State<AccountScreen> {
     super.initState();
    cardColors = List.generate(12, (_) => getLightBrightColor());
 
-   if(DI<MyLocalStorage>().getStringValue(DI<MyLocalStorage>().userName).isNotEmpty){
-    firstLetter = DI<MyLocalStorage>().getStringValue(DI<MyLocalStorage>().userName)[0];
-    }
 
+   accountController.getUserProfile().then((value) {
+     if(accountController.userName.value.isNotEmpty){
+       firstLetter = accountController.userName.value[0];
+     }
+   },);
   }
 
   @override
@@ -42,118 +47,111 @@ class _AccountScreenState extends State<AccountScreen> {
       appBar: AppBar(
         backgroundColor:  DI<ColorConst>().whiteColor,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Card(
-              color:  DI<ColorConst>().redColor.withOpacity(0.3),
-
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  children: [
-                    Center(
-                      child:  Card(
-                        color: Colors.white,
-                        elevation: 3.0,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(45.sp),
-                            side: BorderSide(color: DI<ColorConst>().gryColor, width: 1)),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(45.sp),
-                          child: FadeInImage.assetNetwork(
-                            placeholder: DI<ImageConst>().IMAGE_LOADING,
-                            image: "",
-                            imageErrorBuilder: (context, error, stackTrace) {
-                              return Image.asset(
-                                DI<ImageConst>().PERSON_DEFAULT_IMAGE,
-                                height: 45.sp,
-                                width: 45.sp,
-                              );
-                            },
-                            fit: BoxFit.cover,
-                            height: 45.sp,
+      body: Obx(
+        () => accountController.isLoading.value?
+            SizedBox()
+            : SingleChildScrollView(
+          child: Column(
+            children: [
+              Card(
+                color:  DI<ColorConst>().redColor.withOpacity(0.3),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    children: [
+                      Center(
+                        child:  Card(
+                          color: DI<ColorConst>().greenColor.withOpacity(0.7),
+                          elevation: 3.0,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(45.sp),
+                              side: BorderSide(color: DI<ColorConst>().gryColor, width: 1)),
+                          child: SizedBox(
+                              height: 45.sp,
                             width: 45.sp,
-                          ),
+                              child: Center(
+                                child: Text(firstLetter,style:  DI<CommonWidget>()
+                                    .myTextStyle(DI<ColorConst>().redColor, 25.sp, FontWeight.w500),),
+                              )),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(DI<MyLocalStorage>().getStringValue(DI<MyLocalStorage>().userName,),style:  DI<CommonWidget>()
-                        .myTextStyle(DI<ColorConst>().blackColor, 16.sp, FontWeight.w400),),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text(accountController.userName.value,style:  DI<CommonWidget>()
+                          .myTextStyle(DI<ColorConst>().blackColor, 16.sp, FontWeight.w400),),
 
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-           SizedBox(
-              height: 7.w,
-            ),
+             SizedBox(
+                height: 7.w,
+              ),
 
-            customView(Icons.person,cardColors[6], DI<StringConst>().edit_profile_text, (){
-              Get.toNamed(
-                  DI<RouteHelper>().getEditProfileScreen());
+              customView(Icons.person,cardColors[6], DI<StringConst>().edit_profile_text, (){
+                Get.toNamed(
+                    DI<RouteHelper>().getEditProfileScreen());
 
-            }),
-            SizedBox(
-              height: 10,
-            ),
+              }),
+              SizedBox(
+                height: 10,
+              ),
 
-            customView(Icons.support_agent,cardColors[0], DI<StringConst>().support_ticket_text, (){
+              customView(Icons.support_agent,cardColors[0], DI<StringConst>().support_ticket_text, (){
 
-              Get.toNamed(DI<RouteHelper>().getSupportTicketScreen());
+                Get.toNamed(DI<RouteHelper>().getSupportTicketScreen());
 
-            }),
-            SizedBox(
-              height: 10,
-            ),
-            customView(Icons.calculate_outlined, cardColors[1],DI<StringConst>().pms_text, (){
-              Get.toNamed(DI<RouteHelper>().getPmsScreen());
+              }),
+              SizedBox(
+                height: 10,
+              ),
+              customView(Icons.calculate_outlined, cardColors[1],DI<StringConst>().pms_text, (){
+                //Get.toNamed(DI<RouteHelper>().getPmsScreen());
 
-            }),
+              }),
 
-            SizedBox(
-              height: 10,
-            ),
-            customView(Icons.newspaper,cardColors[3], DI<StringConst>().news_text, (){
+              SizedBox(
+                height: 10,
+              ),
+              customView(Icons.newspaper,cardColors[3], DI<StringConst>().news_text, (){
 
-              Get.toNamed(DI<RouteHelper>().getNewsScreen());
-            }),
+                Get.toNamed(DI<RouteHelper>().getNewsScreen());
+              }),
 
-            SizedBox(
-              height: 10,
-            ),
-            customView(Icons.privacy_tip_outlined,cardColors[4], DI<StringConst>().privacy_policy_text, (){
-              var data = {
-                "url": "https://policies.google.com/privacy?hl=en",
-                "screenType": "Privacy Policy",
-              };
+              SizedBox(
+                height: 10,
+              ),
+              customView(Icons.privacy_tip_outlined,cardColors[4], DI<StringConst>().privacy_policy_text, (){
+                var data = {
+                  "url": "https://policies.google.com/privacy?hl=en",
+                  "screenType": "Privacy Policy",
+                };
+                 Get.toNamed(
+                    DI<RouteHelper>().getWebViewScreen(),
+                    parameters: data);
+
+              }),
+              SizedBox(
+                height: 10,
+              ),
+              customView(Icons.privacy_tip_outlined,cardColors[5], DI<StringConst>().terms_conditions_text, (){
+                var data = {
+                  "url": "https://shaadiviha.com/terms-and-conditions",
+                  "screenType": "Terms & Conditions",
+                };
                Get.toNamed(
-                  DI<RouteHelper>().getWebViewScreen(),
-                  parameters: data);
+                    DI<RouteHelper>().getWebViewScreen(),
+                    parameters: data);
 
-            }),
-            SizedBox(
-              height: 10,
-            ),
-            customView(Icons.privacy_tip_outlined,cardColors[5], DI<StringConst>().terms_conditions_text, (){
-              var data = {
-                "url": "https://shaadiviha.com/terms-and-conditions",
-                "screenType": "Terms & Conditions",
-              };
-             Get.toNamed(
-                  DI<RouteHelper>().getWebViewScreen(),
-                  parameters: data);
-
-            }),
-            SizedBox(
-              height: 10,
-            ),
+              }),
+              SizedBox(
+                height: 10,
+              ),
 
 
-          ],
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: Container(

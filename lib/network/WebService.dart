@@ -13,6 +13,8 @@ class WebService extends GetxService{
   String RESET_PASSWORD_END_POINT = "reset-password";
   String RESEND_VERIFICATION_END_POINT = "resend-verification-code";
   String NEWS_END_POINT = "news";
+  String PROFILE_END_POINT = "profile";
+  String TICKETS_POINT = "tickets";
 
 
 
