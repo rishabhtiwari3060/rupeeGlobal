@@ -15,7 +15,7 @@ class CommonWidget {
         color: txtColor,
         fontSize: size,
         fontWeight: fw,
-        fontFamily: "WinkyRough",
+        fontFamily: "Roboto",
         overflow: TextOverflow.ellipsis);
   }
 
@@ -25,9 +25,11 @@ class CommonWidget {
       TextInputType? textInputType,
       IconData? icon,
       int? maxLine,
-      int? minLine,}) {
+      int? minLine,
+      bool? enable}) {
     return TextFormField(
       controller: controller,
+      enabled: enable,
       onTapOutside: (event) {
         FocusManager.instance.primaryFocus?.unfocus();
       },
@@ -55,12 +57,16 @@ class CommonWidget {
               borderRadius: BorderRadius.circular(7.0),
               borderSide:
               BorderSide(color: DI<ColorConst>().gryColor, width: 1.0)),
+          disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(7.0),
+              borderSide:
+              BorderSide(color: DI<ColorConst>().gryColor, width: 1.0)),
           focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(7.0),
               borderSide:
               BorderSide(color: DI<ColorConst>().gryColor, width: 1.0)),
           contentPadding: EdgeInsets.only(top: 10, left: 10, bottom: 0),
-          prefixIcon: Icon(icon, color: DI<ColorConst>().darkGryColor, size: 25)),
+          prefixIcon:icon==null?null: Icon(icon, color: DI<ColorConst>().darkGryColor, size: 25)),
     );
   }
 

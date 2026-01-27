@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rupeeglobal/controller/account/account_controller.dart';
 import 'package:rupeeglobal/util/ColorConst.dart';
 import 'package:rupeeglobal/util/RouteHelper.dart';
 import 'package:rupeeglobal/util/local_storage.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../util/CommonWidget.dart';
+import '../../util/ImageConst.dart';
 import '../../util/Injection.dart';
 import '../../util/RandomColor.dart';
 import '../../util/StringConst.dart';
@@ -19,13 +21,23 @@ class AccountScreen extends StatefulWidget {
 
 class _AccountScreenState extends State<AccountScreen> {
 
+  AccountController accountController = Get.find<AccountController>();
+
   late List<Color> cardColors;
+  String firstLetter = "";
 
   @override
   void initState() {
    WidgetsFlutterBinding.ensureInitialized();
     super.initState();
    cardColors = List.generate(12, (_) => getLightBrightColor());
+
+
+   accountController.getUserProfile().then((value) {
+     if(accountController.userName.value.isNotEmpty){
+       firstLetter = accountController.userName.value[0];
+     }
+   },);
   }
 
   @override
@@ -35,80 +47,111 @@ class _AccountScreenState extends State<AccountScreen> {
       appBar: AppBar(
         backgroundColor:  DI<ColorConst>().whiteColor,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Card(
-              color:  DI<ColorConst>().redColor.withOpacity(0.3),
-
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  children: [
-                    Center(
-                      child: CircleAvatar(
-                        backgroundColor: DI<ColorConst>().greenColor.withOpacity(0.7),
-                        radius: 15.w,
-                        child: Text("R",style:  DI<CommonWidget>()
-                            .myTextStyle(DI<ColorConst>().redColor, 30.sp, FontWeight.w500),),
+      body: Obx(
+        () => accountController.isLoading.value?
+            SizedBox()
+            : SingleChildScrollView(
+          child: Column(
+            children: [
+              Card(
+                color:  DI<ColorConst>().redColor.withOpacity(0.3),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    children: [
+                      Center(
+                        child:  Card(
+                          color: DI<ColorConst>().greenColor.withOpacity(0.7),
+                          elevation: 3.0,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(45.sp),
+                              side: BorderSide(color: DI<ColorConst>().gryColor, width: 1)),
+                          child: SizedBox(
+                              height: 45.sp,
+                            width: 45.sp,
+                              child: Center(
+                                child: Text(firstLetter,style:  DI<CommonWidget>()
+                                    .myTextStyle(DI<ColorConst>().redColor, 25.sp, FontWeight.w500),),
+                              )),
+                        ),
                       ),
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(DI<MyLocalStorage>().getStringValue(DI<MyLocalStorage>().userName,),style:  DI<CommonWidget>()
-                        .myTextStyle(DI<ColorConst>().blackColor, 16.sp, FontWeight.w400),),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Text(accountController.userName.value,style:  DI<CommonWidget>()
+                          .myTextStyle(DI<ColorConst>().blackColor, 16.sp, FontWeight.w400),),
 
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-           SizedBox(
-              height: 15.w,
-            ),
+             SizedBox(
+                height: 7.w,
+              ),
 
-            Row(
-              children: [
-                customView(Icons.support_agent,cardColors[0], DI<StringConst>().support_ticket_text, (){
+              customView(Icons.person,cardColors[6], DI<StringConst>().edit_profile_text, (){
+                Get.toNamed(
+                    DI<RouteHelper>().getEditProfileScreen());
 
-                  Get.toNamed(DI<RouteHelper>().getSupportTicketScreen());
+              }),
+              SizedBox(
+                height: 10,
+              ),
 
-                }),
+              customView(Icons.support_agent,cardColors[0], DI<StringConst>().support_ticket_text, (){
 
-                SizedBox(
-                  width: 7,
-                ),
-                customView(Icons.calculate_outlined, cardColors[1],DI<StringConst>().pms_text, (){
-                  Get.toNamed(DI<RouteHelper>().getPmsScreen());
+                Get.toNamed(DI<RouteHelper>().getSupportTicketScreen());
 
-                }),
-              ],
-            ),
+              }),
+              SizedBox(
+                height: 10,
+              ),
+              customView(Icons.calculate_outlined, cardColors[1],DI<StringConst>().pms_text, (){
+                //Get.toNamed(DI<RouteHelper>().getPmsScreen());
+
+              }),
+
+              SizedBox(
+                height: 10,
+              ),
+              customView(Icons.newspaper,cardColors[3], DI<StringConst>().news_text, (){
+
+                Get.toNamed(DI<RouteHelper>().getNewsScreen());
+              }),
+
+              SizedBox(
+                height: 10,
+              ),
+              customView(Icons.privacy_tip_outlined,cardColors[4], DI<StringConst>().privacy_policy_text, (){
+                var data = {
+                  "url": "https://policies.google.com/privacy?hl=en",
+                  "screenType": "Privacy Policy",
+                };
+                 Get.toNamed(
+                    DI<RouteHelper>().getWebViewScreen(),
+                    parameters: data);
+
+              }),
+              SizedBox(
+                height: 10,
+              ),
+              customView(Icons.privacy_tip_outlined,cardColors[5], DI<StringConst>().terms_conditions_text, (){
+                var data = {
+                  "url": "https://shaadiviha.com/terms-and-conditions",
+                  "screenType": "Terms & Conditions",
+                };
+               Get.toNamed(
+                    DI<RouteHelper>().getWebViewScreen(),
+                    parameters: data);
+
+              }),
+              SizedBox(
+                height: 10,
+              ),
 
 
-
-            SizedBox(
-              height: 10,
-            ),
-
-            Row(
-              children: [
-                customView(Icons.newspaper,cardColors[3], DI<StringConst>().news_text, (){
-
-                  Get.toNamed(DI<RouteHelper>().getNewsScreen());
-                }),
-
-                SizedBox(
-                  width: 7,
-                ),
-                Expanded(
-                    flex: 1,
-                    child: SizedBox())
-              ],
-            ),
-
-
-          ],
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: Container(
@@ -124,36 +167,36 @@ class _AccountScreenState extends State<AccountScreen> {
 
 
   /// Profile row
-  Widget customView(
-      IconData icon, Color color, String text, void Function() onTap) {
-    return Expanded(
-      flex: 1,
-      child: InkWell(
-        onTap: onTap,
-        child: Card(
-          color: color.withOpacity(0.5),
-          child: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Column(
-              children: [
-                Icon(
-                  icon,
-                  size: 40,
-                  color: DI<ColorConst>().darkGryColor,
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  text,
-                  style: DI<CommonWidget>().myTextStyle(
-                      DI<ColorConst>().darkGryColor, 15.sp, FontWeight.w400),
-                ),
-              ],
+  Widget customView(IconData icon,Color myColor, String text, void Function() onTap) {
+    return Card(
+      color: DI<ColorConst>().gryColor,//myColor.withOpacity(0.5),
+      elevation: 1.0,
+      margin: EdgeInsets.symmetric(horizontal: 10),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 3),
+        child: InkWell(
+          onTap: onTap,
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            dense: true,
+            leading: Icon(
+              icon,
+              color: DI<ColorConst>().secondColorPrimary,
+            ),
+            title: Text(text,
+                style: DI<CommonWidget>().myTextStyle(
+                    DI<ColorConst>().secondColorPrimary,
+                    15.sp,
+                    FontWeight.w400)),
+            trailing: Icon(
+              Icons.arrow_forward_ios_sharp,
+              size: 17,
+              color: DI<ColorConst>().secondColorPrimary,
             ),
           ),
         ),
       ),
     );
   }
+
 }

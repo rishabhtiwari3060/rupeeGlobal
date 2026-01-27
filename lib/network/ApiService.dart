@@ -106,6 +106,44 @@ class ApiService extends GetxService {
     return returnResponse(response!);
   }
 
+  //For putMethod
+  Future<dynamic> putMethod(
+      String endPoint, Map<String, dynamic>? body,
+      {Map<String, dynamic>? header})
+  async {
+    DIO.Response? response;
+    try {
+      print("baseUrl post--- ${DI<WebService>().BASE_URL}$endPoint");
+      print("header--- $header");
+
+      final formData = DIO.FormData.fromMap(body??{});
+
+      response = await dio.put(
+        "${DI<WebService>().BASE_URL}$endPoint",
+        data: formData,
+        options: DIO.Options(
+          headers: {
+            "Content-Type": "application/json",
+            ...?header,
+          },
+        ),
+      );
+      return returnResponse(response);
+    } catch (e) {
+      if (e is DIO.DioException) {
+        if (e.response != null) {
+          response = e.response;
+          return returnResponse(e.response!);
+        } else {
+          log("Error:-- ${e.message}");
+        }
+      } else {
+        log("NO Dio Error: $e");
+      }
+    }
+    return returnResponse(response!);
+  }
+
   //For multipart method
   Future<dynamic> multipartPostMethod(String endPoint, String profileKeyName,
       String filePath, Map<String, dynamic> body, header)
