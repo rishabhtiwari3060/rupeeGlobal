@@ -27,7 +27,9 @@ class _NewsScreenState extends State<NewsScreen> {
     WidgetsFlutterBinding.ensureInitialized();
     super.initState();
     scrollController = ScrollController()..addListener(_scrollListener);
-    accountController.getNewsList(accountController.page.toString());
+    Future.delayed(Duration.zero,() {
+      accountController.getNewsList(accountController.page.toString());
+    },);
   }
 
   @override

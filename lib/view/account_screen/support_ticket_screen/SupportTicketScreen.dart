@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rupeeglobal/controller/account/account_controller.dart';
+import 'package:rupeeglobal/util/RouteHelper.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../util/ColorConst.dart';
@@ -160,12 +161,18 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
                   Icon(Icons.money, color: Colors.white),
                   Spacer(),
                   Text(
-                    accountController.ticketList[index].priority,
+                    accountController.ticketList[index].priority.toUpperCase(),
                     style: DI<CommonWidget>().myTextStyle(
                         DI<ColorConst>().whiteColor,
                         18,
                         FontWeight.w700),
                   ),
+                  Spacer(),
+                  InkWell(
+                      onTap: (){
+                        Get.toNamed(DI<RouteHelper>().getChatScreen());
+                      },
+                      child: Icon(Icons.chat, color: Colors.white)),
                 ],
               ),
 
