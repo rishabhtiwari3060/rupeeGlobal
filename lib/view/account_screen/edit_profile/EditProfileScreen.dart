@@ -76,7 +76,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               height: 20,
             ),
 
-            Text(DI<StringConst>().user_profile_text,
+            Text(DI<StringConst>().edit_profile_text,
               style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().blackColor, 25.sp, FontWeight.w500),),
 
             Text(DI<StringConst>().enter_your_profile_detail_text,
@@ -133,7 +133,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             SizedBox(
               height: 30.w,
             ),
+            DI<CommonWidget>().myButton(DI<StringConst>().save_text,(){
 
+              if(validation()){
+               accountController.updateProfile(nameCtrl.text.trim(),
+                   mobileCtrl.text.trim(), panNumberCtrl.text.trim());
+              }
+
+
+            }),
           ],
         ),
       ),

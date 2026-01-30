@@ -119,6 +119,7 @@ class AuthController extends GetxController{
         DI<CommonFunction>().showSuccessSnackBar(response["success"].toString().toLowerCase());
 
         DI<MyLocalStorage>().setBoolValue(DI<MyLocalStorage>().isLogin,true);
+        DI<MyLocalStorage>().setStringValue(DI<MyLocalStorage>().userId,userData["id"].toString());
         DI<MyLocalStorage>().setStringValue(DI<MyLocalStorage>().userName,userData["name"]);
         DI<MyLocalStorage>().setStringValue(DI<MyLocalStorage>().emailOrPhone,userData["email"]);
         DI<MyLocalStorage>().setStringValue(DI<MyLocalStorage>().userPhone,userData["phone"]);

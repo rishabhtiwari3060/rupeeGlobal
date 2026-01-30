@@ -170,7 +170,12 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
                   Spacer(),
                   InkWell(
                       onTap: (){
-                        Get.toNamed(DI<RouteHelper>().getChatScreen());
+
+                        var data = {
+                          "id" : accountController.ticketList[index].id.toString()
+                        };
+
+                        Get.toNamed(DI<RouteHelper>().getChatScreen(),parameters: data);
                       },
                       child: Icon(Icons.chat, color: Colors.white)),
                 ],

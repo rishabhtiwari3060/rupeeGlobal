@@ -120,7 +120,7 @@ class ApiService extends GetxService {
 
       response = await dio.put(
         "${DI<WebService>().BASE_URL}$endPoint",
-        data: formData,
+        data: body,
         options: DIO.Options(
           headers: {
             "Content-Type": "application/json",

@@ -1,4 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:rupeeglobal/controller/account/account_controller.dart';
+import 'package:rupeeglobal/model/ChatDetailModel.dart';
+import 'package:rupeeglobal/util/ColorConst.dart';
+import 'package:rupeeglobal/util/CommonWidget.dart';
+import 'package:rupeeglobal/util/local_storage.dart';
+
+import '../../../util/Injection.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -9,47 +17,30 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
 
+  AccountController accountController = Get.find<AccountController>();
+
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  String ticketId = "";
 
-
-  final List<_ChatMessage> _messages = [];
 
   @override
   void initState() {
     WidgetsFlutterBinding.ensureInitialized();
     super.initState();
+    if(Get.parameters["id"]!= null){
+      ticketId = Get.parameters["id"]??"";
+    }
+
+
+    Future.delayed(Duration.zero,() {
+      accountController.getChatDetail(ticketId).then((value) {
+        print(accountController.chatList.length);
+      },);
+    },);
   }
 
 
-  void _sendMessage() {
-    final text = _messageController.text.trim();
-    if (text.isEmpty) return;
-
-
-    setState(() {
-      _messages.add(
-        _ChatMessage(
-          message: text,
-          isMe: true,
-          time: TimeOfDay.now().format(context),
-        ),
-      );
-    });
-
-
-    _messageController.clear();
-
-
-// Auto scroll to bottom
-    Future.delayed(const Duration(milliseconds: 100), () {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,14 +51,16 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       body: Column(
         children: [
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(12),
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                return ChatBubble(message: _messages[index]);
-              },
+          Obx(
+           () =>  Expanded(
+              child: ListView.builder(
+                controller: _scrollController,
+                padding: const EdgeInsets.all(12),
+                itemCount:accountController.chatList.length,
+                itemBuilder: (context, index) {
+                  return ChatBubble(message:accountController.chatList[index]);
+                },
+              ),
             ),
           ),
           _buildInputArea(),
@@ -75,6 +68,7 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
     );
   }
+
   Widget _buildInputArea() {
     return SafeArea(
       child: Padding(
@@ -82,25 +76,19 @@ class _ChatScreenState extends State<ChatScreen> {
         child: Row(
           children: [
             Expanded(
-              child: TextField(
-                controller: _messageController,
-                textInputAction: TextInputAction.send,
-                onSubmitted: (_) => _sendMessage(),
-                decoration: InputDecoration(
-                  hintText: 'Type a message...',
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                ),
-              ),
+              child: DI<CommonWidget>().myTextFormField(
+                  controller: _messageController,
+                  'Type a message...')
             ),
             const SizedBox(width: 6),
             CircleAvatar(
               radius: 22,
+              backgroundColor: DI<ColorConst>().redColor,
               child: IconButton(
-                icon: const Icon(Icons.send),
-                onPressed: _sendMessage,
+                icon:  Icon(Icons.send,color: DI<ColorConst>().whiteColor,),
+                onPressed:(){
+                  _sendMessage();
+                },
               ),
             ),
           ],
@@ -108,11 +96,38 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
     );
   }
+
+
+  void _sendMessage()async {
+    final text = _messageController.text.trim();
+    if (text.isEmpty) return;
+
+    await accountController.sendChatMessage(ticketId,text);
+
+    accountController.chatList.add(
+        Message(id: accountController.chatList.length,
+            message: text,
+            isAdmin: false,
+            userName: DI<MyLocalStorage>().userName,
+            createdAt: DateTime.now()));
+
+    accountController.chatList.refresh();
+    _messageController.clear();
+
+    Future.delayed(const Duration(milliseconds: 100), () {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    });
+  }
+
 }
 
 
 class ChatBubble extends StatelessWidget {
-  final _ChatMessage message;
+  final Message message;
 
 
   const ChatBubble({Key? key, required this.message}) : super(key: key);
@@ -120,9 +135,9 @@ class ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final alignment = message.isMe ? Alignment.centerRight : Alignment.centerLeft;
-    final color = message.isMe ? Colors.blue : Colors.grey.shade300;
-    final textColor = message.isMe ? Colors.white : Colors.black87;
+    final alignment = !message.isAdmin ? Alignment.centerRight : Alignment.centerLeft;
+    final color = !message.isAdmin ? DI<ColorConst>().redColor : Colors.grey.shade300;
+    final textColor = !message.isAdmin ? Colors.white : Colors.black87;
 
 
     return Align(
@@ -138,8 +153,8 @@ class ChatBubble extends StatelessWidget {
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(16),
             topRight: const Radius.circular(16),
-            bottomLeft: message.isMe ? const Radius.circular(16) : Radius.zero,
-            bottomRight: message.isMe ? Radius.zero : const Radius.circular(16),
+            bottomLeft: !message.isAdmin ? const Radius.circular(16) : Radius.zero,
+            bottomRight: !message.isAdmin ? Radius.zero : const Radius.circular(16),
           ),
         ),
         child: Column(
@@ -151,7 +166,7 @@ class ChatBubble extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              message.time,
+              "${message.createdAt}",
               style: TextStyle(color: textColor.withOpacity(0.7), fontSize: 10),
             ),
           ],
@@ -161,16 +176,3 @@ class ChatBubble extends StatelessWidget {
   }
 }
 
-
-class _ChatMessage {
-  final String message;
-  final bool isMe;
-  final String time;
-
-
-  _ChatMessage({
-    required this.message,
-    required this.isMe,
-    required this.time,
-  });
-}

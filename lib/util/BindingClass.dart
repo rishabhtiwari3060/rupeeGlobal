@@ -7,9 +7,9 @@ class BindingClass extends Bindings{
   @override
   void dependencies() {
 
-    Get.lazyPut<AuthController>(() => AuthController());
+    Get.lazyPut<AuthController>(() => AuthController(),fenix: true);
 
-    Get.lazyPut<AccountController>(() => AccountController());
+    Get.lazyPut<AccountController>(() => AccountController(),fenix: true);
 
   }
 
