@@ -7,6 +7,7 @@ class MyLocalStorage {
   String isLogin = "isLogin";
   String emailOrPhone = "emailOrPhone";
   String authToken = "authToken";
+  String userId = "userId";
   String userName = "userName";
   String userProfile = "userProfile";
   String userPhone = "userPhone";

@@ -1,3 +1,4 @@
+
 buildscript {
     repositories {
         google()  // ✅ Required
@@ -11,7 +12,6 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.24"
     }
 }
-
 
 
 allprojects {

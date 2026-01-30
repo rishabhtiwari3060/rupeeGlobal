@@ -68,6 +68,13 @@ class StringConst{
   String please_select_prority_text = "please select priority";
   String please_enter_message_text = "please enter message";
 
+  String starting_balance_text = "Starting Balance";
+  String monthly_contribution_text = "Monthly Contribution";
+  String interest_rate_text = "Interest Rate";
+  String duration_text = "Duration";
+  String calculate_text = "Calculate";
+
+
 
 
   String pleaseText = "Please";
@@ -124,6 +131,7 @@ class StringConst{
   String my_order_text = "My Order";
   String wishlist_text = "Wishlist";
   String edit_profile_text = "Edit Profile";
+  String user_profile_text = "User Profile";
   String my_product_text = "My Product";
   String save_address_text = "Save Address";
   String payment_text = "Payment";

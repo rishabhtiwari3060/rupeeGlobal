@@ -10,6 +10,7 @@ import '../view/account_screen/edit_profile/EditProfileScreen.dart';
 import '../view/account_screen/news_screen/NewsScreen.dart';
 import '../view/account_screen/news_screen/news_detail_screen.dart';
 import '../view/account_screen/pms_screen/PmsScreen.dart';
+import '../view/account_screen/support_ticket_screen/ChatScreen.dart';
 import '../view/account_screen/support_ticket_screen/SupportTicketScreen.dart';
 import '../view/account_screen/webview_screen/WebViewScreen.dart';
 import '../view/auth_screen/forgotpassword_screen/ForgotPasswordScreen.dart';
@@ -43,6 +44,7 @@ class RouteHelper{
   String newsDetailScreen = "/NewsDetailScreen";
   String webViewScreen = "/WebViewScreen";
   String editProfileScreen = "/EditProfileScreen";
+  String chatScreen = "/ChatScreen";
 
 
 
@@ -68,6 +70,7 @@ String getPmsScreen() => pmsScreen;
 String getNewsDetailScreen() => newsDetailScreen;
 String getWebViewScreen() => webViewScreen;
 String getEditProfileScreen() => editProfileScreen;
+String getChatScreen() => chatScreen;
 
 
 
@@ -95,6 +98,7 @@ List<GetPage> get routes =>[
   GetPage(name: newsDetailScreen, page: () =>  SafeArea(child:NewsDetailScreen()),),
   GetPage(name: webViewScreen, page: () =>  SafeArea(child:WebViewScreen()),),
   GetPage(name: editProfileScreen, page: () =>  SafeArea(child:EditProfileScreen()),),
+  GetPage(name: chatScreen, page: () =>  SafeArea(child: ChatScreen()),),
 
 
 
