@@ -133,12 +133,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             SizedBox(
               height: 30.w,
             ),
-            DI<CommonWidget>().myButton(DI<StringConst>().save_text,(){
+           /* DI<CommonWidget>().myButton(DI<StringConst>().save_text,(){
               if(validation()){
                 accountController.updateProfile(nameCtrl.text.trim(),
                     mobileCtrl.text.trim(), panNumberCtrl.text.trim());
               }
-            }),
+            }),*/
           ],
         ),
       ),

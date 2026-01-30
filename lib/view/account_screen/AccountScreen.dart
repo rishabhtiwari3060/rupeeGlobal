@@ -124,7 +124,7 @@ class _AccountScreenState extends State<AccountScreen> {
               ),
               customView(Icons.privacy_tip_outlined,cardColors[4], DI<StringConst>().privacy_policy_text, (){
                 var data = {
-                  "url": "https://policies.google.com/privacy?hl=en",
+                  "url": "https://www.rupeeglobal.in/legal/privacy-policy",
                   "screenType": "Privacy Policy",
                 };
                  Get.toNamed(
@@ -137,7 +137,7 @@ class _AccountScreenState extends State<AccountScreen> {
               ),
               customView(Icons.privacy_tip_outlined,cardColors[5], DI<StringConst>().terms_conditions_text, (){
                 var data = {
-                  "url": "https://shaadiviha.com/terms-and-conditions",
+                  "url": "https://www.rupeeglobal.in/legal/terms-and-condition",
                   "screenType": "Terms & Conditions",
                 };
                Get.toNamed(
