@@ -17,10 +17,10 @@ class PmsScreen extends StatefulWidget {
 }
 
 class _PmsScreenState extends State<PmsScreen> {
-  final startCtrl = TextEditingController(text: "1000");
-  final monthlyCtrl = TextEditingController(text: "500");
-  final rateCtrl = TextEditingController(text: "5");
-  final durationCtrl = TextEditingController(text: "12");
+  final startCtrl = TextEditingController();
+  final monthlyCtrl = TextEditingController();
+  final rateCtrl = TextEditingController();
+  final durationCtrl = TextEditingController();
 
   InterestApplyType selectedType = InterestApplyType.perMonth;
 
