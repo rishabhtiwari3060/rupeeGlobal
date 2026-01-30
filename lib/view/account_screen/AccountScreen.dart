@@ -21,22 +21,24 @@ class AccountScreen extends StatefulWidget {
 
 class _AccountScreenState extends State<AccountScreen> {
 
-  AccountController accountController = Get.find<AccountController>();
 
+  late AccountController accountController;
   late List<Color> cardColors;
-  String firstLetter = "";
+
 
   @override
   void initState() {
    WidgetsFlutterBinding.ensureInitialized();
     super.initState();
    cardColors = List.generate(12, (_) => getLightBrightColor());
+    accountController = Get.find<AccountController>();
 
-
-   accountController.getUserProfile().then((value) {
-     if(accountController.userName.value.isNotEmpty){
-       firstLetter = accountController.userName.value[0];
-     }
+   Future.delayed(Duration.zero,() {
+     accountController.getUserProfile().then((value) {
+       if(accountController.userName.value.isNotEmpty){
+         accountController.firstLetter.value = accountController.userName.value[0];
+       }
+     },);
    },);
   }
 
@@ -70,7 +72,7 @@ class _AccountScreenState extends State<AccountScreen> {
                               height: 45.sp,
                             width: 45.sp,
                               child: Center(
-                                child: Text(firstLetter,style:  DI<CommonWidget>()
+                                child: Text(accountController.firstLetter.value,style:  DI<CommonWidget>()
                                     .myTextStyle(DI<ColorConst>().redColor, 25.sp, FontWeight.w500),),
                               )),
                         ),
@@ -107,7 +109,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 height: 10,
               ),
               customView(Icons.calculate_outlined, cardColors[1],DI<StringConst>().pms_text, (){
-                //Get.toNamed(DI<RouteHelper>().getPmsScreen());
+                Get.toNamed(DI<RouteHelper>().getPmsScreen());
 
               }),
 
@@ -124,7 +126,7 @@ class _AccountScreenState extends State<AccountScreen> {
               ),
               customView(Icons.privacy_tip_outlined,cardColors[4], DI<StringConst>().privacy_policy_text, (){
                 var data = {
-                  "url": "https://policies.google.com/privacy?hl=en",
+                  "url": "https://www.rupeeglobal.in/legal/privacy-policy",
                   "screenType": "Privacy Policy",
                 };
                  Get.toNamed(
@@ -137,7 +139,7 @@ class _AccountScreenState extends State<AccountScreen> {
               ),
               customView(Icons.privacy_tip_outlined,cardColors[5], DI<StringConst>().terms_conditions_text, (){
                 var data = {
-                  "url": "https://shaadiviha.com/terms-and-conditions",
+                  "url": "https://www.rupeeglobal.in/legal/terms-and-condition",
                   "screenType": "Terms & Conditions",
                 };
                Get.toNamed(

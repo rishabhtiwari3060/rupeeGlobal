@@ -2,10 +2,12 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rupeeglobal/model/ChatDetailModel.dart';
 import 'package:rupeeglobal/model/TicketModel.dart';
 import 'package:rupeeglobal/model/news_model.dart';
 import 'package:rupeeglobal/repo/account_repo.dart';
 import 'package:rupeeglobal/util/CommonFunction.dart';
+import 'package:rupeeglobal/util/local_storage.dart';
 
 import '../../util/Injection.dart';
 
@@ -15,6 +17,7 @@ class AccountController extends GetxController{
   var isLoading = false.obs;
   var page = 1;
 
+  var firstLetter = "".obs;
   var newsModel = Rxn<NewsModel>();
   var newsList = <News>[].obs;
   bool isScroll = true;
@@ -27,6 +30,10 @@ class AccountController extends GetxController{
   /// Ticket
   var ticketModel = Rxn<TicketModel>();
   var ticketList = <Ticket>[].obs;
+
+  ///Chat detail
+  var chatModel = Rxn<ChatDetailModel>();
+  var chatList = <Message>[].obs;
 
 
   Future<void> getNewsList(String page)async{
@@ -88,7 +95,6 @@ class AccountController extends GetxController{
     }
 
   }
-
 
   Future<void> getTicketList(String status,String priority,String page)async{
 
@@ -164,8 +170,6 @@ class AccountController extends GetxController{
     }
   }
 
-
-
   Future<void> updateProfile(String name,String phone,String panNo)async{
 
     DI<CommonFunction>().showLoading();
@@ -187,7 +191,8 @@ class AccountController extends GetxController{
       if(response["success"].toString() == "true"){
         userName.value = response["data"]["name"].toString();
         userName.refresh();
-
+        firstLetter.value = userName.value[0];
+        firstLetter.refresh();
         Get.back();
       }
 
@@ -197,4 +202,48 @@ class AccountController extends GetxController{
       log("Exception createTicket :- ",error: e.toString());
     }
   }
+
+  Future<void> getChatDetail(String ticketId)async{
+    isLoading.value = true;
+    chatList.clear();
+    DI<CommonFunction>().showLoading();
+    try {
+      var response = await DI<AccountRepo>().getChatDetailRepo(ticketId);
+      isLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+
+      chatModel.value = response;
+      chatList.addAll(chatModel.value?.data?.messages??[]);
+
+    }catch(e){
+      isLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+
+      log("Exception getChatDetail :- ",error: e.toString());
+    }
+  }
+
+  Future<void> sendChatMessage(String ticketId, String msg)async{
+    isLoading.value = true;
+    //DI<CommonFunction>().showLoading();
+
+    Map<String,String> sendChatMap = {
+      "message" : msg
+    };
+    print("sendChatMap :- $sendChatMap");
+
+    try {
+      var response = await DI<AccountRepo>().sendMessageRepo(ticketId,sendChatMap);
+      isLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+
+
+    }catch(e){
+      isLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+
+      log("Exception sendChatMessage :- ",error: e.toString());
+    }
+  }
+
 }

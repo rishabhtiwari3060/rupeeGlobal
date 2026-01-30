@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:get/get.dart';
+import 'package:rupeeglobal/model/ChatDetailModel.dart';
 import 'package:rupeeglobal/model/TicketModel.dart';
 import 'package:rupeeglobal/model/news_model.dart';
 import 'package:rupeeglobal/util/Extension.dart';
@@ -35,7 +36,6 @@ class AccountRepo extends GetxService{
     return ticketModelFromJson(jsonEncode(response.data));
   }
 
-
   Future<dynamic> createTicketRepo(Map<String, String> body)async{
     var response = await DI<ApiService>().postMethod(DI<WebService>().TICKETS_POINT,body,
         header: mainHeader());
@@ -44,12 +44,28 @@ class AccountRepo extends GetxService{
     return response.data;
   }
 
-
   Future<dynamic> updateProfileRepo(Map<String, String> body)async{
     var response = await DI<ApiService>().putMethod(DI<WebService>().PROFILE_END_POINT,body,
         header: mainHeader());
 
     print("updateProfileRepo response :-- $response");
+    return response.data;
+  }
+
+  Future<dynamic> getChatDetailRepo(String ticketId)async{
+    var response = await DI<ApiService>().getMethod("${DI<WebService>().TICKETS_POINT}/$ticketId",
+        header: mainHeader());
+
+    print("getChatDetailRepo response :-- $response");
+    return chatDetailModelFromJson(jsonEncode(response.data));
+  }
+
+  Future<dynamic> sendMessageRepo(String ticketId,Map<String,String> body)async{
+    var response = await DI<ApiService>().postMethod("${DI<WebService>().TICKETS_POINT}/$ticketId/message",
+        body,
+        header: mainHeader());
+
+    print("sendMessageRepo response :-- $response");
     return response.data;
   }
 

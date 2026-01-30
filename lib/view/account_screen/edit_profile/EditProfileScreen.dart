@@ -134,10 +134,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               height: 30.w,
             ),
             DI<CommonWidget>().myButton(DI<StringConst>().save_text,(){
+
               if(validation()){
-                accountController.updateProfile(nameCtrl.text.trim(),
-                    mobileCtrl.text.trim(), panNumberCtrl.text.trim());
+               accountController.updateProfile(nameCtrl.text.trim(),
+                   mobileCtrl.text.trim(), panNumberCtrl.text.trim());
               }
+
+
             }),
           ],
         ),
@@ -145,60 +148,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget profileViewCard() {
-    return Center(
-      child: Obx(
-            () {
-          return Stack(children: [
-            Card(
-              color: Colors.white,
-              elevation: 3.0,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(45.sp),
-                  side: BorderSide(color: DI<ColorConst>().gryColor, width: 1)),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(45.sp),
-                child: imageFile.value != null
-                    ? Image.file(imageFile.value!, height: 45.sp, width: 45.sp)
-                    : FadeInImage.assetNetwork(
-                  placeholder: DI<ImageConst>().IMAGE_LOADING,
-                  image: "",
-                  imageErrorBuilder: (context, error, stackTrace) {
-                    return Image.asset(
-                      DI<ImageConst>().PERSON_DEFAULT_IMAGE,
-                      height: 45.sp,
-                      width: 45.sp,
-                    );
-                  },
-                  fit: BoxFit.cover,
-                  height: 45.sp,
-                  width: 45.sp,
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 9.0,
-              right: 10.0,
-              child: InkWell(
-                onTap: () async {
-                  print("Pick image");
-                  await DI<CommonFunction>().selectImage().then(
-                        (value) {
-                      imageFile.value = value;
-                    },
-                  );
-                },
-                child: Image.asset(
-                  DI<ImageConst>().blackCameraIcon,
-                  height: 21.sp,
-                ),
-              ),
-            )
-          ]);
-        },
-      ),
-    );
-  }
 
 
 
