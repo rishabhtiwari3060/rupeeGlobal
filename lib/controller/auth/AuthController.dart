@@ -81,7 +81,7 @@ class AuthController extends GetxController{
         }else{
 
           DI<MyLocalStorage>().setBoolValue(DI<MyLocalStorage>().isLogin,true);
-          Get.toNamed(DI<RouteHelper>().getHomeTabScreen());
+          Get.offAllNamed(DI<RouteHelper>().getHomeTabScreen());
         }
 
 
@@ -126,7 +126,7 @@ class AuthController extends GetxController{
         DI<MyLocalStorage>().setStringValue(DI<MyLocalStorage>().userBalance,userData["balance"]);
         DI<MyLocalStorage>().setStringValue(DI<MyLocalStorage>().authToken,responseData["access_token"]);
 
-        Get.toNamed(DI<RouteHelper>().getHomeTabScreen());
+        Get.offAllNamed(DI<RouteHelper>().getHomeTabScreen());
       }
 
     }catch(e){
