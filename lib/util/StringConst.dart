@@ -78,6 +78,7 @@ class StringConst{
   String regular_text = "Regular";
   String mtf_text = "MTF";
   String strategy_text = "Strategy";
+  String portfolio_summary_text = "Portfolio Summary";
 
 
 
