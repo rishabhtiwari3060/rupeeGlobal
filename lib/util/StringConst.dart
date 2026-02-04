@@ -73,6 +73,12 @@ class StringConst{
   String interest_rate_text = "Interest Rate";
   String duration_text = "Duration";
   String calculate_text = "Calculate";
+  String positions_text = "Positions";
+  String holdings_text = "Holdings";
+  String regular_text = "Regular";
+  String mtf_text = "MTF";
+  String strategy_text = "Strategy";
+
 
 
 
