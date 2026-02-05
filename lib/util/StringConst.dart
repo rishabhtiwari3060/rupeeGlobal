@@ -78,6 +78,21 @@ class StringConst{
   String regular_text = "Regular";
   String mtf_text = "MTF";
   String strategy_text = "Strategy";
+  String portfolio_summary_text = "Portfolio Summary";
+  String funds_balance_text = "Funds & Balance";
+  String funds_text = "Funds";
+  String add_fund_text = "Add Fund";
+  String withdraw_funds_text = "Withdraw Fund";
+  String transaction_history_text = "Transaction History";
+  String request_add_fund_text = "Request to Add Fund";
+  String request_withdraw_fund_text = "Request to Withdraw Fund";
+  String amount_text = "Amount (₹)";
+  String upi_id_text = "UPI ID";
+  String upi_name_text = "UPI Name";
+  String notes_text = "Notes (Optional)";
+  String submit_fund_request_text = "Submit Add Fund Request";
+  String submit_withdrawal_request_text = "Submit withdrawal Request";
+  String available_balance_text = "Available Balance : ";
 
 
 
