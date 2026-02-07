@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:rupeeglobal/util/RouteHelper.dart';
+import 'package:rupeeglobal/util/StringConst.dart';
 import 'package:rupeeglobal/util/local_storage.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../util/BeepDot.dart';
+import '../../util/ColorConst.dart';
+import '../../util/CommonWidget.dart';
+import '../../util/FixedRangeIndicator.dart';
 import '../../util/Injection.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,15 +25,195 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     WidgetsFlutterBinding.ensureInitialized();
     super.initState();
-
     print("token :-- ${DI<MyLocalStorage>().getStringValue(DI<MyLocalStorage>().authToken)}");
   }
 
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text("Home Screen",style: TextStyle(fontSize: 20.sp),),
+    return Scaffold(
+      appBar: AppBar(
+        title:  Row(
+          children: [
+            Expanded(
+              flex: 1,
+              child: Center(
+                child: Text(DI<StringConst>().market_indices_text,
+                  style: DI<CommonWidget>().myTextStyle(
+                      DI<ColorConst>().secondColorPrimary,
+                      20,
+                      FontWeight.w500),),
+              ),
+            ),
+
+            SizedBox(
+              width: 5,
+            ),
+
+            Expanded(
+              flex: 1,
+              child: Center(
+                child: Text("",//DI<StringConst>().forex_pairs_text,
+                  style: DI<CommonWidget>().myTextStyle(
+                      DI<ColorConst>().blackColor,
+                      20,
+                      FontWeight.w500),),
+              ),
+            )
+          ],
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+        marketIndicesColumn()
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget marketIndicesColumn(){
+    return Column(
+      children: [
+       ListView.builder(
+         shrinkWrap: true,
+         itemCount: 6,
+         physics: NeverScrollableScrollPhysics(),
+         itemBuilder: (context, index) {
+         return  InkWell(
+           onTap: (){
+             Get.toNamed(DI<RouteHelper>().getChartScreen());
+           },
+           child: Card(
+             color: DI<ColorConst>().whiteColor,
+             elevation: 0.5,
+             shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(7)),
+             child: Padding(
+               padding: const EdgeInsets.all(8.0),
+               child: Column(
+                 crossAxisAlignment: CrossAxisAlignment.start,
+                 children: [
+                   Row(
+                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                     children: [
+                       Text("SENSEX", style: DI<CommonWidget>().myTextStyle(
+                           DI<ColorConst>().blackColor,
+                           15,
+                           FontWeight.w500),),
+
+                       Row(
+                         children: [
+                           BeepDot(),
+                           SizedBox(width: 6),
+                           Text("Live",style: DI<CommonWidget>().myTextStyle(
+                               DI<ColorConst>().blackColor,
+                               15,
+                               FontWeight.w500),),
+                         ],
+                       ),
+
+                     ],
+                   ),
+                   SizedBox(height: 10,),
+                   Text("83,580.4", style: DI<CommonWidget>().myTextStyle(
+                       DI<ColorConst>().dark_greenColor,
+                       20,
+                       FontWeight.w500),),
+                   SizedBox(height: 5,),
+                   Row(
+                     children: [
+                       Icon(Icons.arrow_upward,color:  DI<ColorConst>().dark_greenColor,size: 17,),
+                       SizedBox(width: 3,),
+                       Text("+266.47 (+0.32%)", style: DI<CommonWidget>().myTextStyle(
+                           DI<ColorConst>().dark_greenColor,
+                           17,
+                           FontWeight.w500),),
+                     ],
+                   ),
+                   SizedBox(height: 10,),
+                   Divider(),
+                   SizedBox(height: 10,),
+                   Text("Day's High/Low", style: DI<CommonWidget>().myTextStyle(
+                       DI<ColorConst>().darkGryColor,
+                       11,
+                       FontWeight.w400),),
+
+                   FixedRangeIndicator(
+                     min: 82925.35,
+                     max: 83612.12,
+                     value: 83350.00, // 👈 YOU control this
+                   ),
+
+                   SizedBox(height: 10,),
+                   Divider(),
+                   SizedBox(height: 10,),
+                   Row(
+                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                     children: [
+                       Text("Open", style: DI<CommonWidget>().myTextStyle(
+                           DI<ColorConst>().darkGryColor,
+                           11,
+                           FontWeight.w400),),
+
+                       Text("Previous Close", style: DI<CommonWidget>().myTextStyle(
+                           DI<ColorConst>().darkGryColor,
+                           11,
+                           FontWeight.w400),),
+                     ],
+                   ),
+                   SizedBox(height: 5,),
+                   Row(
+                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                     children: [
+                       Text("83,234.05", style: DI<CommonWidget>().myTextStyle(
+                           DI<ColorConst>().blackColor,
+                           15,
+                           FontWeight.w500),),
+
+                       Text("83,313.93", style: DI<CommonWidget>().myTextStyle(
+                           DI<ColorConst>().blackColor,
+                           15,
+                           FontWeight.w500),),
+                     ],
+                   ),
+                   SizedBox(height: 10,),
+                   Row(
+                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                     children: [
+                       Text("High", style: DI<CommonWidget>().myTextStyle(
+                           DI<ColorConst>().darkGryColor,
+                           11,
+                           FontWeight.w400),),
+
+                       Text("Low", style: DI<CommonWidget>().myTextStyle(
+                           DI<ColorConst>().darkGryColor,
+                           11,
+                           FontWeight.w400),),
+                     ],
+                   ),
+                   SizedBox(height: 5,),
+                   Row(
+                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                     children: [
+                       Text("83,612.12", style: DI<CommonWidget>().myTextStyle(
+                           DI<ColorConst>().dark_greenColor,
+                           15,
+                           FontWeight.w500),),
+
+                       Text("82,925.35", style: DI<CommonWidget>().myTextStyle(
+                           DI<ColorConst>().redColor,
+                           15,
+                           FontWeight.w500),),
+                     ],
+                   ),
+                 ],
+               ),
+             ),
+           ),
+         );
+       },)
+      ],
     );
   }
 }

@@ -93,6 +93,9 @@ class StringConst{
   String submit_fund_request_text = "Submit Add Fund Request";
   String submit_withdrawal_request_text = "Submit withdrawal Request";
   String available_balance_text = "Available Balance : ";
+  String market_indices_text = "Market Indices";
+  String forex_pairs_text = "Top 10 Forex Pairs";
+  String option_chain_text = "Option Chain";
 
 
 
