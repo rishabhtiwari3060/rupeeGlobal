@@ -96,6 +96,8 @@ class StringConst{
   String market_indices_text = "Market Indices";
   String forex_pairs_text = "Top 10 Forex Pairs";
   String option_chain_text = "Option Chain";
+  String pay_amount_text = "Pay Amount";
+  String i_have_paid_text = "I Have Paid";
 
 
 

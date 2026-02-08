@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rupeeglobal/controller/home_tab/HomeTabController.dart';
+import 'package:rupeeglobal/util/RouteHelper.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../util/ColorConst.dart';
@@ -15,11 +17,19 @@ class WatchlistScreen extends StatefulWidget {
 }
 
 class _WatchlistScreenState extends State<WatchlistScreen> {
+
+  HomeTabController homeTabController = Get.find<HomeTabController>();
+
   var selectType = 0.obs;
+
+
   @override
   void initState() {
     WidgetsFlutterBinding.ensureInitialized();
     super.initState();
+    Future.delayed(Duration.zero,() {
+      homeTabController.getFundList("1");
+    },);
   }
 
   @override
@@ -61,7 +71,7 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
                                 selectType.value == 0
                                     ? DI<ColorConst>().redColor
                                     : DI<ColorConst>().blackColor,
-                                17,
+                                15,
                                 FontWeight.w500),
                           ),
                           Divider(
@@ -90,7 +100,7 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
                                 selectType.value == 1
                                     ? DI<ColorConst>().redColor
                                     : DI<ColorConst>().blackColor,
-                                17,
+                                15,
                                 FontWeight.w500),
                           ),
                           Divider(
@@ -119,11 +129,40 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
                                 selectType.value == 2
                                     ? DI<ColorConst>().redColor
                                     : DI<ColorConst>().blackColor,
-                                17,
+                                15,
                                 FontWeight.w500),
                           ),
                           Divider(
                             color: selectType.value == 2
+                                ? DI<ColorConst>().redColor
+                                : DI<ColorConst>().whiteColor,
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: InkWell(
+                      onTap: () {
+                        selectType.value = 3;
+                      },
+                      child: Column(
+                        children: [
+                          Text(
+                            DI<StringConst>().pay_amount_text,
+                            style: DI<CommonWidget>().myTextStyle(
+                                selectType.value == 3
+                                    ? DI<ColorConst>().redColor
+                                    : DI<ColorConst>().blackColor,
+                                15,
+                                FontWeight.w500),
+                          ),
+                          Divider(
+                            color: selectType.value == 3
                                 ? DI<ColorConst>().redColor
                                 : DI<ColorConst>().whiteColor,
                           )
@@ -138,6 +177,7 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
               ),
 
               if(selectType.value == 0)
+                homeTabController.isLoading.value?SizedBox():
                 fundColumn(),
 
               if(selectType.value == 1)
@@ -145,6 +185,9 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
 
               if(selectType.value == 2)
                 withdrawFundColumn(),
+
+              if(selectType.value == 3)
+                payAmountColumn(),
             ],
           ),
         ),
@@ -160,20 +203,20 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
           children: [
             Expanded(
                 flex: 1,
-                child: fundContainer("Available Balance", "₹ 1,000",DI<ColorConst>().dark_greenColor)),
+                child: fundContainer("Available Balance", "${homeTabController.fundsModel.value?.data.balance}",DI<ColorConst>().dark_greenColor)),
             SizedBox(
               width: 5,
             ),
             Expanded(
                 flex: 1,
-                child: fundContainer("Margin", "5X",DI<ColorConst>().blackColor)),
+                child: fundContainer("Margin", "${homeTabController.fundsModel.value?.data.margin}X",DI<ColorConst>().blackColor)),
 
             SizedBox(
               width: 5,
             ),
             Expanded(
                 flex: 1,
-                child: fundContainer("Total Funds", "₹ 5,000",DI<ColorConst>().blackColor)),
+                child: fundContainer("Total Funds", "${homeTabController.fundsModel.value?.data.totalAdded}",DI<ColorConst>().blackColor)),
           ],
         ),
         SizedBox(
@@ -193,7 +236,7 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
         ListView.separated(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
-          itemCount: 10,
+          itemCount: homeTabController.fundsList.length,
           itemBuilder: (context, index) {
             return Card(
               color: DI<ColorConst>().whiteColor,
@@ -220,7 +263,7 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
                         Expanded(
                           flex:1,
                           child: Text(
-                            "04 Feb 2026, 11:45 AM",
+                            "${homeTabController.fundsList[index].createdAt}",
                             style: DI<CommonWidget>().myTextStyle(
                                 DI<ColorConst>().blackColor,
                                 16,
@@ -243,7 +286,7 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
                         ),
                         SizedBox(width: 5,),
                         Text(
-                          "NIFTY 25000 PE",
+                            "${homeTabController.fundsList[index].positionId}",
                           style: DI<CommonWidget>().myTextStyle(
                               DI<ColorConst>().blackColor,
                               16,
@@ -272,7 +315,7 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
                               Expanded(
                                 flex:1,
                                 child: Text(
-                                  "₹ 5,000",
+                                  "₹ ${homeTabController.fundsList[index].amount}",
                                   style: DI<CommonWidget>().myTextStyle(
                                       DI<ColorConst>().blackColor,
                                       16,
@@ -301,7 +344,7 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
                               Expanded(
                                 flex:0,
                                 child: Text(
-                                  "Credit",
+                                  "${homeTabController.fundsList[index].transactionType}",
                                   style: DI<CommonWidget>().myTextStyle(
                                       DI<ColorConst>().dark_greenColor,
                                       16,
@@ -561,6 +604,142 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
         ),
 
         DI<CommonWidget>().myButton(DI<StringConst>().submit_withdrawal_request_text,(){}),
+      ],
+    );
+  }
+
+  Widget payAmountColumn(){
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ListView.separated(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: 10,
+          itemBuilder: (context, index) {
+            return InkWell(
+              onTap: (){
+                Get.toNamed(DI<RouteHelper>().getPaymentQrDetailScreen());
+              },
+              child: Card(
+                color: DI<ColorConst>().whiteColor,
+                elevation: 0.3,
+                shape: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0),borderSide: BorderSide(color:Colors.transparent)),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+                  child: Column(
+                    spacing: 5,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            flex:0,
+                            child: Text(
+                              "Amount :",
+                              style: DI<CommonWidget>().myTextStyle(
+                                  DI<ColorConst>().darkGryColor,
+                                  15,
+                                  FontWeight.w500),
+                            ),
+                          ),
+                          SizedBox(width: 5,),
+                          Expanded(
+                            flex:1,
+                            child: Text(
+                              "₹10,000.00",
+                              style: DI<CommonWidget>().myTextStyle(
+                                  DI<ColorConst>().blackColor,
+                                  16,
+                                  FontWeight.w600),
+                            ),
+                          ),
+                        ],
+                      ),
+
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Status :",
+                            style: DI<CommonWidget>().myTextStyle(
+                                DI<ColorConst>().darkGryColor,
+                                15,
+                                FontWeight.w500),
+                          ),
+                          SizedBox(width: 5,),
+                          Text(
+                            "Assigned",
+                            style: DI<CommonWidget>().myTextStyle(
+                                DI<ColorConst>().secondColorPrimary,
+                                16,
+                                FontWeight.w500),
+                          ),
+                        ],
+                      ),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            flex:0,
+                            child: Text(
+                              "Assigned Date :",
+                              style: DI<CommonWidget>().myTextStyle(
+                                  DI<ColorConst>().darkGryColor,
+                                  15,
+                                  FontWeight.w500),
+                            ),
+                          ),
+                          SizedBox(width: 5,),
+                          Expanded(
+                            flex:1,
+                            child: Text(
+                              "04-02-2026",
+                              style: DI<CommonWidget>().myTextStyle(
+                                  DI<ColorConst>().blackColor,
+                                  16,
+                                  FontWeight.w500),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            flex:0,
+                            child: Text(
+                              "Payment Date :",
+                              style: DI<CommonWidget>().myTextStyle(
+                                  DI<ColorConst>().darkGryColor,
+                                  15,
+                                  FontWeight.w500),
+                            ),
+                          ),
+                          SizedBox(width: 5,),
+                          Expanded(
+                            flex:1,
+                            child: Text(
+                              "----",
+                              style: DI<CommonWidget>().myTextStyle(
+                                  DI<ColorConst>().blackColor,
+                                  16,
+                                  FontWeight.w500),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }, separatorBuilder: (BuildContext context, int index) {
+          return SizedBox(
+            height: 10,
+          );
+        },)
       ],
     );
   }

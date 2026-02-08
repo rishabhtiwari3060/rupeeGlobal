@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rupeeglobal/controller/home_tab/HomeTabController.dart';
 import 'package:rupeeglobal/util/StringConst.dart';
 import 'package:sizer/sizer.dart';
 
@@ -15,6 +16,9 @@ class OrderScreen extends StatefulWidget {
 }
 
 class _OrderScreenState extends State<OrderScreen> {
+  
+  HomeTabController homeTabController = Get.find<HomeTabController>();
+  
   var selectType = 0.obs;
   var selectHoldingType = 0.obs;
   var selectPositionType = 0.obs;
@@ -23,6 +27,10 @@ class _OrderScreenState extends State<OrderScreen> {
   void initState() {
     WidgetsFlutterBinding.ensureInitialized();
     super.initState();
+    
+    Future.delayed(Duration.zero,() {
+      homeTabController.getHoldingList("1");
+    },);
   }
 
   @override
@@ -91,7 +99,10 @@ class _OrderScreenState extends State<OrderScreen> {
                   ),
                 ],
               ),
-              selectType.value == 0 ? positionsColumn() : holdingColumn(),
+                if(selectType.value == 0)
+                homeTabController.isLoading.value? SizedBox(): positionsColumn(),
+              if(selectType.value != 0)
+              homeTabController.isLoading.value? SizedBox():holdingColumn(),
             ],
           ),
         ),
@@ -209,19 +220,19 @@ class _OrderScreenState extends State<OrderScreen> {
           children: [
             Expanded(
                 flex: 1,
-                child: holdingContainer("Total Invested", "₹ 2,22,500",DI<ColorConst>().blackColor)),
+                child: holdingContainer("Total Invested", "${homeTabController.holdingModel.value?.data.summary.totalInvested}",DI<ColorConst>().blackColor)),
             SizedBox(
               width: 4,
             ),
             Expanded(
                 flex: 1,
-                child: holdingContainer("Total Value", "₹ 2,31,000",DI<ColorConst>().blackColor)),
+                child: holdingContainer("Total Value", "${homeTabController.holdingModel.value?.data.summary.totalValue}",DI<ColorConst>().blackColor)),
             SizedBox(
               width: 4,
             ),
             Expanded(
                 flex: 1,
-                child: holdingContainer("Margin", "₹ 8,500",DI<ColorConst>().dark_greenColor)),
+                child: holdingContainer("Margin", "${homeTabController.holdingModel.value?.data.summary.margin}",DI<ColorConst>().dark_greenColor)),
           ],
         ),
     SizedBox(
@@ -230,7 +241,7 @@ class _OrderScreenState extends State<OrderScreen> {
         ListView.separated(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
-          itemCount: 10,
+          itemCount: homeTabController.holdingList.length,
           itemBuilder: (context, index) {
             return Card(
               color: DI<ColorConst>().whiteColor,
@@ -258,7 +269,7 @@ class _OrderScreenState extends State<OrderScreen> {
                         Expanded(
                           flex:1,
                           child: Text(
-                            "SENSEX 84800 CE",
+                            homeTabController.holdingList[index].symbol.toString(),
                             style: DI<CommonWidget>().myTextStyle(
                                 DI<ColorConst>().blackColor,
                                 16,
@@ -283,7 +294,7 @@ class _OrderScreenState extends State<OrderScreen> {
                         Expanded(
                           flex:1,
                           child: Text(
-                            "Testing Ebussiness",
+                            homeTabController.holdingList[index].companyName.toString(),
                             style: DI<CommonWidget>().myTextStyle(
                                 DI<ColorConst>().blackColor,
                                 16,
@@ -312,7 +323,7 @@ class _OrderScreenState extends State<OrderScreen> {
                               Expanded(
                                 flex:1,
                                 child: Text(
-                                  "1000",
+                                  homeTabController.holdingList[index].quantity.toString(),
                                   style: DI<CommonWidget>().myTextStyle(
                                       DI<ColorConst>().blackColor,
                                       16,
@@ -336,7 +347,7 @@ class _OrderScreenState extends State<OrderScreen> {
                               ),
                               SizedBox(width: 5,),
                               Text(
-                                "₹ 200",
+                                homeTabController.holdingList[index].avgPrice.toString(),
                                 style: DI<CommonWidget>().myTextStyle(
                                     DI<ColorConst>().blackColor,
                                     16,
@@ -367,7 +378,7 @@ class _OrderScreenState extends State<OrderScreen> {
                               Expanded(
                                 flex:1,
                                 child: Text(
-                                  "₹ 210",
+                                  "₹ ${homeTabController.holdingList[index].ltp.toString()}",
                                   style: DI<CommonWidget>().myTextStyle(
                                       DI<ColorConst>().blackColor,
                                       16,
@@ -391,7 +402,7 @@ class _OrderScreenState extends State<OrderScreen> {
                               ),
                               SizedBox(width: 5,),
                               Text(
-                                "₹ 2,10,000",
+                                "₹ ${homeTabController.holdingList[index].value.toString()}",
                                 style: DI<CommonWidget>().myTextStyle(
                                     DI<ColorConst>().blackColor,
                                     16,
@@ -424,11 +435,11 @@ class _OrderScreenState extends State<OrderScreen> {
                               Expanded(
                                 flex:1,
                                 child: Text(
-                                  "₹ 10,000",
+                                  "₹ ${homeTabController.holdingList[index].pnl.toString()}",
                                   style: DI<CommonWidget>().myTextStyle(
-                                      index %2==0?
-                                      DI<ColorConst>().dark_greenColor:
-                                      DI<ColorConst>().redColor,
+                                      homeTabController.holdingList[index].pnl.toString().contains("-")?
+                                      DI<ColorConst>().redColor:
+                                      DI<ColorConst>().dark_greenColor,
                                       16,
                                       FontWeight.w500),
                                 ),
@@ -451,11 +462,11 @@ class _OrderScreenState extends State<OrderScreen> {
                               ),
                               SizedBox(width: 5,),
                               Text(
-                                "5.00%",
+                                "${(homeTabController.holdingList[index].pnlPercent).roundToDouble().toString()}%",
                                 style: DI<CommonWidget>().myTextStyle(
-                                  index %2==0?
-                                    DI<ColorConst>().dark_greenColor:
-                                  DI<ColorConst>().redColor,
+                                    homeTabController.holdingList[index].pnl.toString().contains("-")?
+                                    DI<ColorConst>().redColor:
+                                  DI<ColorConst>().dark_greenColor,
                                     16,
                                     FontWeight.w500),
                               ),
