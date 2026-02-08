@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:rupeeglobal/model/FundModel.dart';
 import 'package:rupeeglobal/model/HoldingModel.dart';
+import 'package:rupeeglobal/model/MarketIndicesModel.dart';
 import 'package:rupeeglobal/model/PortfolioModel.dart';
 
 import '../network/ApiService.dart';
@@ -44,4 +45,21 @@ class HomeTabRepo extends GetxService{
     print("addFundRepo response :-- $response");
     return response.data;
   }
+
+  Future<dynamic> withdrawFundRepo(Map<String,String> body)async{
+    var response = await DI<ApiService>().postMethod(DI<WebService>().WITHDRAW_FUNDS_POINT,body,
+        header: mainHeader());
+
+    print("withdrawFundRepo response :-- $response");
+    return response.data;
+  }
+
+  Future<dynamic> getMarketIndicesRepo()async{
+    var response = await DI<ApiService>().getMethod(DI<WebService>().MARKET_INDICES_POINT,
+        header: mainHeader());
+
+    print("marketIndicesRepo response :-- $response");
+    return marketIndicesModelFromJson(jsonEncode(response.data));
+  }
+
 }

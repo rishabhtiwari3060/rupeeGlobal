@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rupeeglobal/controller/home_tab/HomeTabController.dart';
 import 'package:rupeeglobal/util/RouteHelper.dart';
 import 'package:rupeeglobal/util/StringConst.dart';
 import 'package:rupeeglobal/util/local_storage.dart';
@@ -20,12 +21,17 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
 
+  HomeTabController homeTabController = Get.find<HomeTabController>();
 
   @override
   void initState() {
     WidgetsFlutterBinding.ensureInitialized();
     super.initState();
     print("token :-- ${DI<MyLocalStorage>().getStringValue(DI<MyLocalStorage>().authToken)}");
+
+    Future.delayed(Duration.zero,() {
+      homeTabController.getMarketIndices();
+    },);
   }
 
 
@@ -64,10 +70,12 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-        marketIndicesColumn()
-          ],
+        child: Obx(
+          () =>  Column(
+            children: [
+          marketIndicesColumn()
+            ],
+          ),
         ),
       ),
     );
@@ -78,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
        ListView.builder(
          shrinkWrap: true,
-         itemCount: 6,
+         itemCount: homeTabController.marketIndicesModel.value?.data.length??0,
          physics: NeverScrollableScrollPhysics(),
          itemBuilder: (context, index) {
          return  InkWell(
@@ -97,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
                    Row(
                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                      children: [
-                       Text("SENSEX", style: DI<CommonWidget>().myTextStyle(
+                       Text("${homeTabController.marketIndicesModel.value?.data[index].name}", style: DI<CommonWidget>().myTextStyle(
                            DI<ColorConst>().blackColor,
                            15,
                            FontWeight.w500),),
@@ -116,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
                      ],
                    ),
                    SizedBox(height: 10,),
-                   Text("83,580.4", style: DI<CommonWidget>().myTextStyle(
+                   Text("${homeTabController.marketIndicesModel.value?.data[index].price}", style: DI<CommonWidget>().myTextStyle(
                        DI<ColorConst>().dark_greenColor,
                        20,
                        FontWeight.w500),),

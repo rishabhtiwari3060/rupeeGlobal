@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:get/get.dart';
 import 'package:rupeeglobal/model/FundModel.dart';
 import 'package:rupeeglobal/model/HoldingModel.dart';
+import 'package:rupeeglobal/model/MarketIndicesModel.dart';
 import 'package:rupeeglobal/model/PortfolioModel.dart';
 import 'package:rupeeglobal/repo/home_tab_repo.dart';
 
@@ -25,6 +26,8 @@ class HomeTabController extends GetxService{
   //Funds
   var fundsModel = Rxn<FundModel>();
   var fundsList = <Transaction>[].obs;
+
+  var marketIndicesModel = Rxn<MarketIndicesModel>();
 
   Future<void> getHoldingList(String page)async{
 
@@ -124,7 +127,7 @@ class HomeTabController extends GetxService{
   }
 
 
-  Future<void> addFund(amount)async{
+  Future<bool> addFund(amount)async{
     isLoading.value = true;
     DI<CommonFunction>().showLoading();
 
@@ -138,12 +141,72 @@ class HomeTabController extends GetxService{
       isLoading.value = false;
       DI<CommonFunction>().hideLoader();
 
+      if(response["success"].toString() == "true"){
+
+        DI<CommonFunction>().showSuccessSnackBar(response["message"].toString());
+
+        return true;
+      }
+      return false;
     }catch(e){
       isLoading.value = false;
       DI<CommonFunction>().hideLoader();
       log("Exception addFund :- ",error: e.toString());
+      return false;
     }
+    return false;
+  }
 
+
+  Future<bool> withdrawFund(amount)async{
+    isLoading.value = true;
+    DI<CommonFunction>().showLoading();
+
+    Map<String,String> withdrawFundMap = {
+      "amount" : amount
+    };
+    print("addFundMap :-- $withdrawFundMap");
+
+    try{
+      var response = await DI<HomeTabRepo>().withdrawFundRepo(withdrawFundMap);
+      isLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+
+      if(response["success"].toString() == "true"){
+
+        DI<CommonFunction>().showSuccessSnackBar(response["message"].toString());
+
+        return true;
+      }
+      return false;
+    }catch(e){
+      isLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+      log("Exception withdrawFund :- ",error: e.toString());
+      return false;
+    }
+    return false;
+  }
+
+
+  Future<void> getMarketIndices()async{
+    isLoading.value = true;
+    DI<CommonFunction>().showLoading();
+    marketIndicesModel.value = null;
+
+    try{
+
+      var response = await DI<HomeTabRepo>().getMarketIndicesRepo();
+      isLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+
+      marketIndicesModel.value = response;
+
+    }catch(e){
+      isLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+      log("Exception getMarketIndices :- ",error: e.toString());
+    }
   }
 
 }

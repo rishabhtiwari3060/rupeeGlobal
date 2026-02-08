@@ -17,7 +17,7 @@ class FundModel {
 
   factory FundModel.fromJson(Map<String, dynamic> json) => FundModel(
     success: json["success"],
-    message: json["message"],
+    message: json["message"].toString(),
     data: Data.fromJson(json["data"]),
   );
 
@@ -29,11 +29,11 @@ class FundModel {
 }
 
 class Data {
-  int balance;
-  int margin;
+  String balance;
+  String margin;
   List<Transaction> transactions;
-  int totalAdded;
-  int totalWithdrawn;
+  String totalAdded;
+  String totalWithdrawn;
   Pagination pagination;
 
   Data({
@@ -46,11 +46,11 @@ class Data {
   });
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
-    balance: json["balance"],
-    margin: json["margin"],
+    balance: json["balance"].toString(),
+    margin: json["margin"].toString(),
     transactions: List<Transaction>.from(json["transactions"].map((x) => Transaction.fromJson(x))),
-    totalAdded: json["total_added"],
-    totalWithdrawn: json["total_withdrawn"],
+    totalAdded: json["total_added"].toString(),
+    totalWithdrawn: json["total_withdrawn"].toString(),
     pagination: Pagination.fromJson(json["pagination"]),
   );
 
@@ -65,16 +65,16 @@ class Data {
 }
 
 class Pagination {
-  int currentPage;
-  int perPage;
-  int total;
-  int totalPages;
-  bool hasNextPage;
-  bool hasPrevPage;
-  dynamic nextPage;
-  dynamic prevPage;
-  int from;
-  int to;
+  String currentPage;
+  String perPage;
+  String total;
+  String totalPages;
+  String hasNextPage;
+  String hasPrevPage;
+  String nextPage;
+  String prevPage;
+  String from;
+  String to;
 
   Pagination({
     required this.currentPage,
@@ -90,16 +90,16 @@ class Pagination {
   });
 
   factory Pagination.fromJson(Map<String, dynamic> json) => Pagination(
-    currentPage: json["current_page"],
-    perPage: json["per_page"],
-    total: json["total"],
-    totalPages: json["total_pages"],
-    hasNextPage: json["has_next_page"],
-    hasPrevPage: json["has_prev_page"],
-    nextPage: json["next_page"],
-    prevPage: json["prev_page"],
-    from: json["from"],
-    to: json["to"],
+    currentPage: json["current_page"].toString(),
+    perPage: json["per_page"].toString(),
+    total: json["total"].toString(),
+    totalPages: json["total_pages"].toString(),
+    hasNextPage: json["has_next_page"].toString(),
+    hasPrevPage: json["has_prev_page"].toString(),
+    nextPage: json["next_page"].toString(),
+    prevPage: json["prev_page"].toString(),
+    from: json["from"].toString(),
+    to: json["to"].toString(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -117,14 +117,14 @@ class Pagination {
 }
 
 class Transaction {
-  int id;
+  String id;
   String type;
   String transactionType;
-  int amount;
-  int status;
-  int positionId;
-  DateTime createdAt;
-  DateTime approvedAt;
+  String amount;
+  String status;
+  String positionId;
+  String createdAt;
+  String approvedAt;
 
   Transaction({
     required this.id,
@@ -138,14 +138,14 @@ class Transaction {
   });
 
   factory Transaction.fromJson(Map<String, dynamic> json) => Transaction(
-    id: json["id"],
-    type: json["type"],
-    transactionType: json["transaction_type"],
-    amount: json["amount"],
-    status: json["status"],
-    positionId: json["position_id"],
-    createdAt: DateTime.parse(json["created_at"]),
-    approvedAt: DateTime.parse(json["approved_at"]),
+    id: json["id"].toString(),
+    type: json["type"].toString(),
+    transactionType: json["transaction_type"].toString(),
+    amount: json["amount"].toString(),
+    status: json["status"].toString(),
+    positionId: json["position_id"].toString(),
+    createdAt: json["created_at"].toString(),
+    approvedAt: json["approved_at"].toString(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -155,7 +155,7 @@ class Transaction {
     "amount": amount,
     "status": status,
     "position_id": positionId,
-    "created_at": createdAt.toIso8601String(),
-    "approved_at": approvedAt.toIso8601String(),
+    "created_at": createdAt,
+    "approved_at": approvedAt,
   };
 }

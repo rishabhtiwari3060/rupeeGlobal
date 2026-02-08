@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rupeeglobal/controller/home_tab/HomeTabController.dart';
+import 'package:rupeeglobal/util/CommonFunction.dart';
 import 'package:rupeeglobal/util/RouteHelper.dart';
 import 'package:sizer/sizer.dart';
 
@@ -9,18 +10,26 @@ import '../../util/CommonWidget.dart';
 import '../../util/Injection.dart';
 import '../../util/StringConst.dart';
 
-class WatchlistScreen extends StatefulWidget {
-  const WatchlistScreen({super.key});
+class FundsScreen extends StatefulWidget {
+  const FundsScreen({super.key});
 
   @override
-  State<WatchlistScreen> createState() => _WatchlistScreenState();
+  State<FundsScreen> createState() => _FundsScreenState();
 }
 
-class _WatchlistScreenState extends State<WatchlistScreen> {
+class _FundsScreenState extends State<FundsScreen> {
 
   HomeTabController homeTabController = Get.find<HomeTabController>();
 
   var selectType = 0.obs;
+
+  late TextEditingController amountCtrl;
+  late TextEditingController noteCtrl;
+  late TextEditingController amountWithdrawCtrl;
+  late TextEditingController upiIdWithdrawCtrl;
+  late TextEditingController upiNameWithdrawCtrl;
+  late TextEditingController noteWithdrawCtrl;
+
 
 
   @override
@@ -30,6 +39,14 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
     Future.delayed(Duration.zero,() {
       homeTabController.getFundList("1");
     },);
+
+
+    amountCtrl = TextEditingController();
+    noteCtrl = TextEditingController();
+    amountWithdrawCtrl = TextEditingController();
+    upiIdWithdrawCtrl = TextEditingController();
+    upiNameWithdrawCtrl = TextEditingController();
+    noteWithdrawCtrl = TextEditingController();
   }
 
   @override
@@ -512,6 +529,7 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
         Text(DI<StringConst>().amount_text,
           style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().blackColor, 13.sp, FontWeight.w400),),
         DI<CommonWidget>().myTextFormField(
+          controller: amountCtrl,
             textInputType: TextInputType.number,
             "",
             textInputAction:TextInputAction.next),
@@ -521,6 +539,7 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
         Text(DI<StringConst>().notes_text,
           style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().blackColor, 13.sp, FontWeight.w400),),
         DI<CommonWidget>().myTextFormField(
+            controller: noteCtrl,
             textInputType: TextInputType.text,
             "",
         minLine: 5,
@@ -529,7 +548,18 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
           height: 15.w,
         ),
 
-        DI<CommonWidget>().myButton(DI<StringConst>().submit_fund_request_text,(){}),
+        DI<CommonWidget>().myButton(DI<StringConst>().submit_fund_request_text,(){
+
+          if(validationAddFund()){
+            homeTabController.addFund(amountCtrl.text.trim()).then((value) {
+              if(value){
+                amountCtrl.clear();
+                noteCtrl.clear();
+              }
+            },);
+
+          }
+        }),
       ],
     );
   }
@@ -538,8 +568,6 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
-
         Text(
           DI<StringConst>().request_withdraw_fund_text,
           style: DI<CommonWidget>().myTextStyle(
@@ -553,7 +581,7 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
         ),
 
         Text(
-          "${DI<StringConst>().available_balance_text} ₹1,000.00",
+          "${DI<StringConst>().available_balance_text} ₹${homeTabController.fundsModel.value?.data.balance}",
           style: DI<CommonWidget>().myTextStyle(
               DI<ColorConst>().dark_greenColor,
               15,
@@ -566,6 +594,7 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
         Text(DI<StringConst>().amount_text,
           style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().blackColor, 13.sp, FontWeight.w400),),
         DI<CommonWidget>().myTextFormField(
+          controller: amountWithdrawCtrl,
             textInputType: TextInputType.number,
             "",
             textInputAction:TextInputAction.next),
@@ -576,6 +605,7 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
         Text(DI<StringConst>().upi_id_text,
           style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().blackColor, 13.sp, FontWeight.w400),),
         DI<CommonWidget>().myTextFormField(
+            controller: upiIdWithdrawCtrl,
             textInputType: TextInputType.text,
             "",
             textInputAction:TextInputAction.next),
@@ -586,6 +616,7 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
         Text(DI<StringConst>().upi_name_text,
           style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().blackColor, 13.sp, FontWeight.w400),),
         DI<CommonWidget>().myTextFormField(
+            controller: upiNameWithdrawCtrl,
             textInputType: TextInputType.text,
             "",
             textInputAction:TextInputAction.next),
@@ -595,6 +626,7 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
         Text(DI<StringConst>().notes_text,
           style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().blackColor, 13.sp, FontWeight.w400),),
         DI<CommonWidget>().myTextFormField(
+            controller: noteWithdrawCtrl,
             textInputType: TextInputType.text,
             "",
             minLine: 5,
@@ -603,7 +635,18 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
           height: 15.w,
         ),
 
-        DI<CommonWidget>().myButton(DI<StringConst>().submit_withdrawal_request_text,(){}),
+        DI<CommonWidget>().myButton(DI<StringConst>().submit_withdrawal_request_text,(){
+          if(validationWithdrawFund()){
+            homeTabController.withdrawFund(amountWithdrawCtrl.text.trim()).then((value) {
+              if(value){
+                amountWithdrawCtrl.clear();
+                noteWithdrawCtrl.clear();
+                upiIdWithdrawCtrl.clear();
+                upiNameWithdrawCtrl.clear();
+              }
+            },);
+          }
+        }),
       ],
     );
   }
@@ -744,7 +787,6 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
     );
   }
 
-
   Widget fundContainer(String title, String amount,Color textColor){
     return   Container(
       padding: EdgeInsets.all(10.0),
@@ -773,5 +815,46 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
         ],
       ),
     );
+  }
+
+
+  bool validationAddFund(){
+
+    if(amountCtrl.text.trim().isEmpty){
+
+      DI<CommonFunction>().showErrorSnackBar("Please make sure all fields are filled correctly before continuing");
+      return false;
+    }
+
+    return true;
+  }
+
+
+  bool validationWithdrawFund(){
+
+    if(amountWithdrawCtrl.text.trim().isEmpty || upiIdWithdrawCtrl.text.trim().isEmpty
+        || upiNameWithdrawCtrl.text.trim().isEmpty ){
+
+      DI<CommonFunction>().showErrorSnackBar("Please make sure all fields are filled correctly before continuing");
+      return false;
+    }else if(int.parse(amountWithdrawCtrl.text.trim().toString()) >  int.parse(homeTabController.fundsModel.value?.data.balance.toString()??"0")){
+      DI<CommonFunction>().showErrorSnackBar("Amount should be less then balance");
+      return false;
+    }
+
+    return true;
+  }
+
+
+
+  @override
+  void dispose() {
+    amountCtrl.dispose();
+    noteCtrl.dispose();
+    amountWithdrawCtrl.dispose();
+    upiIdWithdrawCtrl.dispose();
+    upiNameWithdrawCtrl.dispose();
+    noteWithdrawCtrl.dispose();
+    super.dispose();
   }
 }
