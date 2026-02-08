@@ -21,6 +21,7 @@ import '../view/auth_screen/verification_screen/VerificationScreen.dart';
 import '../view/home_screen/ChartScreen.dart';
 import '../view/home_screen/HomeScreen.dart';
 import '../view/splash_screen/SplashScreen.dart';
+import '../view/watchlist_screen/PaymentQrDetailScreen.dart';
 
 
 
@@ -47,6 +48,7 @@ class RouteHelper{
   String editProfileScreen = "/EditProfileScreen";
   String chatScreen = "/ChatScreen";
   String chartScreen = "/ChartScreen";
+  String paymentQrDetailScreen = "/PaymentQrDetailScreen";
 
 
 
@@ -74,6 +76,7 @@ String getWebViewScreen() => webViewScreen;
 String getEditProfileScreen() => editProfileScreen;
 String getChatScreen() => chatScreen;
 String getChartScreen() => chartScreen;
+String getPaymentQrDetailScreen() => paymentQrDetailScreen;
 
 
 
@@ -103,6 +106,7 @@ List<GetPage> get routes =>[
   GetPage(name: editProfileScreen, page: () =>  SafeArea(child:EditProfileScreen()),),
   GetPage(name: chatScreen, page: () =>  SafeArea(child: ChatScreen()),),
   GetPage(name: chartScreen, page: () =>  SafeArea(child: ChartScreen()),),
+  GetPage(name: paymentQrDetailScreen, page: () =>  SafeArea(child: PaymentQrDetailScreen()),),
 
 
 

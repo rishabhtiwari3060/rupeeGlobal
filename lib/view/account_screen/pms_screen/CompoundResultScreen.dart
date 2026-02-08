@@ -22,85 +22,117 @@ class CompoundResultScreen extends StatelessWidget {
         (result.totalContribution / result.endBalance) * 100;
     final profitPercent = 100 - contributionPercent;
 
-    return Scaffold(
-      appBar: AppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Text("Invest ₹$startInvest with the interest rate $interestRate% per year during $durationCtrl months",
-                maxLines: 3,
-                style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().secondColorPrimary, 16.sp, FontWeight.w400),),
-              const SizedBox(height: 20),
-
-              Text(
-                "End Balance",
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Text(
-                result.endBalance.toStringAsFixed(2),
-                style: const TextStyle(
-                  fontSize: 32,
-                  color: Colors.green,
-                  fontWeight: FontWeight.bold,
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(),
+        body: Padding(
+          padding: const EdgeInsets.all(20),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Text("Invest ₹$startInvest with the interest rate $interestRate% per year during $durationCtrl months",
+                  maxLines: 3,
+                  style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().secondColorPrimary, 16.sp, FontWeight.w400),),
+                const SizedBox(height: 20),
+      
+                Text(
+                  "End Balance",
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-              ),
-              const SizedBox(height: 20),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _info("Contribution", result.totalContribution),
-                  _info("Profit", result.profit),
-                ],
-              ),
-
-              const SizedBox(height: 40),
-
-              SizedBox(
-                height: 250,
-                child: PieChart(
-                  PieChartData(
-                    centerSpaceRadius: 70,
-                    sections: [
-                      PieChartSectionData(
-                        value: contributionPercent,
-                        title: "${contributionPercent.toStringAsFixed(1)}%",
-                        color: Colors.red.shade200,
-                        radius: 45,
-                      ),
-                      PieChartSectionData(
-                        value: profitPercent,
-                        title: "${profitPercent.toStringAsFixed(1)}%",
-                        color: Colors.red,
-                        radius: 45,
-                      ),
-                    ],
+                Text(
+                  result.endBalance.toStringAsFixed(2),
+                  style:  TextStyle(
+                    fontSize: 32,
+                    color: DI<ColorConst>().blackColor,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 20),
+      
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _info("Contribution", result.totalContribution,DI<ColorConst>().blackColor),
+                    _info("Profit", result.profit,DI<ColorConst>().dark_greenColor),
+                  ],
+                ),
+      
+                const SizedBox(height: 40),
+      
+                SizedBox(
+                  height: 250,
+                  child: PieChart(
+                    PieChartData(
+                      centerSpaceRadius: 70,
+                      sections: [
+                        PieChartSectionData(
+                          value: contributionPercent,
+                          title: "${contributionPercent.toStringAsFixed(1)}%",
+                          color: Colors.red.shade200,
+                          radius: 45,
+                        ),
+                        PieChartSectionData(
+                          value: profitPercent,
+                          title: "${profitPercent.toStringAsFixed(1)}%",
+                          color: DI<ColorConst>().dark_greenColor,
+                          radius: 45,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+      
+      
+                buildTable(result.monthWiseData),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _info(String label, double value) {
+  Widget _info(String label, double value,Color textColor) {
     return Column(
       children: [
         Text(label, style: const TextStyle(color: Colors.grey)),
         const SizedBox(height: 4),
         Text(
           value.toStringAsFixed(2),
-          style: const TextStyle(
+          style:  TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.green,
+            color: textColor,
           ),
         ),
       ],
+    );
+  }
+
+  Widget buildTable(List<MonthGrowth> data) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: DataTable(
+        columnSpacing: 25,
+        headingRowColor:
+        MaterialStateProperty.all(Colors.grey.shade200),
+        columns: const [
+          DataColumn(label: Text("Month")),
+          DataColumn(label: Text("Interest")),
+          DataColumn(label: Text("Contribution")),
+          DataColumn(label: Text("End Balance")),
+        ],
+        rows: data.map((item) {
+          return DataRow(
+            cells: [
+              DataCell(Text("M${item.month}")),
+              DataCell(Text("₹${item.interest.toStringAsFixed(2)}")),
+              DataCell(Text("₹${item.contribution.toStringAsFixed(2)}")),
+              DataCell(Text("₹${item.endBalance.toStringAsFixed(2)}")),
+            ],
+          );
+        }).toList(),
+      ),
     );
   }
 }

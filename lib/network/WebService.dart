@@ -15,6 +15,11 @@ class WebService extends GetxService{
   String NEWS_END_POINT = "news";
   String PROFILE_END_POINT = "profile";
   String TICKETS_POINT = "tickets";
+  String HOLDING_POINT = "holdings";
+  String REPORT_POINT = "reports";
+  String FUNDS_POINT = "funds";
+  String ADD_FUNDS_POINT = "funds/add";
+  String WITHDRAW_FUNDS_POINT = "funds/withdraw";
 
 
 
