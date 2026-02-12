@@ -4,6 +4,7 @@ import 'package:rupeeglobal/controller/home_tab/HomeTabController.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../util/ColorConst.dart';
+import '../../util/CommonFunction.dart';
 import '../../util/CommonWidget.dart';
 import '../../util/Injection.dart';
 import '../../util/StringConst.dart';
@@ -27,13 +28,6 @@ class CandleData {
   });
 
   bool get isUp => close >= open;
-}
-
-/// CPR (Central Pivot Range) level for horizontal band on chart.
-class CprLevel {
-  final double price;
-  final Color color;
-  CprLevel(this.price, this.color);
 }
 
 class ChartController extends GetxController {
@@ -78,59 +72,6 @@ class _ChartScreenState extends State<ChartScreen> {
   }
 
   @override
-  void dispose() {
-    Get.delete<ChartController>();
-    super.dispose();
-  }
-
-  List<CandleData> _buildSampleCandles(double price, double open, double high, double low) {
-    final list = <CandleData>[];
-    final times = ["01:00", "04:00", "07:00", "10:00", "13:00", "16:00", "19:00", "22:00", "00:00"];
-    double o = open - 100;
-    for (int i = 0; i < times.length; i++) {
-      final range = 150.0 + (i % 3) * 80.0;
-      final c = o + (i.isEven ? -range * 0.5 : range * 0.4);
-      final h = o + range;
-      final l = o - range * 0.6;
-      list.add(CandleData(
-        open: o,
-        high: h,
-        low: l,
-        close: c,
-        volume: 1.2 + (i % 4) * 0.8,
-        timeLabel: times[i],
-      ));
-      o = c;
-    }
-    if (list.isNotEmpty) {
-      final last = list.last;
-      list[list.length - 1] = CandleData(
-        open: open,
-        high: high,
-        low: low,
-        close: price,
-        volume: last.volume,
-        timeLabel: last.timeLabel,
-      );
-    }
-    return list;
-  }
-
-  List<CprLevel> _buildCprLevels(double prevClose) {
-    final h = prevClose + 200;
-    final l = prevClose - 200;
-    final c = prevClose;
-    final p = (h + l + c) / 3;
-    final r1 = 2 * p - l;
-    final s1 = 2 * p - h;
-    return [
-      CprLevel(r1, DI<ColorConst>().dark_greenColor),
-      CprLevel(p, Colors.blue),
-      CprLevel(s1, DI<ColorConst>().redColor),
-    ];
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: DI<ColorConst>().whiteColor,
@@ -145,7 +86,7 @@ class _ChartScreenState extends State<ChartScreen> {
           double low = 0;
           double prevClose = 0;
           String displayName = name;
-          String categoryLabel = isMarketIndex ? "MARKET INDICES" : "FOREX PAIRS";
+          String categoryLabel = isMarketIndex ? "MARKET INDICES" : "FOREX MARKET";
 
           if (isMarketIndex && _homeCtrl.marketIndexDetailModel.value != null) {
             final data = _homeCtrl.marketIndexDetailModel.value!.data;
@@ -169,9 +110,9 @@ class _ChartScreenState extends State<ChartScreen> {
             displayName = data.name;
           }
 
-          // Build candles and CPR levels with current data
-          final candles = _buildSampleCandles(price, open, high, low);
-          final cprLevels = _buildCprLevels(prevClose);
+          // Build candle/line data from API response (depends on selected timeframe)
+          final timeframeIndex = _chartCtrl.selectedTimeframe.value;
+          final candles = _buildSampleCandles(price, open, high, low, timeframeIndex);
 
           final isNegative = change < 0 || changePercent < 0;
           final changeColor = isNegative ? DI<ColorConst>().redColor : DI<ColorConst>().dark_greenColor;
@@ -185,6 +126,9 @@ class _ChartScreenState extends State<ChartScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header: back arrow (Get.back) | title | Option Chain
+                SizedBox(
+                  height: 15,
+                ),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -246,11 +190,11 @@ class _ChartScreenState extends State<ChartScreen> {
                 ),
                 SizedBox(height: 16),
                 // Symbol label + price + change
-                Text(symbol, style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().darkGryColor, 13, FontWeight.w400)),
+                Text("$displayName", style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().darkGryColor, 13, FontWeight.w400)),
                 SizedBox(height: 4),
                 _homeCtrl.isLoading.value 
                     ? Text("Loading...", style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().blackColor, 28, FontWeight.w700))
-                    : Text(price.toStringAsFixed(2), style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().blackColor, 28, FontWeight.w700)),
+                    : Text(DI<CommonFunction>().formatPrice(price, decimalPlaces: isMarketIndex ? 2 : 5), style: DI<CommonWidget>().myTextStyle(changeColor, 28, FontWeight.w700)),
                 SizedBox(height: 4),
                 _homeCtrl.isLoading.value 
                     ? SizedBox()
@@ -263,14 +207,11 @@ class _ChartScreenState extends State<ChartScreen> {
                         child: Center(child: CircularProgressIndicator(color: DI<ColorConst>().secondColorPrimary)),
                       )
                     : SizedBox(
-                        height: 52.h,
-                        child: CandlestickWithVolume(
+                        height: 40.h,
+                        child: LineAreaChart(
                           candles: candles,
-                          cprLevels: cprLevels,
-                          chartHeight: 32.h,
-                          volumeHeight: 14.h,
-                          increaseColor: DI<ColorConst>().dark_greenColor,
-                          decreaseColor: DI<ColorConst>().redColor,
+                          lineColor: changeColor,
+                          isNegative: isNegative,
                         ),
                       ),
                 SizedBox(height: 16),
@@ -280,10 +221,10 @@ class _ChartScreenState extends State<ChartScreen> {
                     : Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _statItem("OPEN", open.toStringAsFixed(2), DI<ColorConst>().blackColor),
-                          _statItem("HIGH", high.toStringAsFixed(2), DI<ColorConst>().dark_greenColor),
-                          _statItem("LOW", low.toStringAsFixed(2), DI<ColorConst>().redColor),
-                          _statItem("PREVIOUS CLOSE", prevClose.toStringAsFixed(2), DI<ColorConst>().blackColor),
+                          _statItem("OPEN", DI<CommonFunction>().formatPrice(open, decimalPlaces: isMarketIndex ? 2 : 5), DI<ColorConst>().blackColor),
+                          _statItem("HIGH", DI<CommonFunction>().formatPrice(high, decimalPlaces: isMarketIndex ? 2 : 5), DI<ColorConst>().dark_greenColor),
+                          _statItem("LOW", DI<CommonFunction>().formatPrice(low, decimalPlaces: isMarketIndex ? 2 : 5), DI<ColorConst>().redColor),
+                          _statItem("PREVIOUS CLOSE", DI<CommonFunction>().formatPrice(prevClose, decimalPlaces: isMarketIndex ? 2 : 5), DI<ColorConst>().blackColor),
                         ],
                       ),
                 SizedBox(height: 24),
@@ -293,6 +234,68 @@ class _ChartScreenState extends State<ChartScreen> {
         }),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    Get.delete<ChartController>();
+    super.dispose();
+  }
+
+  /// Build chart data based on timeframe (matches website: 1D=24, 1W=7, 1M=30, 1Y=12, ALL=60)
+  List<CandleData> _buildSampleCandles(double price, double open, double high, double low, int timeframeIndex) {
+    const timeframes = ['1D', '1W', '1M', '1Y', 'ALL'];
+    const pointsMap = {'1D': 24, '1W': 7, '1M': 30, '1Y': 12, 'ALL': 60};
+    const variationMap = {'1D': 0.01, '1W': 0.02, '1M': 0.03, '1Y': 0.05, 'ALL': 0.08};
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    final tf = timeframes[timeframeIndex.clamp(0, 4)];
+    final points = pointsMap[tf] ?? 24;
+    final variationFactor = variationMap[tf] ?? 0.01;
+    final basePrice = price;
+    final now = DateTime.now();
+    final list = <CandleData>[];
+    final decimals = basePrice < 100 ? 5 : 2;
+
+    for (int i = points - 1; i >= 0; i--) {
+      double c;
+      if (i == 0) {
+        c = price;
+      } else {
+        final variation = ((i / points) - 0.5) * (basePrice * variationFactor);
+        c = double.parse((basePrice + variation).toStringAsFixed(decimals));
+      }
+
+      String timeLabel;
+      if (tf == '1D') {
+        final time = now.subtract(Duration(hours: i));
+        timeLabel = (i % 2 == 0 || i == points - 1 || i == 0)
+            ? '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}'
+            : '';
+      } else if (tf == '1W') {
+        final date = now.subtract(Duration(days: i));
+        timeLabel = '${months[date.month - 1]} ${date.day}';
+      } else if (tf == '1M') {
+        final date = now.subtract(Duration(days: i));
+        timeLabel = (i % 5 == 0 || i == points - 1 || i == 0) ? '${months[date.month - 1]} ${date.day}' : '';
+      } else if (tf == '1Y') {
+        final date = DateTime(now.year, now.month - i, 1);
+        timeLabel = '${months[date.month - 1]} ${date.year.toString().substring(2)}';
+      } else {
+        final date = DateTime(now.year, now.month - i, 1);
+        timeLabel = (i % 3 == 0 || i == points - 1 || i == 0) ? '${months[date.month - 1]} ${date.year.toString().substring(2)}' : '';
+      }
+
+      list.add(CandleData(
+        open: c,
+        high: c + 0.001,
+        low: c - 0.001,
+        close: c,
+        volume: 1.0,
+        timeLabel: timeLabel.isEmpty ? (tf == '1D' ? '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}' : 'Now') : timeLabel,
+      ));
+    }
+    return list;
   }
 
   Widget _statItem(String title, String value, Color color) {
@@ -359,60 +362,71 @@ class _ChartScreenState extends State<ChartScreen> {
   }
 }
 
-/// Candlestick chart with volume bars below and optional CPR levels.
-class CandlestickWithVolume extends StatelessWidget {
-  final List<CandleData> candles;
-  final List<CprLevel> cprLevels;
-  final double chartHeight;
-  final double volumeHeight;
-  final Color increaseColor;
-  final Color decreaseColor;
+String _firstNonEmptyLabel(List<CandleData> c) {
+  for (final x in c) if (x.timeLabel.isNotEmpty) return x.timeLabel;
+  return '';
+}
+String _lastNonEmptyLabel(List<CandleData> c) {
+  for (int i = c.length - 1; i >= 0; i--) if (c[i].timeLabel.isNotEmpty) return c[i].timeLabel;
+  return '';
+}
+String _labelAt(List<CandleData> c, int i) {
+  if (i < c.length && c[i].timeLabel.isNotEmpty) return c[i].timeLabel;
+  for (int j = i; j < c.length; j++) if (c[j].timeLabel.isNotEmpty) return c[j].timeLabel;
+  for (int j = i; j >= 0; j--) if (c[j].timeLabel.isNotEmpty) return c[j].timeLabel;
+  return '';
+}
 
-  const CandlestickWithVolume({
+/// Line chart with area fill (red line + light red gradient), like forex chart.
+class LineAreaChart extends StatelessWidget {
+  final List<CandleData> candles;
+  final Color lineColor;
+  final bool isNegative;
+
+  const LineAreaChart({
     super.key,
     required this.candles,
-    this.cprLevels = const <CprLevel>[],
-    required this.chartHeight,
-    required this.volumeHeight,
-    required this.increaseColor,
-    required this.decreaseColor,
+    required this.lineColor,
+    this.isNegative = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (candles.isEmpty) return SizedBox(height: chartHeight + volumeHeight);
-    final minP = candles.map((c) => c.low).reduce((a, b) => a < b ? a : b);
-    final maxP = candles.map((c) => c.high).reduce((a, b) => a > b ? a : b);
-    final pad = (maxP - minP) * 0.05;
+    if (candles.isEmpty) return SizedBox();
+    final closes = candles.map((c) => c.close).toList();
+    final minP = closes.reduce((a, b) => a < b ? a : b);
+    final maxP = closes.reduce((a, b) => a > b ? a : b);
+    var pad = (maxP - minP) * 0.08;
+    if (pad <= 0) pad = (maxP.abs().clamp(0.001, double.infinity)) * 0.01;
     final priceMin = minP - pad;
     final priceMax = maxP + pad;
     final steps = 5;
     final priceLabels = List.generate(steps + 1, (i) => priceMax - (priceMax - priceMin) * i / steps);
+    final decimals = maxP < 100 ? 5 : 2;
 
     return Column(
       children: [
-        SizedBox(
-          height: chartHeight,
+        Expanded(
           child: Stack(
             children: [
               CustomPaint(
-                painter: CandlestickPainter(
+                painter: LineAreaChartPainter(
                   candles: candles,
-                  cprLevels: cprLevels,
-                  increaseColor: increaseColor,
-                  decreaseColor: decreaseColor,
+                  lineColor: lineColor,
+                  priceMin: priceMin,
+                  priceMax: priceMax,
                 ),
                 size: Size.infinite,
               ),
               Positioned(
                 right: 4,
-                top: 20,
-                bottom: 20,
+                top: 16,
+                bottom: 16,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: priceLabels.map((v) => Text(
-                    v.toStringAsFixed(0),
+                    v.toStringAsFixed(decimals),
                     style: TextStyle(color: DI<ColorConst>().darkGryColor, fontSize: 10),
                   )).toList(),
                 ),
@@ -420,26 +434,15 @@ class CandlestickWithVolume extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(
-          height: volumeHeight,
-          child: CustomPaint(
-            painter: VolumeBarPainter(
-              candles: candles,
-              increaseColor: increaseColor,
-              decreaseColor: decreaseColor,
-            ),
-            size: Size.infinite,
-          ),
-        ),
-        SizedBox(height: 4),
+        SizedBox(height: 6),
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 28),
+          padding: EdgeInsets.symmetric(horizontal: 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(candles.first.timeLabel, style: TextStyle(color: DI<ColorConst>().darkGryColor, fontSize: 10)),
-              Text(candles[candles.length ~/ 2].timeLabel, style: TextStyle(color: DI<ColorConst>().darkGryColor, fontSize: 10)),
-              Text(candles.last.timeLabel, style: TextStyle(color: DI<ColorConst>().darkGryColor, fontSize: 10)),
+              Text(_firstNonEmptyLabel(candles), style: TextStyle(color: DI<ColorConst>().darkGryColor, fontSize: 10)),
+              if (candles.length > 2) Text(_labelAt(candles, candles.length ~/ 2), style: TextStyle(color: DI<ColorConst>().darkGryColor, fontSize: 10)),
+              Text(_lastNonEmptyLabel(candles), style: TextStyle(color: DI<ColorConst>().darkGryColor, fontSize: 10)),
             ],
           ),
         ),
@@ -448,111 +451,84 @@ class CandlestickWithVolume extends StatelessWidget {
   }
 }
 
-class CandlestickPainter extends CustomPainter {
+class LineAreaChartPainter extends CustomPainter {
   final List<CandleData> candles;
-  final List<CprLevel> cprLevels;
-  final Color increaseColor;
-  final Color decreaseColor;
+  final Color lineColor;
+  final double priceMin;
+  final double priceMax;
 
-  CandlestickPainter({
+  LineAreaChartPainter({
     required this.candles,
-    this.cprLevels = const <CprLevel>[],
-    required this.increaseColor,
-    required this.decreaseColor,
+    required this.lineColor,
+    required this.priceMin,
+    required this.priceMax,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     if (candles.isEmpty) return;
-    final minPrice = candles.map((c) => c.low).reduce((a, b) => a < b ? a : b);
-    final maxPrice = candles.map((c) => c.high).reduce((a, b) => a > b ? a : b);
-    final pad = (maxPrice - minPrice) * 0.05;
-    final priceMin = minPrice - pad;
-    final priceMax = maxPrice + pad;
     final priceRange = priceMax - priceMin;
+    if (priceRange <= 0) return;
 
-    final padding = 24.0;
-    final chartW = size.width - padding * 2;
+    final padding = 20.0;
+    final chartW = size.width - padding - 36;
     final chartH = size.height - padding * 2;
     final n = candles.length;
-    final candleW = (chartW / n).clamp(4.0, 24.0);
-    final gap = (chartW - candleW * n) / (n + 1);
 
-    // CPR horizontal lines (dashed) – draw behind candles
-    for (final level in cprLevels) {
-      if (level.price < priceMin || level.price > priceMax) continue;
-      final y = padding + chartH * (1 - (level.price - priceMin) / priceRange);
-      final dashWidth = 6.0;
-      final dashGap = 4.0;
-      double x = padding;
-      final linePaint = Paint()..color = level.color..strokeWidth = 1.5..style = PaintingStyle.stroke;
-      while (x < padding + chartW) {
-        canvas.drawLine(Offset(x, y), Offset(x + dashWidth, y), linePaint);
-        x += dashWidth + dashGap;
-      }
+    // Horizontal grid lines (faint grey)
+    final gridPaint = Paint()
+      ..color = DI<ColorConst>().darkGryColor.withOpacity(0.15)
+      ..strokeWidth = 0.8
+      ..style = PaintingStyle.stroke;
+    for (int i = 0; i <= 5; i++) {
+      final y = padding + chartH * i / 5;
+      canvas.drawLine(Offset(padding, y), Offset(padding + chartW, y), gridPaint);
     }
 
+    // Build line path from close prices
+    final points = <Offset>[];
     for (int i = 0; i < n; i++) {
-      final c = candles[i];
-      final x = padding + gap + (gap + candleW) * i + candleW / 2;
-      final color = c.isUp ? increaseColor : decreaseColor;
-
-      // Wick: high to low
-      final yHigh = padding + chartH * (1 - (c.high - priceMin) / priceRange);
-      final yLow = padding + chartH * (1 - (c.low - priceMin) / priceRange);
-      canvas.drawLine(Offset(x, yHigh), Offset(x, yLow), Paint()..color = color..strokeWidth = 1.5);
-
-      // Body: open to close
-      final yOpen = padding + chartH * (1 - (c.open - priceMin) / priceRange);
-      final yClose = padding + chartH * (1 - (c.close - priceMin) / priceRange);
-      final top = yOpen < yClose ? yOpen : yClose;
-      final bodyH = (yOpen - yClose).abs().clamp(2.0, chartH);
-      final left = x - candleW / 2;
-      final rect = RRect.fromRectAndRadius(Rect.fromLTWH(left, top, candleW, bodyH), Radius.circular(1));
-      canvas.drawRRect(rect, Paint()..color = color);
-      canvas.drawRRect(rect, Paint()..color = color..style = PaintingStyle.stroke..strokeWidth = 1);
+      final close = candles[i].close;
+      final x = padding + (chartW / (n - 1).clamp(1, n)) * i;
+      final y = padding + chartH * (1 - (close - priceMin) / priceRange);
+      points.add(Offset(x, y));
     }
-  }
+    if (points.length < 2) return;
 
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
-}
-
-class VolumeBarPainter extends CustomPainter {
-  final List<CandleData> candles;
-  final Color increaseColor;
-  final Color decreaseColor;
-
-  VolumeBarPainter({
-    required this.candles,
-    required this.increaseColor,
-    required this.decreaseColor,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (candles.isEmpty) return;
-    final maxVol = candles.map((c) => c.volume).reduce((a, b) => a > b ? a : b);
-    if (maxVol <= 0) return;
-
-    final padding = 24.0;
-    final chartW = size.width - padding * 2;
-    final chartH = size.height - padding * 2;
-    final n = candles.length;
-    final barW = (chartW / n).clamp(2.0, 16.0);
-    final gap = (chartW - barW * n) / (n + 1);
-
-    for (int i = 0; i < n; i++) {
-      final c = candles[i];
-      final color = c.isUp ? increaseColor : decreaseColor;
-      final h = chartH * (c.volume / maxVol);
-      final x = padding + gap + (gap + barW) * i;
-      final y = padding + chartH - h;
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(Rect.fromLTWH(x, y, barW, h), Radius.circular(2)),
-        Paint()..color = color,
-      );
+    // Area fill (gradient: line color to white)
+    final fillPath = Path()..moveTo(points[0].dx, points[0].dy);
+    for (int i = 1; i < points.length; i++) {
+      fillPath.lineTo(points[i].dx, points[i].dy);
     }
+    fillPath.lineTo(points.last.dx, padding + chartH);
+    fillPath.lineTo(points.first.dx, padding + chartH);
+    fillPath.close();
+
+    final gradient = LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [
+        lineColor.withOpacity(0.35),
+        lineColor.withOpacity(0.08),
+        Colors.white,
+      ],
+    ).createShader(Rect.fromLTWH(0, 0, chartW, chartH + padding));
+    canvas.drawPath(fillPath, Paint()..shader = gradient);
+
+    // Line
+    final linePath = Path()..moveTo(points[0].dx, points[0].dy);
+    for (int i = 1; i < points.length; i++) {
+      linePath.lineTo(points[i].dx, points[i].dy);
+    }
+    canvas.drawPath(
+      linePath,
+      Paint()
+        ..color = lineColor
+        ..strokeWidth = 2
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round,
+    );
   }
 
   @override

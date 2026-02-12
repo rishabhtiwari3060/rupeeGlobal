@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../util/ColorConst.dart';
+import '../../../util/CommonFunction.dart';
 import '../../../util/CommonWidget.dart';
 import '../../../util/ImageConst.dart';
 import '../../../util/Injection.dart';
@@ -82,7 +83,7 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
               height: 5,
             ),
             Text(
-              "${DateTime.parse(publishedAt).toLocal()}",
+              "${DI<CommonFunction>().formatDate(publishedAt.isEmpty ? null : DateTime.tryParse(publishedAt))}",
               maxLines: 3,
               style: DI<CommonWidget>().myTextStyle(
                   DI<ColorConst>().secondColorPrimary,

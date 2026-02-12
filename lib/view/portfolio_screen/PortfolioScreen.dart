@@ -4,6 +4,7 @@ import 'package:rupeeglobal/controller/home_tab/HomeTabController.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../util/ColorConst.dart';
+import '../../util/CommonFunction.dart';
 import '../../util/CommonWidget.dart';
 import '../../util/Injection.dart';
 import '../../util/StringConst.dart';
@@ -50,7 +51,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         Expanded(
                           child: _statCard(
                               "Total Invested",
-                              "₹${homeTabController.portfolioModel.value?.data.portfolio.totalInvested}",
+                              "₹${DI<CommonFunction>().formatPrice(homeTabController.portfolioModel.value?.data.portfolio.totalInvested)}",
                               DI<ColorConst>().blackColor,
                               Icons.account_balance_wallet_outlined),
                         ),
@@ -58,7 +59,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         Expanded(
                           child: _statCard(
                               "Current Value",
-                              "₹${homeTabController.portfolioModel.value?.data.portfolio.totalValue}",
+                              "₹${DI<CommonFunction>().formatPrice(homeTabController.portfolioModel.value?.data.portfolio.totalValue)}",
                               DI<ColorConst>().blackColor,
                               Icons.trending_up_rounded),
                         ),
@@ -70,7 +71,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         Expanded(
                           child: _statCard(
                               "Total P&L",
-                              "₹${homeTabController.portfolioModel.value?.data.portfolio.totalPnl}",
+                              "₹${DI<CommonFunction>().formatPrice(homeTabController.portfolioModel.value?.data.portfolio.totalPnl)}",
                               DI<ColorConst>().dark_greenColor,
                               Icons.show_chart_rounded),
                         ),
@@ -96,7 +97,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         Expanded(
                           child: _statCard(
                               "Today",
-                              "₹${homeTabController.portfolioModel.value?.data.profitLoss.total}",
+                              "₹${DI<CommonFunction>().formatPrice(homeTabController.portfolioModel.value?.data.profitLoss.today)}",
                               DI<ColorConst>().dark_greenColor,
                               null),
                         ),
@@ -104,7 +105,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         Expanded(
                           child: _statCard(
                               "This Week",
-                              "₹${homeTabController.portfolioModel.value?.data.profitLoss.week}",
+                              "₹${DI<CommonFunction>().formatPrice(homeTabController.portfolioModel.value?.data.profitLoss.week)}",
                               DI<ColorConst>().dark_greenColor,
                               null),
                         ),
@@ -116,7 +117,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         Expanded(
                           child: _statCard(
                               "This Month",
-                              "₹${homeTabController.portfolioModel.value?.data.profitLoss.month}",
+                              "₹${DI<CommonFunction>().formatPrice(homeTabController.portfolioModel.value?.data.profitLoss.month)}",
                               DI<ColorConst>().dark_greenColor,
                               null),
                         ),
@@ -124,8 +125,54 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         Expanded(
                           child: _statCard(
                               "This Year",
-                              "₹${homeTabController.portfolioModel.value?.data.profitLoss.year}",
+                              "₹${DI<CommonFunction>().formatPrice(homeTabController.portfolioModel.value?.data.profitLoss.year)}",
                               DI<ColorConst>().dark_greenColor,
+                              null),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(height: 24),
+
+                    /// ─── Fund Statistics ────────────────────
+                    _sectionHeader(
+                        Icons.account_balance_outlined, "Fund Statistics"),
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _statCard(
+                              "Current Balance",
+                              "₹${DI<CommonFunction>().formatPrice(homeTabController.portfolioModel.value?.data.funds.currentBalance, decimalPlaces: 0)}",
+                              _fundAmountColor(homeTabController.portfolioModel.value?.data.funds.currentBalance ?? 0),
+                              null),
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: _statCard(
+                              "Total Added",
+                              "₹${DI<CommonFunction>().formatPrice(homeTabController.portfolioModel.value?.data.funds.totalAdded, decimalPlaces: 0)}",
+                              DI<ColorConst>().dark_greenColor,
+                              null),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _statCard(
+                              "Total Withdrawn",
+                              "₹${DI<CommonFunction>().formatPrice(homeTabController.portfolioModel.value?.data.funds.totalWithdrawn, decimalPlaces: 0)}",
+                              DI<ColorConst>().redColor,
+                              null),
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: _statCard(
+                              "Net Deposit",
+                              "₹${DI<CommonFunction>().formatPrice(homeTabController.portfolioModel.value?.data.funds.netDeposit, decimalPlaces: 0)}",
+                              _fundAmountColor(homeTabController.portfolioModel.value?.data.funds.netDeposit ?? 0),
                               null),
                         ),
                       ],
@@ -150,7 +197,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         Expanded(
                           child: _statCard(
                               "Total Positions",
-                              "₹${homeTabController.portfolioModel.value?.data.trades.total}",
+                              "₹${DI<CommonFunction>().formatPrice(homeTabController.portfolioModel.value?.data.trades.total)}",
                               DI<ColorConst>().blackColor,
                               Icons.list_alt_rounded),
                         ),
@@ -158,7 +205,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         Expanded(
                           child: _statCard(
                               "Profitable",
-                              "₹${homeTabController.portfolioModel.value?.data.trades.winning}",
+                              "₹${DI<CommonFunction>().formatPrice(homeTabController.portfolioModel.value?.data.trades.winning)}",
                               DI<ColorConst>().dark_greenColor,
                               Icons.thumb_up_alt_outlined),
                         ),
@@ -170,7 +217,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         Expanded(
                           child: _statCard(
                               "Loss Making",
-                              "₹${homeTabController.portfolioModel.value?.data.trades.losing}",
+                              "₹${DI<CommonFunction>().formatPrice(homeTabController.portfolioModel.value?.data.trades.losing)}",
                               DI<ColorConst>().redColor,
                               Icons.thumb_down_alt_outlined),
                         ),
@@ -294,23 +341,23 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           ),
           _fundFlowRow(
             "Today",
-            "₹ ${data.funds.today.added}",
-            "₹ ${data.funds.today.withdrawn}",
-            "₹ ${(data.funds.today.added ?? 0) + (data.funds.today.withdrawn ?? 0)}",
+            "₹ ${DI<CommonFunction>().formatPrice(data.funds.today.added)}",
+            "₹ ${DI<CommonFunction>().formatPrice(data.funds.today.withdrawn)}",
+            "₹ ${DI<CommonFunction>().formatPrice(data.funds.today.added - data.funds.today.withdrawn)}",
           ),
           Divider(height: 0, thickness: 0.5, color: DI<ColorConst>().dividerColor.withOpacity(0.3), indent: 14, endIndent: 14),
           _fundFlowRow(
             "This Month",
-            "₹ ${data.funds.month.added}",
-            "₹ ${data.funds.month.withdrawn}",
-            "₹ ${(data.funds.month.added ?? 0) + (data.funds.month.withdrawn ?? 0)}",
+            "₹ ${DI<CommonFunction>().formatPrice(data.funds.month.added)}",
+            "₹ ${DI<CommonFunction>().formatPrice(data.funds.month.withdrawn)}",
+            "₹ ${DI<CommonFunction>().formatPrice(data.funds.month.added - data.funds.month.withdrawn)}",
           ),
           Divider(height: 0, thickness: 0.5, color: DI<ColorConst>().dividerColor.withOpacity(0.3), indent: 14, endIndent: 14),
           _fundFlowRow(
             "This Year",
-            "₹ ${data.funds.year.added}",
-            "₹ ${data.funds.year.withdrawn}",
-            "₹ ${(data.funds.year.added ?? 0) + (data.funds.year.withdrawn ?? 0)}",
+            "₹ ${DI<CommonFunction>().formatPrice(data.funds.year.added)}",
+            "₹ ${DI<CommonFunction>().formatPrice(data.funds.year.withdrawn)}",
+            "₹ ${DI<CommonFunction>().formatPrice(data.funds.year.added - data.funds.year.withdrawn)}",
           ),
         ],
       ),
@@ -413,9 +460,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                       ),
                     ),
                     Text(
-                      "₹ ${item.amount}",
+                      "₹ ${DI<CommonFunction>().formatPrice(item.amount)}",
                       style: DI<CommonWidget>().myTextStyle(
-                          DI<ColorConst>().redColor, 16.sp, FontWeight.w600),
+                          DI<ColorConst>().blackColor, 16.sp, FontWeight.w600),
                     ),
                   ],
                 ),
@@ -426,7 +473,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         size: 14, color: DI<ColorConst>().darkGryColor),
                     SizedBox(width: 4),
                     Text(
-                      "${item.date}",
+                      "${DI<CommonFunction>().formatDate(item.date)}",
                       style: DI<CommonWidget>().myTextStyle(
                           DI<ColorConst>().secondColorPrimary,
                           14.sp,
@@ -463,7 +510,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                     DI<ColorConst>().blackColor, 16.sp, FontWeight.w600),
               ),
               Text(
-                "₹ ${homeTabController.portfolioModel.value?.data.totalCharges ?? 0}",
+                "₹ ${DI<CommonFunction>().formatPrice(homeTabController.portfolioModel.value?.data.totalCharges ?? 0)}",
                 style: DI<CommonWidget>().myTextStyle(
                     DI<ColorConst>().blackColor, 17.sp, FontWeight.w700),
               ),
@@ -472,6 +519,13 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         ),
       ],
     );
+  }
+
+  /// Color for fund amount: green if positive, red if negative, black if zero
+  Color _fundAmountColor(num value) {
+    if (value > 0) return DI<ColorConst>().dark_greenColor;
+    if (value < 0) return DI<ColorConst>().redColor;
+    return DI<ColorConst>().blackColor;
   }
 
   /// Format long percentages

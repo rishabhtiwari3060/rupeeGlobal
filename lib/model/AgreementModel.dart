@@ -57,6 +57,7 @@ class Agreement {
   String createdAt;
   bool hasSignedDocument;
   String? content;  // Available in detail response
+  String? downloadUrl;  // Available in detail response - direct PDF download link
   String? signedDocumentUrl;  // Available in detail response
 
   Agreement({
@@ -67,6 +68,7 @@ class Agreement {
     required this.createdAt,
     required this.hasSignedDocument,
     this.content,
+    this.downloadUrl,
     this.signedDocumentUrl,
   });
 
@@ -78,7 +80,8 @@ class Agreement {
     createdAt: json["created_at"] ?? "",
     hasSignedDocument: json["has_signed_document"] ?? false,
     content: json["content"],
-    signedDocumentUrl: json["signed_document_url"],
+    downloadUrl: json["download_url"]?.toString(),
+    signedDocumentUrl: json["signed_document_url"]?.toString(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -89,6 +92,7 @@ class Agreement {
     "created_at": createdAt,
     "has_signed_document": hasSignedDocument,
     "content": content,
+    "download_url": downloadUrl,
     "signed_document_url": signedDocumentUrl,
   };
 

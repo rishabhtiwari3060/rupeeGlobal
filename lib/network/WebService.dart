@@ -24,12 +24,16 @@ class WebService extends GetxService{
   String FOREX_PARIS_POINT = "forex-pairs";
   String POSITIONS_POINT = "positions";
   String AGREEMENTS_POINT = "agreements";
+  String PAY_AMOUNT_POINT = "funds/payment-qr";
+  String PAY_AMOUNT_DETAIL_POINT = "funds/payment-qr/";
 
   // Detail endpoints (use with symbol)
   String getMarketIndexDetailEndpoint(String symbol) => "market-indices/$symbol";
   String getForexPairDetailEndpoint(String symbol) => "forex-pairs/$symbol";
   String getPositionDetailEndpoint(String id) => "positions/$id";
-  
+  String getPaymentQrDetailEndpoint(int id) => "funds/payment-qr/$id";
+  String getPaymentQrMarkPaidEndpoint(int id) => "funds/payment-qr/$id/mark-paid";
+
   // Agreement endpoints
   String getAgreementDetailEndpoint(int id) => "agreements/$id";
   String getAgreementDownloadEndpoint(int id) => "agreements/$id/download";

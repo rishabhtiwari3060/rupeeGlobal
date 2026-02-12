@@ -99,7 +99,15 @@ class AccountController extends GetxController{
 
   Future<void> getTicketList(String status,String priority,String page)async{
 
-    String query = "?status=$status&priority=$priority&page=$page&per_page=20";
+    status = status.removeAllWhitespace;
+    priority = priority.removeAllWhitespace;
+    String query ="";
+    if(status == "allstatus") status = "";
+    if(priority == "allpriority") priority = "";
+
+
+    query = "?status=$status&priority=$priority&page=$page&per_page=20";
+
 
     if(page.toString() == "1"){
       ticketList.clear();
@@ -224,7 +232,7 @@ class AccountController extends GetxController{
     }
   }
 
-  Future<void> sendChatMessage(String ticketId, String msg)async{
+  Future<bool> sendChatMessage(String ticketId, String msg)async{
     isLoading.value = true;
     //DI<CommonFunction>().showLoading();
 
@@ -239,12 +247,18 @@ class AccountController extends GetxController{
       DI<CommonFunction>().hideLoader();
 
 
+      if(response["success"].toString() == "true"){
+        return true;
+      }
+
     }catch(e){
       isLoading.value = false;
       DI<CommonFunction>().hideLoader();
 
       log("Exception sendChatMessage :- ",error: e.toString());
     }
+
+    return false;
   }
 
   // ========== AGREEMENT SECTION ==========
@@ -315,21 +329,34 @@ class AccountController extends GetxController{
       DI<CommonFunction>().hideLoader();
 
       if (response != null && response["success"] == true) {
+        final data = response["data"];
+        String? signedDocUrl;
+        if (data != null) {
+          final agreement = data["agreement"];
+          signedDocUrl = (agreement != null && agreement["signed_document_url"] != null)
+              ? agreement["signed_document_url"].toString()
+              : (data["signed_document_url"] != null
+                  ? data["signed_document_url"].toString()
+                  : null);
+        }
+
         // Update the agreement in the list
         int index = agreementList.indexWhere((a) => a.id == id);
         if (index != -1) {
           agreementList[index].status = "signed";
           agreementList[index].hasSignedDocument = true;
+          if (signedDocUrl != null) agreementList[index].signedDocumentUrl = signedDocUrl;
           agreementList.refresh();
         }
-        
+
         // Refresh agreement detail if viewing
         if (selectedAgreement.value?.id == id) {
           selectedAgreement.value?.status = "signed";
           selectedAgreement.value?.hasSignedDocument = true;
+          if (signedDocUrl != null) selectedAgreement.value?.signedDocumentUrl = signedDocUrl;
           selectedAgreement.refresh();
         }
-        
+
         return true;
       }
       return false;

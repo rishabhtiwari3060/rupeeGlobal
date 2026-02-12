@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../util/ColorConst.dart';
+import '../../../util/CommonFunction.dart';
 import '../../../util/CommonWidget.dart';
 import '../../../util/Injection.dart';
 import 'CompoundResult.dart';
@@ -30,7 +31,7 @@ class CompoundResultScreen extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                Text("Invest ₹$startInvest with the interest rate $interestRate% per year during $durationCtrl months",
+                Text("Invest ₹${DI<CommonFunction>().formatPrice(startInvest)} with the interest rate $interestRate% per year during $durationCtrl months",
                   maxLines: 3,
                   style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().secondColorPrimary, 16.sp, FontWeight.w400),),
                 const SizedBox(height: 20),
@@ -40,7 +41,7 @@ class CompoundResultScreen extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 Text(
-                  result.endBalance.toStringAsFixed(2),
+                  DI<CommonFunction>().formatPrice(result.endBalance, decimalPlaces: 2),
                   style:  TextStyle(
                     fontSize: 32,
                     color: DI<ColorConst>().blackColor,
@@ -98,7 +99,7 @@ class CompoundResultScreen extends StatelessWidget {
         Text(label, style: TextStyle(color: DI<ColorConst>().darkGryColor)),
         const SizedBox(height: 4),
         Text(
-          value.toStringAsFixed(2),
+          DI<CommonFunction>().formatPrice(value, decimalPlaces: 2),
           style:  TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -126,9 +127,9 @@ class CompoundResultScreen extends StatelessWidget {
           return DataRow(
             cells: [
               DataCell(Text("M${item.month}")),
-              DataCell(Text("₹${item.interest.toStringAsFixed(2)}")),
-              DataCell(Text("₹${item.contribution.toStringAsFixed(2)}")),
-              DataCell(Text("₹${item.endBalance.toStringAsFixed(2)}")),
+              DataCell(Text("₹${DI<CommonFunction>().formatPrice(item.interest, decimalPlaces: 2)}")),
+              DataCell(Text("₹${DI<CommonFunction>().formatPrice(item.contribution, decimalPlaces: 2)}")),
+              DataCell(Text("₹${DI<CommonFunction>().formatPrice(item.endBalance, decimalPlaces: 2)}")),
             ],
           );
         }).toList(),

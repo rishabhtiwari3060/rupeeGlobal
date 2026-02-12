@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:rupeeglobal/controller/home_tab/HomeTabController.dart';
 import 'package:rupeeglobal/model/PositionModel.dart';
 import 'package:rupeeglobal/util/StringConst.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../util/ColorConst.dart';
+import '../../util/CommonFunction.dart';
 import '../../util/CommonWidget.dart';
 import '../../util/Injection.dart';
 
@@ -110,7 +110,7 @@ class _OrderScreenState extends State<OrderScreen> {
                 isSelected
                     ? Colors.white
                     : DI<ColorConst>().blackColor,
-                14.sp,
+                12.sp,
                 FontWeight.w500,
               ),
             ),
@@ -187,7 +187,7 @@ class _OrderScreenState extends State<OrderScreen> {
             isSelected
                 ? DI<ColorConst>().secondColorPrimary
                 : DI<ColorConst>().darkGryColor,
-            11.sp,
+            12.sp,
             FontWeight.w500,
           ),
         ),
@@ -210,9 +210,9 @@ class _OrderScreenState extends State<OrderScreen> {
         /// P&L summary cards
         Row(
           children: [
-            Expanded(child: _pnlCard("Day's P&L", "₹ ${totalPnl.toStringAsFixed(2)}", Icons.today_rounded)),
+            Expanded(child: _pnlCard("Day's P&L", "₹ ${DI<CommonFunction>().formatPrice(totalPnl, decimalPlaces: 2)}", Icons.today_rounded)),
             SizedBox(width: 10),
-            Expanded(child: _pnlCard("Overall P&L", "₹ ${totalPnl.toStringAsFixed(2)}", Icons.assessment_outlined)),
+            Expanded(child: _pnlCard("Overall P&L", "₹ ${DI<CommonFunction>().formatPrice(totalPnl, decimalPlaces: 2)}", Icons.assessment_outlined)),
           ],
         ),
         SizedBox(height: 16),
@@ -222,7 +222,7 @@ class _OrderScreenState extends State<OrderScreen> {
           Text(
             "CF (${cfPositions.length})",
             style: DI<CommonWidget>().myTextStyle(
-                DI<ColorConst>().darkGryColor, 13.sp, FontWeight.w500),
+                DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w500),
           ),
           SizedBox(height: 6),
           ListView.separated(
@@ -242,7 +242,7 @@ class _OrderScreenState extends State<OrderScreen> {
           Text(
             "Closed (${closedPositions.length})",
             style: DI<CommonWidget>().myTextStyle(
-                DI<ColorConst>().darkGryColor, 13.sp, FontWeight.w500),
+                DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w500),
           ),
           SizedBox(height: 6),
           ListView.separated(
@@ -268,7 +268,7 @@ class _OrderScreenState extends State<OrderScreen> {
                   Text(
                     "No positions found",
                     style: DI<CommonWidget>().myTextStyle(
-                        DI<ColorConst>().darkGryColor, 14.sp, FontWeight.w500),
+                        DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w500),
                   ),
                 ],
               ),
@@ -318,7 +318,7 @@ class _OrderScreenState extends State<OrderScreen> {
           Text(
             value,
             style: DI<CommonWidget>().myTextStyle(
-                pnlColor, 17.sp, FontWeight.w700),
+                pnlColor, 19.sp, FontWeight.w700),
           ),
         ],
       ),
@@ -329,23 +329,15 @@ class _OrderScreenState extends State<OrderScreen> {
   Widget _positionCard(Position position) {
     final isNegative = position.pnl < 0;
     final pnlColor = isNegative ? DI<ColorConst>().redColor : DI<ColorConst>().dark_greenColor;
-    final pnlText = isNegative 
-        ? "₹ ${position.pnl.toStringAsFixed(2)}" 
-        : "₹ ${position.pnl.toStringAsFixed(2)}";
+    final pnlText = "₹ ${DI<CommonFunction>().formatPrice(position.pnl, decimalPlaces: 2)}";
     final pnlPercentText = isNegative 
         ? "(${position.pnlPercent.toStringAsFixed(2)}%)" 
         : "(${position.pnlPercent.toStringAsFixed(2)}%)";
 
     // Format expiry date
-    String formattedExpiry = position.expiryDate;
-    if (position.expiryDate.isNotEmpty) {
-      try {
-        final date = DateTime.parse(position.expiryDate);
-        formattedExpiry = DateFormat('dd MMM yyyy').format(date);
-      } catch (e) {
-        formattedExpiry = position.expiryDate;
-      }
-    }
+    final formattedExpiry = position.expiryDate.isEmpty
+        ? ""
+        : DI<CommonFunction>().formatDate(position.expiryDate);
 
     return Container(
       padding: EdgeInsets.all(14),
@@ -367,13 +359,13 @@ class _OrderScreenState extends State<OrderScreen> {
                 child: Text(
                   position.symbol,
                   style: DI<CommonWidget>().myTextStyle(
-                      DI<ColorConst>().blackColor, 14.sp, FontWeight.w600),
+                      DI<ColorConst>().blackColor, 12.sp, FontWeight.w600),
                 ),
               ),
               Text(
                 pnlText,
                 style: DI<CommonWidget>().myTextStyle(
-                    pnlColor, 14.sp, FontWeight.w600),
+                    pnlColor, 12.sp, FontWeight.w600),
               ),
             ],
           ),
@@ -391,14 +383,14 @@ class _OrderScreenState extends State<OrderScreen> {
                   Text(
                     "$formattedExpiry · Qty ${position.quantity}",
                     style: DI<CommonWidget>().myTextStyle(
-                        DI<ColorConst>().darkGryColor, 11.sp, FontWeight.w400),
+                        DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w400),
                   ),
                 ],
               ),
               Text(
                 pnlPercentText,
                 style: DI<CommonWidget>().myTextStyle(
-                    pnlColor, 11.sp, FontWeight.w400),
+                    pnlColor, 12.sp, FontWeight.w400),
               ),
             ],
           ),
@@ -420,7 +412,7 @@ class _OrderScreenState extends State<OrderScreen> {
                       size: 15, color: DI<ColorConst>().secondColorPrimary),
                   SizedBox(width: 4),
                   Text(
-                    "Buy ₹ ${position.buyPrice.toStringAsFixed(2)}",
+                    "Buy ₹ ${DI<CommonFunction>().formatPrice(position.buyPrice, decimalPlaces: 2)}",
                     style: DI<CommonWidget>().myTextStyle(
                         DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w400),
                   ),
@@ -432,7 +424,7 @@ class _OrderScreenState extends State<OrderScreen> {
                       size: 15, color: DI<ColorConst>().dark_greenColor),
                   SizedBox(width: 4),
                   Text(
-                    "Sell ₹ ${position.sellPrice.toStringAsFixed(2)}",
+                    "Sell ₹ ${DI<CommonFunction>().formatPrice(position.sellPrice, decimalPlaces: 2)}",
                     style: DI<CommonWidget>().myTextStyle(
                         DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w500),
                   ),
@@ -458,7 +450,7 @@ class _OrderScreenState extends State<OrderScreen> {
             Expanded(
               child: _holdingSummaryCard(
                 "Total Invested",
-                "₹${homeTabController.holdingModel.value?.data.summary.totalInvested ?? 0}",
+                "₹${DI<CommonFunction>().formatPrice(homeTabController.holdingModel.value?.data.summary.totalInvested ?? 0)}",
                 DI<ColorConst>().blackColor,
                 Icons.account_balance_wallet_outlined,
               ),
@@ -467,7 +459,7 @@ class _OrderScreenState extends State<OrderScreen> {
             Expanded(
               child: _holdingSummaryCard(
                 "Total Value",
-                "₹${homeTabController.holdingModel.value?.data.summary.totalValue ?? 0}",
+                "₹${DI<CommonFunction>().formatPrice(homeTabController.holdingModel.value?.data.summary.totalValue ?? 0)}",
                 DI<ColorConst>().blackColor,
                 Icons.trending_up_rounded,
               ),
@@ -476,7 +468,7 @@ class _OrderScreenState extends State<OrderScreen> {
             Expanded(
               child: _holdingSummaryCard(
                 "Margin",
-                "₹${homeTabController.holdingModel.value?.data.summary.margin ?? 0}",
+                "₹${DI<CommonFunction>().formatPrice(homeTabController.holdingModel.value?.data.summary.margin ?? 0)}",
                 DI<ColorConst>().dark_greenColor,
                 Icons.savings_outlined,
               ),
@@ -497,7 +489,7 @@ class _OrderScreenState extends State<OrderScreen> {
                       Text(
                         "No holdings found",
                         style: DI<CommonWidget>().myTextStyle(
-                            DI<ColorConst>().darkGryColor, 14.sp, FontWeight.w500),
+                            DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w500),
                       ),
                     ],
                   ),
@@ -539,13 +531,13 @@ class _OrderScreenState extends State<OrderScreen> {
           Text(
             title,
             style: DI<CommonWidget>().myTextStyle(
-                DI<ColorConst>().darkGryColor, 10.sp, FontWeight.w400),
+                DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w400),
           ),
           SizedBox(height: 4),
           Text(
             amount,
             style: DI<CommonWidget>()
-                .myTextStyle(valueColor, 13.sp, FontWeight.w700),
+                .myTextStyle(valueColor, 12.sp, FontWeight.w700),
           ),
         ],
       ),
@@ -574,13 +566,13 @@ class _OrderScreenState extends State<OrderScreen> {
           Text(
             item.symbol.toString(),
             style: DI<CommonWidget>()
-                .myTextStyle(DI<ColorConst>().blackColor, 14.sp, FontWeight.w600),
+                .myTextStyle(DI<ColorConst>().blackColor, 12.sp, FontWeight.w600),
           ),
           SizedBox(height: 2),
           Text(
             item.companyName.toString(),
             style: DI<CommonWidget>()
-                .myTextStyle(DI<ColorConst>().darkGryColor, 11.sp, FontWeight.w400),
+                .myTextStyle(DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w400),
           ),
           SizedBox(height: 12),
 
@@ -589,11 +581,11 @@ class _OrderScreenState extends State<OrderScreen> {
             children: [
               _holdingInfoChip("Qty", "${item.quantity}"),
               SizedBox(width: 8),
-              _holdingInfoChip("Avg", "₹${item.avgPrice}"),
+              _holdingInfoChip("Avg", "₹${DI<CommonFunction>().formatPrice(item.avgPrice)}"),
               SizedBox(width: 8),
-              _holdingInfoChip("LTP", "₹${item.ltp}"),
+              _holdingInfoChip("LTP", "₹${DI<CommonFunction>().formatPrice(item.ltp)}"),
               SizedBox(width: 8),
-              _holdingInfoChip("Value", "₹${item.value}"),
+              _holdingInfoChip("Value", "₹${DI<CommonFunction>().formatPrice(item.value)}"),
             ],
           ),
           SizedBox(height: 10),
@@ -619,9 +611,9 @@ class _OrderScreenState extends State<OrderScreen> {
                   ),
                   SizedBox(width: 4),
                   Text(
-                    "P&L: ₹${item.pnl}",
+                    "P&L: ₹${DI<CommonFunction>().formatPrice(item.pnl)}",
                     style: DI<CommonWidget>()
-                        .myTextStyle(pnlColor, 13.sp, FontWeight.w600),
+                        .myTextStyle(pnlColor, 12.sp, FontWeight.w600),
                   ),
                 ],
               ),
@@ -634,7 +626,7 @@ class _OrderScreenState extends State<OrderScreen> {
                 child: Text(
                   "${item.pnlPercent.toStringAsFixed(2)}%",
                   style: DI<CommonWidget>()
-                      .myTextStyle(pnlColor, 11.sp, FontWeight.w600),
+                      .myTextStyle(pnlColor, 12.sp, FontWeight.w600),
                 ),
               ),
             ],
@@ -653,7 +645,7 @@ class _OrderScreenState extends State<OrderScreen> {
           Text(
             label,
             style: DI<CommonWidget>().myTextStyle(
-                DI<ColorConst>().darkGryColor, 10.sp, FontWeight.w400),
+                DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w400),
           ),
           SizedBox(height: 2),
           Text(

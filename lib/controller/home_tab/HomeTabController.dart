@@ -9,6 +9,8 @@ import 'package:rupeeglobal/model/PortfolioModel.dart';
 import 'package:rupeeglobal/model/PositionModel.dart';
 import 'package:rupeeglobal/model/MarketIndexDetailModel.dart';
 import 'package:rupeeglobal/model/ForexPairDetailModel.dart';
+import 'package:rupeeglobal/model/PaymentQrModel.dart';
+import 'package:rupeeglobal/model/PaymentQrDetailModel.dart';
 import 'package:rupeeglobal/repo/home_tab_repo.dart';
 
 import '../../util/CommonFunction.dart';
@@ -30,6 +32,15 @@ class HomeTabController extends GetxService{
   //Funds
   var fundsModel = Rxn<FundModel>();
   var fundsList = <Transaction>[].obs;
+
+  // Payment QR (Pay Amount tab)
+  var paymentQrModel = Rxn<PaymentQrModel>();
+  var paymentQrList = <PaymentQrCode>[].obs;
+  var isPaymentQrLoading = false.obs;
+
+  // Payment QR Detail
+  var paymentQrDetailModel = Rxn<PaymentQrDetailModel>();
+  var isPaymentQrDetailLoading = false.obs;
 
   var marketIndicesModel = Rxn<MarketIndicesModel>();
   var forexPairsModel = Rxn<ForexPairsModel>();
@@ -164,7 +175,7 @@ class HomeTabController extends GetxService{
       if(response["success"].toString() == "true"){
 
         DI<CommonFunction>().showSuccessSnackBar(response["message"].toString());
-
+        getFundList("1");
         return true;
       }
       return false;
@@ -178,12 +189,15 @@ class HomeTabController extends GetxService{
   }
 
 
-  Future<bool> withdrawFund(amount)async{
+  Future<bool> withdrawFund(String amount,upiId,upiName,notes)async{
     isLoading.value = true;
     DI<CommonFunction>().showLoading();
 
     Map<String,String> withdrawFundMap = {
-      "amount" : amount
+      "amount" : amount,
+      "upi_id" : upiId,
+      "upi_name" : upiName,
+      "user_notes" : notes,
     };
     print("addFundMap :-- $withdrawFundMap");
 
@@ -195,7 +209,7 @@ class HomeTabController extends GetxService{
       if(response["success"].toString() == "true"){
 
         DI<CommonFunction>().showSuccessSnackBar(response["message"].toString());
-
+        getFundList("1");
         return true;
       }
       return false;
@@ -208,6 +222,70 @@ class HomeTabController extends GetxService{
     return false;
   }
 
+  Future<void> getPaymentQrList()async{
+    isPaymentQrLoading.value = true;
+    paymentQrList.clear();
+    paymentQrModel.value = null;
+
+    try{
+      var response = await DI<HomeTabRepo>().getPaymentQrRepo();
+      isPaymentQrLoading.value = false;
+      paymentQrModel.value = response;
+      paymentQrList.addAll(paymentQrModel.value?.data.paymentQrCodes ?? []);
+    }catch(e){
+      isPaymentQrLoading.value = false;
+      log("Exception getPaymentQrList :- ",error: e.toString());
+    }
+  }
+
+  Future<void> getPaymentQrDetail(int id)async{
+    isPaymentQrDetailLoading.value = true;
+    paymentQrDetailModel.value = null;
+    DI<CommonFunction>().showLoading();
+
+    try{
+      var response = await DI<HomeTabRepo>().getPaymentQrDetailRepo(id);
+      isPaymentQrDetailLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+      paymentQrDetailModel.value = response;
+    }catch(e){
+      isPaymentQrDetailLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+      log("Exception getPaymentQrDetail :- ",error: e.toString());
+    }
+  }
+
+  Future<void> markPaymentQrPaid(int id)async{
+    DI<CommonFunction>().showLoading();
+    try{
+      var response = await DI<HomeTabRepo>().markPaymentQrPaidRepo(id);
+      DI<CommonFunction>().hideLoader();
+      if(response != null && response["success"] == true){
+        final idx = paymentQrList.indexWhere((e) => e.id == id);
+        if(idx >= 0){
+          final item = paymentQrList[idx];
+          paymentQrList[idx] = PaymentQrCode(
+            id: item.id,
+            amount: item.amount,
+            status: "paid",
+            paymentDate:response["data"]["payment_date"],
+            createdAt: item.createdAt,
+          );
+          paymentQrList.refresh();
+        }
+        DI<CommonFunction>().showSuccessSnackBar(
+            response["message"]?.toString() ?? "Payment marked as paid successfully");
+        Get.back();
+      } else {
+        DI<CommonFunction>().showErrorSnackBar(
+            response?["message"]?.toString() ?? "Failed to mark payment as paid");
+      }
+    }catch(e){
+      DI<CommonFunction>().hideLoader();
+      DI<CommonFunction>().showErrorSnackBar("Failed to mark payment as paid");
+      log("Exception markPaymentQrPaid :- ",error: e.toString());
+    }
+  }
 
   Future<void> getMarketIndices()async{
     isLoading.value = true;

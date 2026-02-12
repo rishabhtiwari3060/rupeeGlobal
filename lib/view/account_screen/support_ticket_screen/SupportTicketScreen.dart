@@ -38,7 +38,7 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
     messageCtrl = TextEditingController();
     _scrollController = ScrollController()..addListener(_scrollListener);
     Future.delayed(Duration.zero, () {
-      accountController.getTicketList("pending", "high", "1");
+      accountController.getTicketList("allstatus", "allpriority", "1");
     });
   }
 
@@ -87,7 +87,7 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
         title: Text(
           DI<StringConst>().support_ticket_text,
           style: DI<CommonWidget>()
-              .myTextStyle(DI<ColorConst>().blackColor, 18.sp, FontWeight.w600),
+              .myTextStyle(DI<ColorConst>().blackColor, 19.sp, FontWeight.w600),
         ),
       ),
       body: Column(
@@ -160,7 +160,7 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
         label: Text(
           "New Ticket",
           style: DI<CommonWidget>()
-              .myTextStyle(Colors.white, 13.sp, FontWeight.w600),
+              .myTextStyle(Colors.white, 14.sp, FontWeight.w600),
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
@@ -180,7 +180,7 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
           Text(
             "No tickets found",
             style: DI<CommonWidget>().myTextStyle(
-                DI<ColorConst>().darkGryColor, 15.sp, FontWeight.w500),
+                DI<ColorConst>().darkGryColor, 14.sp, FontWeight.w500),
           ),
         ],
       ),
@@ -197,7 +197,9 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
 
     return InkWell(
       onTap: () {
-        var data = {"id": ticket.id.toString()};
+        var data = {"id": ticket.id.toString(),
+        "status" : ticket.adminStatus.toString()
+        };
         Get.toNamed(DI<RouteHelper>().getChatScreen(), parameters: data);
       },
       borderRadius: BorderRadius.circular(14),
@@ -238,9 +240,9 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
                       Text(
                         "Ticket #${ticket.id}",
                         style: DI<CommonWidget>().myTextStyle(
-                            DI<ColorConst>().blackColor,
-                            14.sp,
-                            FontWeight.w600),
+DI<ColorConst>().blackColor,
+                                            14.sp,
+                                            FontWeight.w600),
                       ),
                       SizedBox(height: 2),
                       Row(
@@ -250,10 +252,10 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
                               color: DI<ColorConst>().darkGryColor),
                           SizedBox(width: 3),
                           Text(
-                            "${ticket.createdAt}",
+                            "${DI<CommonFunction>().formatDate(ticket.createdAt)}",
                             style: DI<CommonWidget>().myTextStyle(
                                 DI<ColorConst>().darkGryColor,
-                                10.sp,
+                                12.sp,
                                 FontWeight.w400),
                           ),
                         ],
@@ -277,7 +279,7 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: DI<CommonWidget>().myTextStyle(
-                  DI<ColorConst>().blackColor, 12.sp, FontWeight.w400),
+                  DI<ColorConst>().blackColor, 14.sp, FontWeight.w400),
             ),
             SizedBox(height: 12),
 
@@ -318,7 +320,7 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
                               "${ticket.messagesCount}",
                               style: DI<CommonWidget>().myTextStyle(
                                   DI<ColorConst>().darkGryColor,
-                                  10.sp,
+                                  12.sp,
                                   FontWeight.w500),
                             ),
                           ],
@@ -347,7 +349,7 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
       child: Text(
         text,
         style: DI<CommonWidget>()
-            .myTextStyle(color, 10.sp, FontWeight.w600),
+            .myTextStyle(color, 12.sp, FontWeight.w600),
       ),
     );
   }
@@ -381,7 +383,7 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: DI<CommonWidget>().myTextStyle(
-              DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w400),
+              DI<ColorConst>().darkGryColor, 14.sp, FontWeight.w400),
           contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           border: InputBorder.none,
         ),
@@ -389,7 +391,7 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
         icon: Icon(Icons.keyboard_arrow_down_rounded,
             color: DI<ColorConst>().darkGryColor),
         style: DI<CommonWidget>().myTextStyle(
-            DI<ColorConst>().blackColor, 12.sp, FontWeight.w400),
+            DI<ColorConst>().blackColor, 14.sp, FontWeight.w400),
         items: items.map((value) {
           return DropdownMenuItem<String>(
             value: value,
@@ -424,7 +426,7 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
                     Text(
                       "Create New Ticket",
                       style: DI<CommonWidget>().myTextStyle(
-                          DI<ColorConst>().blackColor, 17.sp, FontWeight.w600),
+                          DI<ColorConst>().blackColor, 19.sp, FontWeight.w600),
                     ),
                     InkWell(
                       onTap: () {
@@ -450,7 +452,7 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
                 Text(
                   "Priority",
                   style: DI<CommonWidget>().myTextStyle(
-                      DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w400),
+                      DI<ColorConst>().darkGryColor, 14.sp, FontWeight.w400),
                 ),
                 SizedBox(height: 6),
                 _filterDropdown('Select Priority', createPriorityList, (value) {
@@ -462,7 +464,7 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
                 Text(
                   "Message",
                   style: DI<CommonWidget>().myTextStyle(
-                      DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w400),
+                      DI<ColorConst>().darkGryColor, 14.sp, FontWeight.w400),
                 ),
                 SizedBox(height: 6),
                 DI<CommonWidget>().myTextFormField(
@@ -480,9 +482,11 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
                         createPriorityValue?.toLowerCase() ?? "",
                         messageCtrl.text.trim());
                     Get.back();
+
+                    createPriorityValue = "";
+                    messageCtrl.clear();
                   }
-                  createPriorityValue = "";
-                  messageCtrl.clear();
+
                 }),
               ],
             ),
@@ -500,6 +504,10 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
     } else if (messageCtrl.text.isEmpty) {
       DI<CommonFunction>()
           .showErrorSnackBar(DI<StringConst>().please_enter_message_text);
+      return false;
+    } else if (messageCtrl.text.length <5) {
+      DI<CommonFunction>()
+          .showErrorSnackBar("please enter more 5 character in message");
       return false;
     }
     return true;
