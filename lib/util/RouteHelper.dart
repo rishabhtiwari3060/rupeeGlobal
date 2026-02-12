@@ -4,7 +4,7 @@ import 'package:rupeeglobal/view/account_screen/AccountScreen.dart';
 import 'package:rupeeglobal/view/home_tab_screen/HomeTabScreen.dart';
 import 'package:rupeeglobal/view/orders_screen/OrderScreen.dart';
 import 'package:rupeeglobal/view/portfolio_screen/PortfolioScreen.dart';
-import 'package:rupeeglobal/view/watchlist_screen/WatchListScreen.dart';
+import 'package:rupeeglobal/view/watchlist_screen/FundsScreen.dart';
 
 import '../view/account_screen/edit_profile/EditProfileScreen.dart';
 import '../view/account_screen/news_screen/NewsScreen.dart';
@@ -88,7 +88,7 @@ String getPaymentQrDetailScreen() => paymentQrDetailScreen;
 List<GetPage> get routes =>[
   GetPage(name: splashscreen, page: () => SplashScreen(),),
   GetPage(name: homeScreen, page: () =>  SafeArea(child:HomeScreen()),),
-  GetPage(name: watchlistScreen, page: () =>  SafeArea(child:WatchlistScreen()),),
+  GetPage(name: watchlistScreen, page: () =>  SafeArea(child:FundsScreen()),),
   GetPage(name: portfolioScreen, page: () =>  SafeArea(child:PortfolioScreen()),),
   GetPage(name: orderScreen, page: () =>  SafeArea(child:OrderScreen()),),
   GetPage(name: accountScreen, page: () =>  SafeArea(child:AccountScreen()),),

@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:rupeeglobal/view/account_screen/AccountScreen.dart';
 import 'package:rupeeglobal/view/orders_screen/OrderScreen.dart';
 import 'package:rupeeglobal/view/portfolio_screen/PortfolioScreen.dart';
-import 'package:rupeeglobal/view/watchlist_screen/WatchListScreen.dart';
+import 'package:rupeeglobal/view/watchlist_screen/FundsScreen.dart';
 import 'package:sizer/sizer.dart';
 import '../../util/ColorConst.dart';
 import '../../util/CommonWidget.dart';
@@ -25,7 +25,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
 
   final List<Widget> _screens = [
     HomeScreen(),
-    WatchlistScreen(),
+    FundsScreen(),
     PortfolioScreen(),
     OrderScreen(),
     AccountScreen()
@@ -61,7 +61,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                           : Icons.home_outlined,
                       DI<StringConst>().home_text.toUpperCase(),
                       _currentIndex.value == 0
-                          ? DI<ColorConst>().secondColorPrimary
+                          ? DI<ColorConst>().dark_greenColor
                           : DI<ColorConst>().blackColor)),
             ),
             Expanded(
@@ -72,11 +72,11 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                   },
                   child: bottomNavIcon(
                       _currentIndex.value == 1
-                          ? Icons.inventory_2
-                          : Icons.inventory_2_outlined,
-                      DI<StringConst>().watchlist_text.toUpperCase(),
+                          ? CupertinoIcons.money_euro_circle_fill
+                          : CupertinoIcons.money_euro_circle,
+                      DI<StringConst>().funds_text.toUpperCase(),
                       _currentIndex.value == 1
-                          ? DI<ColorConst>().secondColorPrimary
+                          ? DI<ColorConst>().dark_greenColor
                           : DI<ColorConst>().blackColor)),
             ),
             Expanded(
@@ -91,7 +91,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                           : Icons.add_circle_outline,
                       DI<StringConst>().portfolio_text.toUpperCase(),
                       _currentIndex.value == 2
-                          ? DI<ColorConst>().secondColorPrimary
+                          ? DI<ColorConst>().dark_greenColor
                           : DI<ColorConst>().blackColor)),
             ),
             Expanded(
@@ -106,7 +106,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                           : CupertinoIcons.gift,
                       DI<StringConst>().order_text.toUpperCase(),
                       _currentIndex.value == 3
-                          ? DI<ColorConst>().secondColorPrimary
+                          ? DI<ColorConst>().dark_greenColor
                           : DI<ColorConst>().blackColor)),
             ),
             Expanded(
@@ -121,7 +121,7 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
                           : Icons.person_2_outlined,
                       DI<StringConst>().account_text.toUpperCase(),
                       _currentIndex.value == 4
-                          ? DI<ColorConst>().secondColorPrimary
+                          ? DI<ColorConst>().dark_greenColor
                           : DI<ColorConst>().blackColor)),
             ),
           ],

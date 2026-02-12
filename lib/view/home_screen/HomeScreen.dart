@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rupeeglobal/controller/home_tab/HomeTabController.dart';
 import 'package:rupeeglobal/util/RouteHelper.dart';
 import 'package:rupeeglobal/util/StringConst.dart';
 import 'package:rupeeglobal/util/local_storage.dart';
@@ -20,12 +21,17 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
 
+  HomeTabController homeTabController = Get.find<HomeTabController>();
 
   @override
   void initState() {
     WidgetsFlutterBinding.ensureInitialized();
     super.initState();
     print("token :-- ${DI<MyLocalStorage>().getStringValue(DI<MyLocalStorage>().authToken)}");
+
+    Future.delayed(Duration.zero,() {
+      homeTabController.getMarketIndices();
+    },);
   }
 
 
@@ -64,10 +70,12 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-        marketIndicesColumn()
-          ],
+        child: Obx(
+          () =>  Column(
+            children: [
+          marketIndicesColumn()
+            ],
+          ),
         ),
       ),
     );
@@ -78,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
        ListView.builder(
          shrinkWrap: true,
-         itemCount: 6,
+         itemCount: homeTabController.marketIndicesModel.value?.data.length??0,
          physics: NeverScrollableScrollPhysics(),
          itemBuilder: (context, index) {
          return  InkWell(
@@ -97,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
                    Row(
                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                      children: [
-                       Text("SENSEX", style: DI<CommonWidget>().myTextStyle(
+                       Text("${homeTabController.marketIndicesModel.value?.data[index].name}", style: DI<CommonWidget>().myTextStyle(
                            DI<ColorConst>().blackColor,
                            15,
                            FontWeight.w500),),
@@ -116,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
                      ],
                    ),
                    SizedBox(height: 10,),
-                   Text("83,580.4", style: DI<CommonWidget>().myTextStyle(
+                   Text("${homeTabController.marketIndicesModel.value?.data[index].price}", style: DI<CommonWidget>().myTextStyle(
                        DI<ColorConst>().dark_greenColor,
                        20,
                        FontWeight.w500),),
@@ -125,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
                      children: [
                        Icon(Icons.arrow_upward,color:  DI<ColorConst>().dark_greenColor,size: 17,),
                        SizedBox(width: 3,),
-                       Text("+266.47 (+0.32%)", style: DI<CommonWidget>().myTextStyle(
+                       Text("+${homeTabController.marketIndicesModel.value?.data[index].change} (+${homeTabController.marketIndicesModel.value?.data[index].changePercent}%)", style: DI<CommonWidget>().myTextStyle(
                            DI<ColorConst>().dark_greenColor,
                            17,
                            FontWeight.w500),),
@@ -140,9 +148,9 @@ class _HomeScreenState extends State<HomeScreen> {
                        FontWeight.w400),),
 
                    FixedRangeIndicator(
-                     min: 82925.35,
-                     max: 83612.12,
-                     value: 83350.00, // 👈 YOU control this
+                     min: double.parse(homeTabController.marketIndicesModel.value?.data[index].low.toString()??"0.0"),
+                     max: double.parse(homeTabController.marketIndicesModel.value?.data[index].high.toString()??"0.0"),
+                     value: double.parse(homeTabController.marketIndicesModel.value?.data[index].price.toString()??"0.0"),
                    ),
 
                    SizedBox(height: 10,),
@@ -166,12 +174,12 @@ class _HomeScreenState extends State<HomeScreen> {
                    Row(
                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                      children: [
-                       Text("83,234.05", style: DI<CommonWidget>().myTextStyle(
+                       Text("${homeTabController.marketIndicesModel.value?.data[index].open}", style: DI<CommonWidget>().myTextStyle(
                            DI<ColorConst>().blackColor,
                            15,
                            FontWeight.w500),),
 
-                       Text("83,313.93", style: DI<CommonWidget>().myTextStyle(
+                       Text("${homeTabController.marketIndicesModel.value?.data[index].previousClose}", style: DI<CommonWidget>().myTextStyle(
                            DI<ColorConst>().blackColor,
                            15,
                            FontWeight.w500),),
@@ -196,12 +204,12 @@ class _HomeScreenState extends State<HomeScreen> {
                    Row(
                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                      children: [
-                       Text("83,612.12", style: DI<CommonWidget>().myTextStyle(
+                       Text("${homeTabController.marketIndicesModel.value?.data[index].high}", style: DI<CommonWidget>().myTextStyle(
                            DI<ColorConst>().dark_greenColor,
                            15,
                            FontWeight.w500),),
 
-                       Text("82,925.35", style: DI<CommonWidget>().myTextStyle(
+                       Text("${homeTabController.marketIndicesModel.value?.data[index].low}", style: DI<CommonWidget>().myTextStyle(
                            DI<ColorConst>().redColor,
                            15,
                            FontWeight.w500),),

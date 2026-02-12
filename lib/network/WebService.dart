@@ -20,6 +20,7 @@ class WebService extends GetxService{
   String FUNDS_POINT = "funds";
   String ADD_FUNDS_POINT = "funds/add";
   String WITHDRAW_FUNDS_POINT = "funds/withdraw";
+  String MARKET_INDICES_POINT = "market-indices";
 
 
 

@@ -6,6 +6,8 @@ import 'package:dio/io.dart';
 import 'package:get/get.dart';
 import '../util/CommonWidget.dart';
 import '../util/Injection.dart';
+import '../util/RouteHelper.dart';
+import '../util/local_storage.dart';
 import 'WebService.dart';
 
 class ApiService extends GetxService {
@@ -257,6 +259,12 @@ class ApiService extends GetxService {
     if(response.data["success"].toString() == "false"){
 
       DI<CommonWidget>().errorDialog(response.data["message"].toString(), () {
+        if(response.data["message"].toString() == "Invalid access token"){
+
+          DI<MyLocalStorage>().clearLocalStorage();
+          Get.offAllNamed(DI<RouteHelper>().getLoginScreen());
+          return;
+        }
         Get.back();
       });
 

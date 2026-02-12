@@ -150,7 +150,8 @@ class CommonFunction {
   void showErrorSnackBar(String message) {
     ScaffoldMessenger.of(Get.context!).showSnackBar(
       SnackBar(
-        content: Text(message,style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().whiteColor,
+        content: Text(message,
+          maxLines : 5,style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().whiteColor,
             15.sp, FontWeight.w500),),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
