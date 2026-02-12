@@ -116,7 +116,7 @@ class AuthController extends GetxController{
       var responseData = response["data"];
       var userData = responseData["user"];
       if(response["success"].toString() == "true"){
-        DI<CommonFunction>().showSuccessSnackBar(response["success"].toString().toLowerCase());
+       
 
         DI<MyLocalStorage>().setBoolValue(DI<MyLocalStorage>().isLogin,true);
         DI<MyLocalStorage>().setStringValue(DI<MyLocalStorage>().userId,userData["id"].toString());

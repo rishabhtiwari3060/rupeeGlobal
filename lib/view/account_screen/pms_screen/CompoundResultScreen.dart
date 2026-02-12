@@ -68,7 +68,7 @@ class CompoundResultScreen extends StatelessWidget {
                         PieChartSectionData(
                           value: contributionPercent,
                           title: "${contributionPercent.toStringAsFixed(1)}%",
-                          color: Colors.red.shade200,
+                          color: DI<ColorConst>().redColor.withOpacity(0.6),
                           radius: 45,
                         ),
                         PieChartSectionData(
@@ -95,7 +95,7 @@ class CompoundResultScreen extends StatelessWidget {
   Widget _info(String label, double value,Color textColor) {
     return Column(
       children: [
-        Text(label, style: const TextStyle(color: Colors.grey)),
+        Text(label, style: TextStyle(color: DI<ColorConst>().darkGryColor)),
         const SizedBox(height: 4),
         Text(
           value.toStringAsFixed(2),
@@ -115,7 +115,7 @@ class CompoundResultScreen extends StatelessWidget {
       child: DataTable(
         columnSpacing: 25,
         headingRowColor:
-        MaterialStateProperty.all(Colors.grey.shade200),
+        WidgetStateProperty.all(DI<ColorConst>().gryColor),
         columns: const [
           DataColumn(label: Text("Month")),
           DataColumn(label: Text("Interest")),

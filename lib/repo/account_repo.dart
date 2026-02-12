@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart' as DIO;
 import 'package:get/get.dart';
+import 'package:rupeeglobal/model/AgreementModel.dart';
 import 'package:rupeeglobal/model/ChatDetailModel.dart';
 import 'package:rupeeglobal/model/TicketModel.dart';
 import 'package:rupeeglobal/model/news_model.dart';
@@ -66,6 +68,54 @@ class AccountRepo extends GetxService{
         header: mainHeader());
 
     print("sendMessageRepo response :-- $response");
+    return response.data;
+  }
+
+  // Agreement APIs
+  Future<dynamic> getAgreementsRepo() async {
+    var response = await DI<ApiService>().getMethod(
+      DI<WebService>().AGREEMENTS_POINT,
+      header: mainHeader(),
+    );
+
+    print("getAgreementsRepo response :-- $response");
+    return agreementListModelFromJson(jsonEncode(response.data));
+  }
+
+  Future<dynamic> getAgreementDetailRepo(int id) async {
+    var response = await DI<ApiService>().getMethod(
+      DI<WebService>().getAgreementDetailEndpoint(id),
+      header: mainHeader(),
+    );
+
+    print("getAgreementDetailRepo response :-- $response");
+    return agreementDetailModelFromJson(jsonEncode(response.data));
+  }
+
+  Future<String> getAgreementDownloadUrl(int id) {
+    return Future.value(
+      "${DI<WebService>().BASE_URL}${DI<WebService>().getAgreementDownloadEndpoint(id)}"
+    );
+  }
+
+  Future<String> getAgreementViewSignedUrl(int id) {
+    return Future.value(
+      "${DI<WebService>().BASE_URL}${DI<WebService>().getAgreementViewSignedEndpoint(id)}"
+    );
+  }
+
+  Future<dynamic> uploadSignedAgreementRepo(int id, String filePath) async {
+    DIO.FormData formData = DIO.FormData.fromMap({
+      'signed_document': await DIO.MultipartFile.fromFile(filePath, filename: filePath.split('/').last),
+    });
+
+    var response = await DI<ApiService>().postMethodWithFormData(
+      DI<WebService>().getAgreementUploadEndpoint(id),
+      formData,
+      header: mainHeader(),
+    );
+
+    print("uploadSignedAgreementRepo response :-- $response");
     return response.data;
   }
 

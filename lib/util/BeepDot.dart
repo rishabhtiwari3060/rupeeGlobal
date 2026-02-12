@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'ColorConst.dart';
+import 'Injection.dart';
+
 class BeepDot extends StatefulWidget {
   const BeepDot({super.key});
 
@@ -33,8 +36,8 @@ class _BeepDotState extends State<BeepDot>
       child: Container(
         width: 10,
         height: 10,
-        decoration: const BoxDecoration(
-          color: Colors.green,
+        decoration: BoxDecoration(
+          color: DI<ColorConst>().greenColor,
           shape: BoxShape.circle,
         ),
       ),

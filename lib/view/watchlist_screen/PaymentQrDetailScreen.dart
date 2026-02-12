@@ -19,7 +19,6 @@ class _PaymentQrDetailScreenState extends State<PaymentQrDetailScreen> {
 
   @override
   void initState() {
-    WidgetsFlutterBinding.ensureInitialized();
     super.initState();
   }
 

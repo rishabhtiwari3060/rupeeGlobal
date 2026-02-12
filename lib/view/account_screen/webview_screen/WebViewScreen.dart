@@ -22,7 +22,6 @@ class _WebViewScreenState extends State<WebViewScreen> {
   String screenType = "";
   @override
   void initState() {
-    WidgetsFlutterBinding.ensureInitialized();
     super.initState();
     webUrl = Get.parameters["url"]??"";
     screenType = Get.parameters["screenType"]??"";
@@ -44,7 +43,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
             style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().blackColor, 17.sp, FontWeight.w400),),
           elevation: 0.0,
           automaticallyImplyLeading: false,
-          backgroundColor: DI<ColorConst>().whiteColor,
+          backgroundColor: DI<ColorConst>().scaffoldBgColor,
         ),
         body: InAppWebView(
           initialUrlRequest: URLRequest(

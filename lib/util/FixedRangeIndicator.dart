@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'ColorConst.dart';
+import 'Injection.dart';
+
 class FixedRangeIndicator extends StatelessWidget {
   final double min;
   final double max;
@@ -32,8 +35,8 @@ class FixedRangeIndicator extends StatelessWidget {
                   width: width,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    gradient: const LinearGradient(
-                      colors: [Colors.red, Colors.green],
+                    gradient: LinearGradient(
+                      colors: [DI<ColorConst>().redColor, DI<ColorConst>().dark_greenColor],
                     ),
                   ),
                 ),
@@ -42,10 +45,10 @@ class FixedRangeIndicator extends StatelessWidget {
                 Positioned(
                   left: width * percent - 8,
                   top: -7,
-                  child: const Icon(
+                  child: Icon(
                     Icons.arrow_drop_down,
                     size: 20,
-                    color: Colors.grey,
+                    color: DI<ColorConst>().darkGryColor,
                   ),
                 ),
               ],
@@ -61,11 +64,11 @@ class FixedRangeIndicator extends StatelessWidget {
           children: [
             Text(
               "Low: ${min.toStringAsFixed(2)}",
-              style: const TextStyle(color: Colors.red),
+              style: TextStyle(color: DI<ColorConst>().redColor),
             ),
             Text(
               "High: ${max.toStringAsFixed(2)}",
-              style: const TextStyle(color: Colors.green),
+              style: TextStyle(color: DI<ColorConst>().dark_greenColor),
             ),
           ],
         ),

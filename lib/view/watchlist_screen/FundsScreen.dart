@@ -18,7 +18,6 @@ class FundsScreen extends StatefulWidget {
 }
 
 class _FundsScreenState extends State<FundsScreen> {
-
   HomeTabController homeTabController = Get.find<HomeTabController>();
 
   var selectType = 0.obs;
@@ -30,16 +29,12 @@ class _FundsScreenState extends State<FundsScreen> {
   late TextEditingController upiNameWithdrawCtrl;
   late TextEditingController noteWithdrawCtrl;
 
-
-
   @override
   void initState() {
-    WidgetsFlutterBinding.ensureInitialized();
     super.initState();
-    Future.delayed(Duration.zero,() {
+    Future.delayed(Duration.zero, () {
       homeTabController.getFundList("1");
-    },);
-
+    });
 
     amountCtrl = TextEditingController();
     noteCtrl = TextEditingController();
@@ -52,159 +47,32 @@ class _FundsScreenState extends State<FundsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: DI<ColorConst>().scaffoldBgColor,
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 10.0),
+        padding: EdgeInsets.symmetric(horizontal: 14),
         child: Obx(
-          () =>  Column(
+          () => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                DI<StringConst>().funds_balance_text,
-                style: DI<CommonWidget>().myTextStyle(
-                    DI<ColorConst>().blackColor,
-                    20,
-                    FontWeight.w500),
-              ),
-              SizedBox(
-                height: 10,
-              ),
+              SizedBox(height: 8),
 
-              Row(
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: InkWell(
-                      onTap: () {
-                        selectType.value = 0;
-                      },
-                      child: Column(
-                        children: [
-                          Text(
-                            DI<StringConst>().funds_text,
-                            style: DI<CommonWidget>().myTextStyle(
-                                selectType.value == 0
-                                    ? DI<ColorConst>().redColor
-                                    : DI<ColorConst>().blackColor,
-                                15,
-                                FontWeight.w500),
-                          ),
-                          Divider(
-                            color: selectType.value == 0
-                                ? DI<ColorConst>().redColor
-                                : DI<ColorConst>().whiteColor,
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: InkWell(
-                      onTap: () {
-                        selectType.value = 1;
-                      },
-                      child: Column(
-                        children: [
-                          Text(
-                            DI<StringConst>().add_fund_text,
-                            style: DI<CommonWidget>().myTextStyle(
-                                selectType.value == 1
-                                    ? DI<ColorConst>().redColor
-                                    : DI<ColorConst>().blackColor,
-                                15,
-                                FontWeight.w500),
-                          ),
-                          Divider(
-                            color: selectType.value == 1
-                                ? DI<ColorConst>().redColor
-                                : DI<ColorConst>().whiteColor,
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: InkWell(
-                      onTap: () {
-                        selectType.value = 2;
-                      },
-                      child: Column(
-                        children: [
-                          Text(
-                            DI<StringConst>().withdraw_funds_text,
-                            style: DI<CommonWidget>().myTextStyle(
-                                selectType.value == 2
-                                    ? DI<ColorConst>().redColor
-                                    : DI<ColorConst>().blackColor,
-                                15,
-                                FontWeight.w500),
-                          ),
-                          Divider(
-                            color: selectType.value == 2
-                                ? DI<ColorConst>().redColor
-                                : DI<ColorConst>().whiteColor,
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: InkWell(
-                      onTap: () {
-                        selectType.value = 3;
-                      },
-                      child: Column(
-                        children: [
-                          Text(
-                            DI<StringConst>().pay_amount_text,
-                            style: DI<CommonWidget>().myTextStyle(
-                                selectType.value == 3
-                                    ? DI<ColorConst>().redColor
-                                    : DI<ColorConst>().blackColor,
-                                15,
-                                FontWeight.w500),
-                          ),
-                          Divider(
-                            color: selectType.value == 3
-                                ? DI<ColorConst>().redColor
-                                : DI<ColorConst>().whiteColor,
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 10,
-              ),
+              /// Section header
+              _sectionHeader(Icons.account_balance_wallet_outlined,
+                  DI<StringConst>().funds_balance_text),
+              SizedBox(height: 14),
 
-              if(selectType.value == 0)
-                homeTabController.isLoading.value?SizedBox():
-                fundColumn(),
+              /// Tab selector
+              _buildTabs(),
+              SizedBox(height: 16),
 
-              if(selectType.value == 1)
-                addFundColumn(),
+              if (selectType.value == 0)
+                homeTabController.isLoading.value
+                    ? SizedBox()
+                    : _fundColumn(),
 
-              if(selectType.value == 2)
-                withdrawFundColumn(),
-
-              if(selectType.value == 3)
-                payAmountColumn(),
+              if (selectType.value == 1) _addFundColumn(),
+              if (selectType.value == 2) _withdrawFundColumn(),
+              if (selectType.value == 3) _payAmountColumn(),
             ],
           ),
         ),
@@ -212,640 +80,584 @@ class _FundsScreenState extends State<FundsScreen> {
     );
   }
 
-  Widget fundColumn(){
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  /// ─── Section Header with Icon ────────────────────
+  Widget _sectionHeader(IconData icon, String title) {
+    return Row(
       children: [
-        Row(
-          children: [
-            Expanded(
-                flex: 1,
-                child: fundContainer("Available Balance", "${homeTabController.fundsModel.value?.data.balance}",DI<ColorConst>().dark_greenColor)),
-            SizedBox(
-              width: 5,
-            ),
-            Expanded(
-                flex: 1,
-                child: fundContainer("Margin", "${homeTabController.fundsModel.value?.data.margin}X",DI<ColorConst>().blackColor)),
-
-            SizedBox(
-              width: 5,
-            ),
-            Expanded(
-                flex: 1,
-                child: fundContainer("Total Funds", "${homeTabController.fundsModel.value?.data.totalAdded}",DI<ColorConst>().blackColor)),
-          ],
-        ),
-        SizedBox(
-          height: 10,
-        ),
+        Icon(icon, color: DI<ColorConst>().secondColorPrimary, size: 22),
+        SizedBox(width: 8),
         Text(
-          DI<StringConst>().transaction_history_text,
-          style: DI<CommonWidget>().myTextStyle(
-              DI<ColorConst>().blackColor,
-              20,
-              FontWeight.w500),
+          title,
+          style: DI<CommonWidget>()
+              .myTextStyle(DI<ColorConst>().blackColor, 20.sp, FontWeight.w600),
         ),
-
-        SizedBox(
-          height: 10,
-        ),
-        ListView.separated(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: homeTabController.fundsList.length,
-          itemBuilder: (context, index) {
-            return Card(
-              color: DI<ColorConst>().whiteColor,
-              elevation: 0.3,
-              shape: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0),borderSide: BorderSide(color:Colors.transparent)),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
-                child: Column(
-                  spacing: 5,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          flex:0,
-                          child: Text(
-                            "Date :",
-                            style: DI<CommonWidget>().myTextStyle(
-                                DI<ColorConst>().darkGryColor,
-                                15,
-                                FontWeight.w500),
-                          ),
-                        ),
-                        SizedBox(width: 5,),
-                        Expanded(
-                          flex:1,
-                          child: Text(
-                            "${homeTabController.fundsList[index].createdAt}",
-                            style: DI<CommonWidget>().myTextStyle(
-                                DI<ColorConst>().blackColor,
-                                16,
-                                FontWeight.w500),
-                          ),
-                        ),
-                      ],
-                    ),
-                 
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Position :",
-                          style: DI<CommonWidget>().myTextStyle(
-                              DI<ColorConst>().darkGryColor,
-                              15,
-                              FontWeight.w500),
-                        ),
-                        SizedBox(width: 5,),
-                        Text(
-                            "${homeTabController.fundsList[index].positionId}",
-                          style: DI<CommonWidget>().myTextStyle(
-                              DI<ColorConst>().blackColor,
-                              16,
-                              FontWeight.w500),
-                        ),
-                      ],
-                    ),
-
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                flex:0,
-                                child: Text(
-                                  "Amount :",
-                                  style: DI<CommonWidget>().myTextStyle(
-                                      DI<ColorConst>().darkGryColor,
-                                      15,
-                                      FontWeight.w500),
-                                ),
-                              ),
-                              SizedBox(width: 5,),
-                              Expanded(
-                                flex:1,
-                                child: Text(
-                                  "₹ ${homeTabController.fundsList[index].amount}",
-                                  style: DI<CommonWidget>().myTextStyle(
-                                      DI<ColorConst>().blackColor,
-                                      16,
-                                      FontWeight.w500),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Expanded(
-                                flex:0,
-                                child: Text(
-                                  "Type :",
-                                  style: DI<CommonWidget>().myTextStyle(
-                                      DI<ColorConst>().darkGryColor,
-                                      15,
-                                      FontWeight.w500),
-                                ),
-                              ),
-                              SizedBox(width: 5,),
-                              Expanded(
-                                flex:0,
-                                child: Text(
-                                  "${homeTabController.fundsList[index].transactionType}",
-                                  style: DI<CommonWidget>().myTextStyle(
-                                      DI<ColorConst>().dark_greenColor,
-                                      16,
-                                      FontWeight.w500),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                flex:0,
-                                child: Text(
-                                  "P&L :",
-                                  style: DI<CommonWidget>().myTextStyle(
-                                      DI<ColorConst>().darkGryColor,
-                                      15,
-                                      FontWeight.w500),
-                                ),
-                              ),
-                              SizedBox(width: 5,),
-                              Expanded(
-                                flex:1,
-                                child: Text(
-                                  "Profit",
-                                  style: DI<CommonWidget>().myTextStyle(
-                                      DI<ColorConst>().blackColor,
-                                      16,
-                                      FontWeight.w500),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(
-                                "Status :",
-                                style: DI<CommonWidget>().myTextStyle(
-                                    DI<ColorConst>().darkGryColor,
-                                    15,
-                                    FontWeight.w500),
-                              ),
-                              SizedBox(width: 5,),
-                              Text(
-                                "Success",
-                                style: DI<CommonWidget>().myTextStyle(
-                                    DI<ColorConst>().blackColor,
-                                    16,
-                                    FontWeight.w500),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                flex:0,
-                                child: Text(
-                                  "P&L :",
-                                  style: DI<CommonWidget>().myTextStyle(
-                                      DI<ColorConst>().darkGryColor,
-                                      15,
-                                      FontWeight.w500),
-                                ),
-                              ),
-                              SizedBox(width: 5,),
-                              Expanded(
-                                flex:1,
-                                child: Text(
-                                  "₹ 10,000",
-                                  style: DI<CommonWidget>().myTextStyle(
-                                      index %2==0?
-                                      DI<ColorConst>().dark_greenColor:
-                                      DI<ColorConst>().redColor,
-                                      16,
-                                      FontWeight.w500),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                "P&L % :",
-                                style: DI<CommonWidget>().myTextStyle(
-                                    DI<ColorConst>().darkGryColor,
-                                    15,
-                                    FontWeight.w500),
-                              ),
-                              SizedBox(width: 5,),
-                              Text(
-                                "5.00%",
-                                style: DI<CommonWidget>().myTextStyle(
-                                    index %2==0?
-                                    DI<ColorConst>().dark_greenColor:
-                                    DI<ColorConst>().redColor,
-                                    16,
-                                    FontWeight.w500),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-
-
-                  ],
-                ),
-              ),
-            );
-          }, separatorBuilder: (BuildContext context, int index) {
-          return SizedBox(
-            height: 10,
-          );
-        },)
-
-
       ],
     );
   }
 
-  Widget addFundColumn(){
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-
-        Text(
-          DI<StringConst>().request_add_fund_text,
-          style: DI<CommonWidget>().myTextStyle(
-              DI<ColorConst>().blackColor,
-              20,
-              FontWeight.w500),
-        ),
-
-
-        SizedBox(
-          height: 7.w,
-        ),
-
-        Text(DI<StringConst>().amount_text,
-          style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().blackColor, 13.sp, FontWeight.w400),),
-        DI<CommonWidget>().myTextFormField(
-          controller: amountCtrl,
-            textInputType: TextInputType.number,
-            "",
-            textInputAction:TextInputAction.next),
-        SizedBox(
-          height: 10,
-        ),
-        Text(DI<StringConst>().notes_text,
-          style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().blackColor, 13.sp, FontWeight.w400),),
-        DI<CommonWidget>().myTextFormField(
-            controller: noteCtrl,
-            textInputType: TextInputType.text,
-            "",
-        minLine: 5,
-        textInputAction:TextInputAction.done),
-        SizedBox(
-          height: 15.w,
-        ),
-
-        DI<CommonWidget>().myButton(DI<StringConst>().submit_fund_request_text,(){
-
-          if(validationAddFund()){
-            homeTabController.addFund(amountCtrl.text.trim()).then((value) {
-              if(value){
-                amountCtrl.clear();
-                noteCtrl.clear();
-              }
-            },);
-
-          }
-        }),
-      ],
-    );
-  }
-
-  Widget withdrawFundColumn(){
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          DI<StringConst>().request_withdraw_fund_text,
-          style: DI<CommonWidget>().myTextStyle(
-              DI<ColorConst>().blackColor,
-              20,
-              FontWeight.w500),
-        ),
-
-        SizedBox(
-          height: 7.w,
-        ),
-
-        Text(
-          "${DI<StringConst>().available_balance_text} ₹${homeTabController.fundsModel.value?.data.balance}",
-          style: DI<CommonWidget>().myTextStyle(
-              DI<ColorConst>().dark_greenColor,
-              15,
-              FontWeight.w700),
-        ),
-
-        SizedBox(
-          height: 7,
-        ),
-        Text(DI<StringConst>().amount_text,
-          style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().blackColor, 13.sp, FontWeight.w400),),
-        DI<CommonWidget>().myTextFormField(
-          controller: amountWithdrawCtrl,
-            textInputType: TextInputType.number,
-            "",
-            textInputAction:TextInputAction.next),
-        SizedBox(
-          height: 10,
-        ),
-
-        Text(DI<StringConst>().upi_id_text,
-          style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().blackColor, 13.sp, FontWeight.w400),),
-        DI<CommonWidget>().myTextFormField(
-            controller: upiIdWithdrawCtrl,
-            textInputType: TextInputType.text,
-            "",
-            textInputAction:TextInputAction.next),
-        SizedBox(
-          height: 10,
-        ),
-
-        Text(DI<StringConst>().upi_name_text,
-          style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().blackColor, 13.sp, FontWeight.w400),),
-        DI<CommonWidget>().myTextFormField(
-            controller: upiNameWithdrawCtrl,
-            textInputType: TextInputType.text,
-            "",
-            textInputAction:TextInputAction.next),
-        SizedBox(
-          height: 10,
-        ),
-        Text(DI<StringConst>().notes_text,
-          style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().blackColor, 13.sp, FontWeight.w400),),
-        DI<CommonWidget>().myTextFormField(
-            controller: noteWithdrawCtrl,
-            textInputType: TextInputType.text,
-            "",
-            minLine: 5,
-            textInputAction:TextInputAction.done),
-        SizedBox(
-          height: 15.w,
-        ),
-
-        DI<CommonWidget>().myButton(DI<StringConst>().submit_withdrawal_request_text,(){
-          if(validationWithdrawFund()){
-            homeTabController.withdrawFund(amountWithdrawCtrl.text.trim()).then((value) {
-              if(value){
-                amountWithdrawCtrl.clear();
-                noteWithdrawCtrl.clear();
-                upiIdWithdrawCtrl.clear();
-                upiNameWithdrawCtrl.clear();
-              }
-            },);
-          }
-        }),
-      ],
-    );
-  }
-
-  Widget payAmountColumn(){
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ListView.separated(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: 10,
-          itemBuilder: (context, index) {
-            return InkWell(
-              onTap: (){
-                Get.toNamed(DI<RouteHelper>().getPaymentQrDetailScreen());
-              },
-              child: Card(
-                color: DI<ColorConst>().whiteColor,
-                elevation: 0.3,
-                shape: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0),borderSide: BorderSide(color:Colors.transparent)),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
-                  child: Column(
-                    spacing: 5,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            flex:0,
-                            child: Text(
-                              "Amount :",
-                              style: DI<CommonWidget>().myTextStyle(
-                                  DI<ColorConst>().darkGryColor,
-                                  15,
-                                  FontWeight.w500),
-                            ),
-                          ),
-                          SizedBox(width: 5,),
-                          Expanded(
-                            flex:1,
-                            child: Text(
-                              "₹10,000.00",
-                              style: DI<CommonWidget>().myTextStyle(
-                                  DI<ColorConst>().blackColor,
-                                  16,
-                                  FontWeight.w600),
-                            ),
-                          ),
-                        ],
-                      ),
-
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Status :",
-                            style: DI<CommonWidget>().myTextStyle(
-                                DI<ColorConst>().darkGryColor,
-                                15,
-                                FontWeight.w500),
-                          ),
-                          SizedBox(width: 5,),
-                          Text(
-                            "Assigned",
-                            style: DI<CommonWidget>().myTextStyle(
-                                DI<ColorConst>().secondColorPrimary,
-                                16,
-                                FontWeight.w500),
-                          ),
-                        ],
-                      ),
-
-                      Row(
-                        children: [
-                          Expanded(
-                            flex:0,
-                            child: Text(
-                              "Assigned Date :",
-                              style: DI<CommonWidget>().myTextStyle(
-                                  DI<ColorConst>().darkGryColor,
-                                  15,
-                                  FontWeight.w500),
-                            ),
-                          ),
-                          SizedBox(width: 5,),
-                          Expanded(
-                            flex:1,
-                            child: Text(
-                              "04-02-2026",
-                              style: DI<CommonWidget>().myTextStyle(
-                                  DI<ColorConst>().blackColor,
-                                  16,
-                                  FontWeight.w500),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      Row(
-                        children: [
-                          Expanded(
-                            flex:0,
-                            child: Text(
-                              "Payment Date :",
-                              style: DI<CommonWidget>().myTextStyle(
-                                  DI<ColorConst>().darkGryColor,
-                                  15,
-                                  FontWeight.w500),
-                            ),
-                          ),
-                          SizedBox(width: 5,),
-                          Expanded(
-                            flex:1,
-                            child: Text(
-                              "----",
-                              style: DI<CommonWidget>().myTextStyle(
-                                  DI<ColorConst>().blackColor,
-                                  16,
-                                  FontWeight.w500),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }, separatorBuilder: (BuildContext context, int index) {
-          return SizedBox(
-            height: 10,
-          );
-        },)
-      ],
-    );
-  }
-
-  Widget fundContainer(String title, String amount,Color textColor){
-    return   Container(
-      padding: EdgeInsets.all(10.0),
+  /// ─── Tabs ────────────────────────────────────────
+  Widget _buildTabs() {
+    return Container(
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5.0),
-          color: Colors.transparent,
-          border: Border.all(color: DI<ColorConst>().darkGryColor)
+        color: DI<ColorConst>().cardBgColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: DI<ColorConst>().dividerColor.withOpacity(0.4),
+          width: 0.8,
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: EdgeInsets.all(4),
+      child: Row(
         children: [
-          Text(title,
-            style: DI<CommonWidget>().myTextStyle(
-                DI<ColorConst>().darkGryColor,
-                14,
-                FontWeight.w400),),
-          SizedBox(
-            height: 3,
-          ),
-
-          Text("₹ $amount",
-            style: DI<CommonWidget>().myTextStyle(
-                textColor,
-                15,
-                FontWeight.w700),),
+          _tabItem(DI<StringConst>().funds_text, 0),
+          SizedBox(width: 3),
+          _tabItem(DI<StringConst>().add_fund_text, 1),
+          SizedBox(width: 3),
+          _tabItem(DI<StringConst>().withdraw_funds_text, 2),
+          SizedBox(width: 3),
+          _tabItem(DI<StringConst>().pay_amount_text, 3),
         ],
       ),
     );
   }
 
+  Widget _tabItem(String label, int index) {
+    final isSelected = selectType.value == index;
+    return Expanded(
+      child: InkWell(
+        onTap: () => selectType.value = index,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 9),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? DI<ColorConst>().secondColorPrimary
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Center(
+            child: Text(
+              label,
+              style: DI<CommonWidget>().myTextStyle(
+                isSelected ? Colors.white : DI<ColorConst>().blackColor,
+                12.sp,
+                FontWeight.w500,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
-  bool validationAddFund(){
+  /// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  /// ─── Funds Tab ───────────────────────────────────
+  /// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Widget _fundColumn() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        /// Summary row
+        Row(
+          children: [
+            Expanded(
+              child: _summaryCard(
+                "Available Balance",
+                "₹${homeTabController.fundsModel.value?.data.balance}",
+                DI<ColorConst>().dark_greenColor,
+                Icons.account_balance_outlined,
+              ),
+            ),
+            SizedBox(width: 8),
+            Expanded(
+              child: _summaryCard(
+                "Margin",
+                "${homeTabController.fundsModel.value?.data.margin}X",
+                DI<ColorConst>().blackColor,
+                Icons.speed_outlined,
+              ),
+            ),
+            SizedBox(width: 8),
+            Expanded(
+              child: _summaryCard(
+                "Total Funds",
+                "₹${homeTabController.fundsModel.value?.data.totalAdded}",
+                DI<ColorConst>().blackColor,
+                Icons.savings_outlined,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 20),
 
-    if(amountCtrl.text.trim().isEmpty){
+        /// Transaction History header
+        Row(
+          children: [
+            Icon(Icons.history_rounded,
+                color: DI<ColorConst>().secondColorPrimary, size: 20),
+            SizedBox(width: 6),
+            Text(
+              DI<StringConst>().transaction_history_text,
+              style: DI<CommonWidget>().myTextStyle(
+                  DI<ColorConst>().blackColor, 18.sp, FontWeight.w600),
+            ),
+          ],
+        ),
+        SizedBox(height: 10),
 
-      DI<CommonFunction>().showErrorSnackBar("Please make sure all fields are filled correctly before continuing");
+        /// Transaction list
+        ListView.separated(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: homeTabController.fundsList.length,
+          separatorBuilder: (_, __) => SizedBox(height: 10),
+          itemBuilder: (context, index) {
+            final item = homeTabController.fundsList[index];
+            return _transactionCard(item, index);
+          },
+        ),
+      ],
+    );
+  }
+
+  /// ─── Summary Card ────────────────────────────────
+  Widget _summaryCard(
+      String title, String amount, Color valueColor, IconData icon) {
+    return Container(
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: DI<ColorConst>().cardBgColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: DI<ColorConst>().dividerColor.withOpacity(0.4),
+          width: 0.8,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: DI<ColorConst>().darkGryColor, size: 18),
+          SizedBox(height: 6),
+          Text(
+            title,
+            style: DI<CommonWidget>().myTextStyle(
+                DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w400),
+          ),
+          SizedBox(height: 4),
+          Text(
+            amount,
+            style: DI<CommonWidget>()
+                .myTextStyle(valueColor, 15.sp, FontWeight.w700),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// ─── Transaction Card ────────────────────────────
+  Widget _transactionCard(dynamic item, int index) {
+    return Container(
+      padding: EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: DI<ColorConst>().cardBgColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: DI<ColorConst>().dividerColor.withOpacity(0.4),
+          width: 0.8,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// Date + Type
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.calendar_today_outlined,
+                      size: 14, color: DI<ColorConst>().darkGryColor),
+                  SizedBox(width: 4),
+                  Text(
+                    "${item.createdAt}",
+                    style: DI<CommonWidget>().myTextStyle(
+                        DI<ColorConst>().darkGryColor, 13.sp, FontWeight.w400),
+                  ),
+                ],
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: DI<ColorConst>().dark_greenColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  "${item.transactionType}",
+                  style: DI<CommonWidget>().myTextStyle(
+                      DI<ColorConst>().dark_greenColor, 12.sp, FontWeight.w600),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10),
+
+          /// Amount + Position
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Amount",
+                    style: DI<CommonWidget>().myTextStyle(
+                        DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w400),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    "₹ ${item.amount}",
+                    style: DI<CommonWidget>().myTextStyle(
+                        DI<ColorConst>().blackColor, 16.sp, FontWeight.w600),
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    "Position ID",
+                    style: DI<CommonWidget>().myTextStyle(
+                        DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w400),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    "${item.positionId}",
+                    style: DI<CommonWidget>().myTextStyle(
+                        DI<ColorConst>().secondColorPrimary,
+                        14.sp,
+                        FontWeight.w500),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  /// ─── Add Fund Tab ────────────────────────────────
+  /// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Widget _addFundColumn() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: DI<ColorConst>().cardBgColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: DI<ColorConst>().dividerColor.withOpacity(0.4),
+          width: 0.8,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            DI<StringConst>().request_add_fund_text,
+            style: DI<CommonWidget>().myTextStyle(
+                DI<ColorConst>().blackColor, 18.sp, FontWeight.w600),
+          ),
+          SizedBox(height: 20),
+
+          _fieldLabel(DI<StringConst>().amount_text),
+          DI<CommonWidget>().myTextFormField(
+            controller: amountCtrl,
+            textInputType: TextInputType.number,
+            "",
+            textInputAction: TextInputAction.next,
+          ),
+          SizedBox(height: 14),
+
+          _fieldLabel(DI<StringConst>().notes_text),
+          DI<CommonWidget>().myTextFormField(
+            controller: noteCtrl,
+            textInputType: TextInputType.text,
+            "",
+            minLine: 4,
+            textInputAction: TextInputAction.done,
+          ),
+          SizedBox(height: 24),
+
+          DI<CommonWidget>().myButton(
+            DI<StringConst>().submit_fund_request_text,
+            () {
+              if (validationAddFund()) {
+                homeTabController
+                    .addFund(amountCtrl.text.trim())
+                    .then((value) {
+                  if (value) {
+                    amountCtrl.clear();
+                    noteCtrl.clear();
+                  }
+                });
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  /// ─── Withdraw Fund Tab ───────────────────────────
+  /// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Widget _withdrawFundColumn() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: DI<ColorConst>().cardBgColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: DI<ColorConst>().dividerColor.withOpacity(0.4),
+          width: 0.8,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            DI<StringConst>().request_withdraw_fund_text,
+            style: DI<CommonWidget>().myTextStyle(
+                DI<ColorConst>().blackColor, 18.sp, FontWeight.w600),
+          ),
+          SizedBox(height: 10),
+
+          /// Available Balance badge
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: DI<ColorConst>().dark_greenColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              "${DI<StringConst>().available_balance_text} ₹${homeTabController.fundsModel.value?.data.balance}",
+              style: DI<CommonWidget>().myTextStyle(
+                  DI<ColorConst>().dark_greenColor, 14.sp, FontWeight.w600),
+            ),
+          ),
+          SizedBox(height: 16),
+
+          _fieldLabel(DI<StringConst>().amount_text),
+          DI<CommonWidget>().myTextFormField(
+            controller: amountWithdrawCtrl,
+            textInputType: TextInputType.number,
+            "",
+            textInputAction: TextInputAction.next,
+          ),
+          SizedBox(height: 14),
+
+          _fieldLabel(DI<StringConst>().upi_id_text),
+          DI<CommonWidget>().myTextFormField(
+            controller: upiIdWithdrawCtrl,
+            textInputType: TextInputType.text,
+            "",
+            textInputAction: TextInputAction.next,
+          ),
+          SizedBox(height: 14),
+
+          _fieldLabel(DI<StringConst>().upi_name_text),
+          DI<CommonWidget>().myTextFormField(
+            controller: upiNameWithdrawCtrl,
+            textInputType: TextInputType.text,
+            "",
+            textInputAction: TextInputAction.next,
+          ),
+          SizedBox(height: 14),
+
+          _fieldLabel(DI<StringConst>().notes_text),
+          DI<CommonWidget>().myTextFormField(
+            controller: noteWithdrawCtrl,
+            textInputType: TextInputType.text,
+            "",
+            minLine: 4,
+            textInputAction: TextInputAction.done,
+          ),
+          SizedBox(height: 24),
+
+          DI<CommonWidget>().myButton(
+            DI<StringConst>().submit_withdrawal_request_text,
+            () {
+              if (validationWithdrawFund()) {
+                homeTabController
+                    .withdrawFund(amountWithdrawCtrl.text.trim())
+                    .then((value) {
+                  if (value) {
+                    amountWithdrawCtrl.clear();
+                    noteWithdrawCtrl.clear();
+                    upiIdWithdrawCtrl.clear();
+                    upiNameWithdrawCtrl.clear();
+                  }
+                });
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  /// ─── Pay Amount Tab ──────────────────────────────
+  /// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Widget _payAmountColumn() {
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      itemCount: 10,
+      separatorBuilder: (_, __) => SizedBox(height: 10),
+      itemBuilder: (context, index) {
+        return InkWell(
+          onTap: () {
+            Get.toNamed(DI<RouteHelper>().getPaymentQrDetailScreen());
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: DI<ColorConst>().cardBgColor,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: DI<ColorConst>().dividerColor.withOpacity(0.4),
+                width: 0.8,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// Amount + Status
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "₹10,000.00",
+                      style: DI<CommonWidget>().myTextStyle(
+                          DI<ColorConst>().blackColor, 17.sp, FontWeight.w600),
+                    ),
+                    Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: DI<ColorConst>()
+                            .secondColorPrimary
+                            .withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        "Assigned",
+                        style: DI<CommonWidget>().myTextStyle(
+                            DI<ColorConst>().secondColorPrimary,
+                            12.sp,
+                            FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10),
+                Divider(
+                  height: 0,
+                  thickness: 0.6,
+                  color: DI<ColorConst>().dividerColor.withOpacity(0.3),
+                ),
+                SizedBox(height: 10),
+
+                /// Dates
+                Row(
+                  children: [
+                    Expanded(
+                      child: _dateInfo(
+                          "Assigned Date", "04-02-2026", Icons.event_available),
+                    ),
+                    Expanded(
+                      child:
+                          _dateInfo("Payment Date", "----", Icons.event_note),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// ─── Date info item ──────────────────────────────
+  Widget _dateInfo(String label, String value, IconData icon) {
+    return Row(
+      children: [
+        Icon(icon, size: 15, color: DI<ColorConst>().darkGryColor),
+        SizedBox(width: 4),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: DI<CommonWidget>().myTextStyle(
+                  DI<ColorConst>().darkGryColor, 11.sp, FontWeight.w400),
+            ),
+            Text(
+              value,
+              style: DI<CommonWidget>().myTextStyle(
+                  DI<ColorConst>().blackColor, 13.sp, FontWeight.w500),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  /// ─── Field Label ─────────────────────────────────
+  Widget _fieldLabel(String text) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 4),
+      child: Text(
+        text,
+        style: DI<CommonWidget>().myTextStyle(
+            DI<ColorConst>().darkGryColor, 14.sp, FontWeight.w400),
+      ),
+    );
+  }
+
+  /// ─── Validations ─────────────────────────────────
+  bool validationAddFund() {
+    if (amountCtrl.text.trim().isEmpty) {
+      DI<CommonFunction>().showErrorSnackBar(
+          "Please make sure all fields are filled correctly before continuing");
       return false;
     }
-
     return true;
   }
 
-
-  bool validationWithdrawFund(){
-
-    if(amountWithdrawCtrl.text.trim().isEmpty || upiIdWithdrawCtrl.text.trim().isEmpty
-        || upiNameWithdrawCtrl.text.trim().isEmpty ){
-
-      DI<CommonFunction>().showErrorSnackBar("Please make sure all fields are filled correctly before continuing");
+  bool validationWithdrawFund() {
+    if (amountWithdrawCtrl.text.trim().isEmpty ||
+        upiIdWithdrawCtrl.text.trim().isEmpty ||
+        upiNameWithdrawCtrl.text.trim().isEmpty) {
+      DI<CommonFunction>().showErrorSnackBar(
+          "Please make sure all fields are filled correctly before continuing");
       return false;
-    }else if(int.parse(amountWithdrawCtrl.text.trim().toString()) >  int.parse(homeTabController.fundsModel.value?.data.balance.toString()??"0")){
-      DI<CommonFunction>().showErrorSnackBar("Amount should be less then balance");
+    } else if (int.parse(amountWithdrawCtrl.text.trim()) >
+        int.parse(
+            homeTabController.fundsModel.value?.data.balance.toString() ??
+                "0")) {
+      DI<CommonFunction>()
+          .showErrorSnackBar("Amount should be less than balance");
       return false;
     }
-
     return true;
   }
-
-
 
   @override
   void dispose() {

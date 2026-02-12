@@ -23,7 +23,6 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
 
   @override
   void initState() {
-    WidgetsFlutterBinding.ensureInitialized();
     super.initState();
     isLogin = DI<MyLocalStorage>().getBoolValue(DI<MyLocalStorage>().isLogin);
     print(isLogin);
@@ -57,7 +56,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: DI<ColorConst>().whiteColor,
+      backgroundColor: DI<ColorConst>().scaffoldBgColor,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

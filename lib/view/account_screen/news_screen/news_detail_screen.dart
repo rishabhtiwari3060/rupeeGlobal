@@ -20,7 +20,6 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
   String imageUrl = "", title = "",description = "",publishedAt = "";
   @override
   void initState() {
-    WidgetsFlutterBinding.ensureInitialized();
     super.initState();
     if(Get.parameters["title"] != null){
 

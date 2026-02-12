@@ -24,7 +24,6 @@ class _NewsScreenState extends State<NewsScreen> {
 
   @override
   void initState() {
-    WidgetsFlutterBinding.ensureInitialized();
     super.initState();
     scrollController = ScrollController()..addListener(_scrollListener);
     Future.delayed(Duration.zero,() {
@@ -142,7 +141,7 @@ class _NewsScreenState extends State<NewsScreen> {
                     ),
                   );
                 },
-                separatorBuilder: (context, index) => Divider(),
+                separatorBuilder: (context, index) => Divider(color: DI<ColorConst>().dividerColor, thickness: 0.6),
               ),
       ),
       bottomNavigationBar: Obx(

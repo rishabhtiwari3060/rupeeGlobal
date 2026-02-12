@@ -3,8 +3,12 @@ import 'dart:developer';
 import 'package:get/get.dart';
 import 'package:rupeeglobal/model/FundModel.dart';
 import 'package:rupeeglobal/model/HoldingModel.dart';
+import 'package:rupeeglobal/model/ForexPairsModel.dart';
 import 'package:rupeeglobal/model/MarketIndicesModel.dart';
 import 'package:rupeeglobal/model/PortfolioModel.dart';
+import 'package:rupeeglobal/model/PositionModel.dart';
+import 'package:rupeeglobal/model/MarketIndexDetailModel.dart';
+import 'package:rupeeglobal/model/ForexPairDetailModel.dart';
 import 'package:rupeeglobal/repo/home_tab_repo.dart';
 
 import '../../util/CommonFunction.dart';
@@ -28,6 +32,22 @@ class HomeTabController extends GetxService{
   var fundsList = <Transaction>[].obs;
 
   var marketIndicesModel = Rxn<MarketIndicesModel>();
+  var forexPairsModel = Rxn<ForexPairsModel>();
+  var selectedHomeTab = 0.obs; // 0 = Market Indices, 1 = Forex Pairs
+
+  // Market Index Detail
+  var marketIndexDetailModel = Rxn<MarketIndexDetailModel>();
+  
+  // Forex Pair Detail
+  var forexPairDetailModel = Rxn<ForexPairDetailModel>();
+
+  // Positions
+  var positionModel = Rxn<PositionModel>();
+  var positionList = <Position>[].obs;
+  var selectedPositionType = "Regular".obs; // Regular, MTF, Strategy
+  var selectedPositionStatus = "CF".obs; // CF, Closed
+  bool isPositionScroll = true;
+  var positionPage = 1.obs;
 
   Future<void> getHoldingList(String page)async{
 
@@ -195,18 +215,129 @@ class HomeTabController extends GetxService{
     marketIndicesModel.value = null;
 
     try{
-
       var response = await DI<HomeTabRepo>().getMarketIndicesRepo();
       isLoading.value = false;
       DI<CommonFunction>().hideLoader();
-
       marketIndicesModel.value = response;
-
     }catch(e){
       isLoading.value = false;
       DI<CommonFunction>().hideLoader();
       log("Exception getMarketIndices :- ",error: e.toString());
     }
+  }
+
+  Future<void> getForexPairs()async{
+    isLoading.value = true;
+    DI<CommonFunction>().showLoading();
+    forexPairsModel.value = null;
+
+    try{
+      var response = await DI<HomeTabRepo>().getForexPairsRepo();
+      isLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+      forexPairsModel.value = response;
+    }catch(e){
+      isLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+      log("Exception getForexPairs :- ",error: e.toString());
+    }
+  }
+
+  // Get Market Index Detail
+  Future<void> getMarketIndexDetail(String symbol)async{
+    isLoading.value = true;
+    DI<CommonFunction>().showLoading();
+    marketIndexDetailModel.value = null;
+
+    try{
+      var response = await DI<HomeTabRepo>().getMarketIndexDetailRepo(symbol);
+      isLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+      marketIndexDetailModel.value = response;
+    }catch(e){
+      isLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+      log("Exception getMarketIndexDetail :- ",error: e.toString());
+    }
+  }
+
+  // Get Forex Pair Detail
+  Future<void> getForexPairDetail(String symbol)async{
+    isLoading.value = true;
+    DI<CommonFunction>().showLoading();
+    forexPairDetailModel.value = null;
+
+    try{
+      var response = await DI<HomeTabRepo>().getForexPairDetailRepo(symbol);
+      isLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+      forexPairDetailModel.value = response;
+    }catch(e){
+      isLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+      log("Exception getForexPairDetail :- ",error: e.toString());
+    }
+  }
+
+  // Get Positions with filters and pagination
+  Future<void> getPositionList(String page, {String? type, String? status})async{
+    
+    // Build query string with filters
+    String query = "?page=$page&per_page=20";
+    if(type != null && type.isNotEmpty){
+      query += "&type=$type";
+    }
+    if(status != null && status.isNotEmpty){
+      query += "&status=$status";
+    }
+
+    if(page.toString() == "1"){
+      positionList.clear();
+      isLoading.value = true;
+      DI<CommonFunction>().showLoading();
+      isPositionScroll = true;
+    }else{
+      isBottomLoading.value = true;
+    }
+
+    try{
+      var response = await DI<HomeTabRepo>().getPositionsRepo(query);
+      
+      isLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+      isBottomLoading.value = false;
+      positionModel.value = response;
+
+      positionList.addAll(positionModel.value?.data.positions??[]);
+
+      if(positionModel.value?.data.positions.isEmpty??true){
+        isPositionScroll = false;
+      }
+
+    }catch(e){
+      isLoading.value = false;
+      isBottomLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+      log("Exception getPositionList :- ",error: e.toString());
+    }
+  }
+
+  // Reset positions and fetch with new filters
+  void refreshPositions(){
+    positionPage.value = 1;
+    getPositionList("1", type: selectedPositionType.value, status: selectedPositionStatus.value);
+  }
+
+  // Change position type filter
+  void changePositionType(String type){
+    selectedPositionType.value = type;
+    refreshPositions();
+  }
+
+  // Change position status filter
+  void changePositionStatus(String status){
+    selectedPositionStatus.value = status;
+    refreshPositions();
   }
 
 }

@@ -12,6 +12,9 @@ class MyLocalStorage {
   String userProfile = "userProfile";
   String userPhone = "userPhone";
   String userBalance = "userBalance";
+  String rememberMe = "rememberMe";
+  String rememberEmail = "rememberEmail";
+  String rememberPassword = "rememberPassword";
 
 
   //For Storing String value
@@ -51,9 +54,22 @@ class MyLocalStorage {
     return localStorage.read(key)?? [];
   }
 
-  //For Clear the GetStorage
+  //For Clear the GetStorage (preserves remember-me credentials)
   void clearLocalStorage(){
+    /// Save remember-me data before erasing
+    final savedRememberMe = getBoolValue(rememberMe);
+    final savedEmail = getStringValue(rememberEmail);
+    final savedPassword = getStringValue(rememberPassword);
+
     localStorage.erase();
+
+    /// Restore remember-me data after erase
+    if (savedRememberMe) {
+      setBoolValue(rememberMe, true);
+      setStringValue(rememberEmail, savedEmail);
+      setStringValue(rememberPassword, savedPassword);
+    }
+
     print("clearLocalStorage");
   }
 }

@@ -94,10 +94,24 @@ class StringConst{
   String submit_withdrawal_request_text = "Submit withdrawal Request";
   String available_balance_text = "Available Balance : ";
   String market_indices_text = "Market Indices";
-  String forex_pairs_text = "Top 10 Forex Pairs";
+  String forex_pairs_text = "Forex Pairs";
   String option_chain_text = "Option Chain";
   String pay_amount_text = "Pay Amount";
   String i_have_paid_text = "I Have Paid";
+  String agreements_text = "Agreements";
+  String pending_text = "Pending";
+  String signed_text = "Signed";
+  String created_at_text = "Created At";
+  String signed_at_text = "Signed At";
+  String download_pdf_text = "Download PDF";
+  String upload_signed_agreement_text = "Upload Signed Agreement";
+  String view_signed_agreement_text = "View Signed Agreement";
+  String no_agreements_found_text = "No agreements found";
+  String agreement_content_text = "Agreement Content";
+  String select_pdf_file_text = "Select PDF File";
+  String pdf_only_max_5mb_text = "PDF only, Max 5MB";
+  String upload_text = "Upload";
+  String uploading_text = "Uploading...";
 
 
 
