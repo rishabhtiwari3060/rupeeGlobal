@@ -33,14 +33,13 @@ class _HomeTabScreenState extends State<HomeTabScreen> {
 
   @override
   void initState() {
-    WidgetsFlutterBinding.ensureInitialized();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Obx(() =>  Scaffold(
-     backgroundColor:  DI<ColorConst>().whiteColor,
+     backgroundColor:  DI<ColorConst>().scaffoldBgColor,
       body: _screens[_currentIndex.value],
       bottomNavigationBar: SizedBox(
         height: kBottomNavigationBarHeight,

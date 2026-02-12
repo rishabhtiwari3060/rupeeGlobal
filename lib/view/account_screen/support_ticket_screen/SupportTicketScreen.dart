@@ -18,333 +18,468 @@ class SupportTicketScreen extends StatefulWidget {
 }
 
 class _SupportTicketScreenState extends State<SupportTicketScreen> {
-  AccountController accountController =Get.find();
+  AccountController accountController = Get.find();
 
-  String? selectedStatusValue, selectedPriorityValue,createPriorityValue = "";
+  String? selectedStatusValue, selectedPriorityValue, createPriorityValue = "";
 
   List<String> statusList = ['All Status', 'Pending', 'Closed'];
-  List<String> priorityList = ['All Priority', 'Low', 'Urgent','High'];
-  List<String> createPriorityList = ['Low', 'Urgent','High'];
+  List<String> priorityList = ['All Priority', 'Low', 'Urgent', 'High'];
+  List<String> createPriorityList = ['Low', 'Urgent', 'High'];
 
   late TextEditingController messageCtrl;
+  late ScrollController _scrollController;
+
+  int _ticketPage = 1;
+  bool _canScrollMore = true;
 
   @override
   void initState() {
-    WidgetsFlutterBinding.ensureInitialized();
     super.initState();
     messageCtrl = TextEditingController();
-   Future.delayed(Duration.zero,() {
-     accountController.getTicketList("pending","high","1");
-   },);
+    _scrollController = ScrollController()..addListener(_scrollListener);
+    Future.delayed(Duration.zero, () {
+      accountController.getTicketList("pending", "high", "1");
+    });
+  }
+
+  @override
+  void dispose() {
+    messageCtrl.dispose();
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.maxScrollExtent ==
+        _scrollController.offset) {
+      if (_canScrollMore && !accountController.isLoading.value) {
+        _ticketPage++;
+        accountController.getTicketList(
+          selectedStatusValue?.toLowerCase() ?? "pending",
+          selectedPriorityValue?.toLowerCase() ?? "high",
+          _ticketPage.toString(),
+        );
+      }
+    }
+  }
+
+  void _resetAndFetch() {
+    _ticketPage = 1;
+    _canScrollMore = true;
+    accountController.getTicketList(
+      selectedStatusValue?.toLowerCase() ?? "",
+      selectedPriorityValue?.toLowerCase() ?? "",
+      "1",
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: DI<ColorConst>().scaffoldBgColor,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         leading: InkWell(
-            onTap: () {
-              Get.back();
-            },
-            child: Icon(
-              Icons.arrow_back_ios,
-              color: DI<ColorConst>().blackColor,
-            )),
+          onTap: () => Get.back(),
+          child: Icon(Icons.arrow_back_ios, color: DI<ColorConst>().blackColor),
+        ),
         title: Text(
           DI<StringConst>().support_ticket_text,
           style: DI<CommonWidget>()
-              .myTextStyle(DI<ColorConst>().blackColor, 20, FontWeight.w400),
+              .myTextStyle(DI<ColorConst>().blackColor, 18.sp, FontWeight.w600),
         ),
       ),
-
-      body: SingleChildScrollView(
-        physics: AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.symmetric(horizontal: 10),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-
-            Row(
+      body: Column(
+        children: [
+          /// Filter Row
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            child: Row(
               children: [
                 Expanded(
-                  flex: 1,
-                  child: dropDown('All Status', statusList,  (value) {
+                  child: _filterDropdown('All Status', statusList, (value) {
                     selectedStatusValue = value;
-                    print('Selected value: $value');
-
-                    accountController.getTicketList(selectedStatusValue?.toLowerCase()??"",selectedPriorityValue?.toLowerCase()??"","1");
-                  },),
+                    _resetAndFetch();
+                  }),
                 ),
-                SizedBox(
-                  width: 5,
-                ),
+                SizedBox(width: 10),
                 Expanded(
-                  flex: 1,
-                  child: dropDown('All Priority', priorityList,  (value) {
+                  child:
+                      _filterDropdown('All Priority', priorityList, (value) {
                     selectedPriorityValue = value;
-                    print('Selected value: $value');
-                    accountController.getTicketList(selectedStatusValue?.toLowerCase()??"",selectedPriorityValue?.toLowerCase()??"","1");
-                  },),
+                    _resetAndFetch();
+                  }),
                 ),
               ],
             ),
+          ),
 
-            SizedBox(
-              height: 10,
+          /// Ticket List
+          Expanded(
+            child: Obx(
+              () => accountController.isLoading.value
+                  ? SizedBox()
+                  : accountController.ticketList.isEmpty
+                      ? _emptyState()
+                      : ListView.separated(
+                          controller: _scrollController,
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                          itemCount: accountController.ticketList.length,
+                          separatorBuilder: (_, __) => SizedBox(height: 10),
+                          itemBuilder: (context, index) {
+                            final ticket = accountController.ticketList[index];
+                            return _ticketCard(ticket);
+                          },
+                        ),
             ),
-            Obx(() => accountController.isLoading.value?SizedBox(): listView())
+          ),
+        ],
+      ),
 
+      /// Bottom loading indicator for pagination
+      bottomNavigationBar: Obx(
+        () => accountController.isBottomLoading.value
+            ? SizedBox(
+                height: kBottomNavigationBarHeight,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: DI<ColorConst>().secondColorPrimary,
+                  ),
+                ),
+              )
+            : SizedBox(),
+      ),
+
+      /// FAB
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: DI<ColorConst>().secondColorPrimary,
+        onPressed: () => _createTicketDialog(),
+        icon: Icon(Icons.add_rounded, color: Colors.white, size: 20),
+        label: Text(
+          "New Ticket",
+          style: DI<CommonWidget>()
+              .myTextStyle(Colors.white, 13.sp, FontWeight.w600),
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+    );
+  }
+
+  /// ─── Empty State ─────────────────────────────────
+  Widget _emptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.confirmation_number_outlined,
+              size: 60, color: DI<ColorConst>().darkGryColor.withOpacity(0.4)),
+          SizedBox(height: 12),
+          Text(
+            "No tickets found",
+            style: DI<CommonWidget>().myTextStyle(
+                DI<ColorConst>().darkGryColor, 15.sp, FontWeight.w500),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// ─── Ticket Card ─────────────────────────────────
+  Widget _ticketCard(dynamic ticket) {
+    final isPending =
+        ticket.adminStatus.toString().toLowerCase() == "pending";
+    final statusColor = isPending
+        ? Colors.orange
+        : DI<ColorConst>().dark_greenColor;
+
+    return InkWell(
+      onTap: () {
+        var data = {"id": ticket.id.toString()};
+        Get.toNamed(DI<RouteHelper>().getChatScreen(), parameters: data);
+      },
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: DI<ColorConst>().cardBgColor,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: DI<ColorConst>().dividerColor.withOpacity(0.4),
+            width: 0.8,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// Header: ID + Priority + Chat
+            Row(
+              children: [
+                /// Ticket icon
+                Container(
+                  height: 36,
+                  width: 36,
+                  decoration: BoxDecoration(
+                    color: DI<ColorConst>()
+                        .secondColorPrimary
+                        .withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(Icons.confirmation_number_outlined,
+                      color: DI<ColorConst>().secondColorPrimary, size: 18),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Ticket #${ticket.id}",
+                        style: DI<CommonWidget>().myTextStyle(
+                            DI<ColorConst>().blackColor,
+                            14.sp,
+                            FontWeight.w600),
+                      ),
+                      SizedBox(height: 2),
+                      Row(
+                        children: [
+                          Icon(Icons.calendar_today_outlined,
+                              size: 12,
+                              color: DI<ColorConst>().darkGryColor),
+                          SizedBox(width: 3),
+                          Text(
+                            "${ticket.createdAt}",
+                            style: DI<CommonWidget>().myTextStyle(
+                                DI<ColorConst>().darkGryColor,
+                                10.sp,
+                                FontWeight.w400),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                /// Priority badge
+                _badge(
+                  ticket.priority.toString().toUpperCase(),
+                  _priorityColor(ticket.priority.toString()),
+                ),
+              ],
+            ),
+            SizedBox(height: 12),
+
+            /// Message
+            Text(
+              ticket.message,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: DI<CommonWidget>().myTextStyle(
+                  DI<ColorConst>().blackColor, 12.sp, FontWeight.w400),
+            ),
+            SizedBox(height: 12),
+
+            Divider(
+              height: 0,
+              thickness: 0.6,
+              color: DI<ColorConst>().dividerColor.withOpacity(0.4),
+            ),
+            SizedBox(height: 10),
+
+            /// Footer: Status + Chat button
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _badge(
+                  ticket.adminStatus.toString().toUpperCase(),
+                  statusColor,
+                ),
+                Row(
+                  children: [
+                    if (ticket.messagesCount != null &&
+                        ticket.messagesCount > 0)
+                      Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        margin: EdgeInsets.only(right: 8),
+                        decoration: BoxDecoration(
+                          color: DI<ColorConst>().darkGryColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.chat_bubble_outline,
+                                size: 13,
+                                color: DI<ColorConst>().darkGryColor),
+                            SizedBox(width: 3),
+                            Text(
+                              "${ticket.messagesCount}",
+                              style: DI<CommonWidget>().myTextStyle(
+                                  DI<ColorConst>().darkGryColor,
+                                  10.sp,
+                                  FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                      ),
+                    Icon(Icons.arrow_forward_ios_rounded,
+                        size: 14, color: DI<ColorConst>().darkGryColor),
+                  ],
+                ),
+              ],
+            ),
           ],
         ),
       ),
-
-      floatingActionButton:  FloatingActionButton.extended(
-        backgroundColor: DI<ColorConst>().darkBlueColor,
-        onPressed: () {
-          createTicketDialog();
-          },
-
-        label: Text(
-          DI<StringConst>().create_new_ticket_text,
-          style: DI<CommonWidget>().myTextStyle(
-              DI<ColorConst>().whiteColor,
-              18,
-              FontWeight.w700),
-        ),
-
-      ),
-
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-
-
     );
   }
 
-
-  Widget listView(){
-    return ListView.separated(
-      itemCount: accountController.ticketList.length,
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      itemBuilder: (context, index) {
-      return  ClipPath(
-        clipper: TicketClipper(),
-        child: Container(
-          width: double.infinity,
-          height: 50.sp,
-          padding: const EdgeInsets.all(16),
-          decoration:  BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                DI<ColorConst>().redColor.withOpacity(0.5),
-                DI<ColorConst>().redColor.withOpacity(0.7),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children:  [
-                  Text(
-                    "Ticket ID #${accountController.ticketList[index].id}",
-                    style: DI<CommonWidget>().myTextStyle(
-                        DI<ColorConst>().whiteColor,
-                        18,
-                        FontWeight.w700),
-                  ),
-                  Spacer(),
-                  Icon(Icons.money, color: Colors.white),
-                  Spacer(),
-                  Text(
-                    accountController.ticketList[index].priority.toUpperCase(),
-                    style: DI<CommonWidget>().myTextStyle(
-                        DI<ColorConst>().whiteColor,
-                        18,
-                        FontWeight.w700),
-                  ),
-                  Spacer(),
-                  InkWell(
-                      onTap: (){
-
-                        var data = {
-                          "id" : accountController.ticketList[index].id.toString()
-                        };
-
-                        Get.toNamed(DI<RouteHelper>().getChatScreen(),parameters: data);
-                      },
-                      child: Icon(Icons.chat, color: Colors.white)),
-                ],
-              ),
-
-              const Spacer(),
-
-              /// Bottom Row
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    accountController.ticketList[index].message,
-                    maxLines: 3,
-                    style: DI<CommonWidget>().myTextStyle(
-                        DI<ColorConst>().whiteColor,
-                        17,
-                        FontWeight.w400),
-                  ),
-                  SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Expanded(
-                        flex :2,
-                        child: Text(
-                          "${accountController.ticketList[index].createdAt}",
-                          style: DI<CommonWidget>().myTextStyle(
-                              DI<ColorConst>().greenColor,
-                              15,
-                              FontWeight.w400),
-                        ),
-                      ),
-
-                      Expanded(
-                        flex: 1,
-                        child: Align(
-                          alignment: Alignment.bottomRight,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal:00, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            alignment: Alignment.center,
-                            child:  Text(
-                              accountController.ticketList[index].adminStatus.toUpperCase(),
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      );
-    }, separatorBuilder: (BuildContext context, int index) { return SizedBox(height: 10,); },);
-  }
-
-  Widget dropDown(String hint,List<String> myList, ValueChanged<String?>? onChanged){
-   return DropdownButtonFormField<String>(
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: DI<CommonWidget>().myTextStyle(
-            DI<ColorConst>().blackColor,
-            13,
-            FontWeight.w400),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 14,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide:  BorderSide(color: DI<ColorConst>().darkGryColor,width: 0.9),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide:  BorderSide(color: DI<ColorConst>().darkGryColor,width: 0.9),
-        ),
+  /// ─── Badge Widget ────────────────────────────────
+  Widget _badge(String text, Color color) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
       ),
-      value: selectedStatusValue,
-      items: myList.map((value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(
-            value,
-            style: DI<CommonWidget>().myTextStyle(
-                DI<ColorConst>().blackColor,
-                13,
-                FontWeight.w400),
-          ),
-        );
-      }).toList(),
-      onChanged: onChanged
+      child: Text(
+        text,
+        style: DI<CommonWidget>()
+            .myTextStyle(color, 10.sp, FontWeight.w600),
+      ),
     );
   }
 
+  Color _priorityColor(String priority) {
+    switch (priority.toLowerCase()) {
+      case 'urgent':
+        return DI<ColorConst>().redColor;
+      case 'high':
+        return Colors.orange;
+      case 'low':
+        return DI<ColorConst>().dark_greenColor;
+      default:
+        return DI<ColorConst>().darkGryColor;
+    }
+  }
 
-  void createTicketDialog(){
+  /// ─── Filter Dropdown ─────────────────────────────
+  Widget _filterDropdown(
+      String hint, List<String> items, ValueChanged<String?>? onChanged) {
+    return Container(
+      decoration: BoxDecoration(
+        color: DI<ColorConst>().cardBgColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: DI<ColorConst>().dividerColor.withOpacity(0.5),
+          width: 0.8,
+        ),
+      ),
+      child: DropdownButtonFormField<String>(
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: DI<CommonWidget>().myTextStyle(
+              DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w400),
+          contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          border: InputBorder.none,
+        ),
+        dropdownColor: DI<ColorConst>().cardBgColor,
+        icon: Icon(Icons.keyboard_arrow_down_rounded,
+            color: DI<ColorConst>().darkGryColor),
+        style: DI<CommonWidget>().myTextStyle(
+            DI<ColorConst>().blackColor, 12.sp, FontWeight.w400),
+        items: items.map((value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        onChanged: onChanged,
+      ),
+    );
+  }
+
+  /// ─── Create Ticket Dialog ────────────────────────
+  void _createTicketDialog() {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) {
         return Dialog(
-          backgroundColor: DI<ColorConst>().whiteColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(7),
-          ),
+          backgroundColor: DI<ColorConst>().dialogBgColor,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Align(
-                  alignment: Alignment.topRight,
-                  child: InkWell(
-                    child: const Icon(Icons.cancel),
-                    onTap: () {
-
-                      createPriorityValue = "";
-                      messageCtrl.clear();
-                      Get.back();
-                    },
-                  ),
+                /// Header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Create New Ticket",
+                      style: DI<CommonWidget>().myTextStyle(
+                          DI<ColorConst>().blackColor, 17.sp, FontWeight.w600),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        createPriorityValue = "";
+                        messageCtrl.clear();
+                        Get.back();
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: DI<ColorConst>().darkGryColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(Icons.close_rounded,
+                            size: 18, color: DI<ColorConst>().darkGryColor),
+                      ),
+                    ),
+                  ],
                 ),
+                SizedBox(height: 20),
 
-                const SizedBox(height: 5),
-                Text("Create New Ticket ", style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().blackColor, 17.sp, FontWeight.w500),),
-                const SizedBox(height: 10),
-                Text("Priority ", style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().blackColor, 14.sp, FontWeight.w500),),
-                dropDown('Select Priority', createPriorityList,  (value) {
+                /// Priority
+                Text(
+                  "Priority",
+                  style: DI<CommonWidget>().myTextStyle(
+                      DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w400),
+                ),
+                SizedBox(height: 6),
+                _filterDropdown('Select Priority', createPriorityList, (value) {
                   createPriorityValue = value;
-                  print('Selected value: $value');
+                }),
+                SizedBox(height: 16),
 
-                },),
-
-
-
-                SizedBox(
-                  height: 10,
+                /// Message
+                Text(
+                  "Message",
+                  style: DI<CommonWidget>().myTextStyle(
+                      DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w400),
                 ),
-
-                Text("Message ", style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().blackColor, 14.sp, FontWeight.w500),),
+                SizedBox(height: 6),
                 DI<CommonWidget>().myTextFormField(
                   controller: messageCtrl,
-                    "Enter message",
-                    maxLine:null,
-                    minLine: 5,
-
-                    textInputAction: TextInputAction.done),
-                SizedBox(
-                  height: 10.w,
+                  "Enter message",
+                  maxLine: null,
+                  minLine: 4,
+                  textInputAction: TextInputAction.done,
                 ),
-                DI<CommonWidget>().myButton(DI<StringConst>().save_text,(){
+                SizedBox(height: 24),
 
-                  if(validation()){
-                    accountController.createTicket(createPriorityValue?.toLowerCase()??"", messageCtrl.text.trim());
+                DI<CommonWidget>().myButton(DI<StringConst>().save_text, () {
+                  if (_validation()) {
+                    accountController.createTicket(
+                        createPriorityValue?.toLowerCase() ?? "",
+                        messageCtrl.text.trim());
                     Get.back();
-
                   }
                   createPriorityValue = "";
                   messageCtrl.clear();
@@ -357,62 +492,16 @@ class _SupportTicketScreenState extends State<SupportTicketScreen> {
     );
   }
 
-
-  bool validation(){
-
-    if(createPriorityValue?.isEmpty??false){
-
+  bool _validation() {
+    if (createPriorityValue?.isEmpty ?? false) {
       DI<CommonFunction>()
           .showErrorSnackBar(DI<StringConst>().please_select_prority_text);
-
       return false;
-    }else if(messageCtrl.text.isEmpty){
+    } else if (messageCtrl.text.isEmpty) {
       DI<CommonFunction>()
           .showErrorSnackBar(DI<StringConst>().please_enter_message_text);
-
       return false;
     }
-
     return true;
-
   }
-}
-
-
-
-
-
-class TicketClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-
-    const cutRadius = 12.0;
-
-    path.moveTo(0, 0);
-    path.lineTo(size.width, 0);
-    path.lineTo(size.width, size.height / 2 - cutRadius);
-
-    path.arcToPoint(
-      Offset(size.width, size.height / 2 + cutRadius),
-      radius: const Radius.circular(cutRadius),
-      clockwise: false,
-    );
-
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
-    path.lineTo(0, size.height / 2 + cutRadius);
-
-    path.arcToPoint(
-      Offset(0, size.height / 2 - cutRadius),
-      radius: const Radius.circular(cutRadius),
-      clockwise: false,
-    );
-
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

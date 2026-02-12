@@ -146,6 +146,41 @@ class ApiService extends GetxService {
     return returnResponse(response!);
   }
 
+  //For post method with FormData (file upload)
+  Future<dynamic> postMethodWithFormData(
+      String endPoint, DIO.FormData formData,
+      {Map<String, dynamic>? header})
+  async {
+    DIO.Response? response;
+    try {
+      print("baseUrl postFormData--- ${DI<WebService>().BASE_URL}$endPoint");
+
+      response = await dio.post(
+        "${DI<WebService>().BASE_URL}$endPoint",
+        data: formData,
+        options: DIO.Options(
+          headers: {
+            "Content-Type": "multipart/form-data",
+            ...?header,
+          },
+        ),
+      );
+      return returnResponse(response);
+    } catch (e) {
+      if (e is DIO.DioException) {
+        if (e.response != null) {
+          response = e.response;
+          return returnResponse(e.response!);
+        } else {
+          log("Error:-- ${e.message}");
+        }
+      } else {
+        log("NO Dio Error: $e");
+      }
+    }
+    return returnResponse(response!);
+  }
+
   //For multipart method
   Future<dynamic> multipartPostMethod(String endPoint, String profileKeyName,
       String filePath, Map<String, dynamic> body, header)
@@ -258,13 +293,16 @@ class ApiService extends GetxService {
   Future<DIO.Response> returnResponse(DIO.Response response) async {
     if(response.data["success"].toString() == "false"){
 
-      DI<CommonWidget>().errorDialog(response.data["message"].toString(), () {
-        if(response.data["message"].toString() == "Invalid access token"){
+
+      if(response.data["message"].toString() == "Invalid access token"){
 
           DI<MyLocalStorage>().clearLocalStorage();
           Get.offAllNamed(DI<RouteHelper>().getLoginScreen());
-          return;
+          return response;
         }
+
+      DI<CommonWidget>().errorDialog(response.data["message"].toString(), () {
+      
         Get.back();
       });
 

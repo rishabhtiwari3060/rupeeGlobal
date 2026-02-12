@@ -26,7 +26,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void initState() {
-    WidgetsFlutterBinding.ensureInitialized();
     super.initState();
     if(Get.parameters["id"]!= null){
       ticketId = Get.parameters["id"]??"";
@@ -136,8 +135,8 @@ class ChatBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final alignment = !message.isAdmin ? Alignment.centerRight : Alignment.centerLeft;
-    final color = !message.isAdmin ? DI<ColorConst>().redColor : Colors.grey.shade300;
-    final textColor = !message.isAdmin ? Colors.white : Colors.black87;
+    final color = !message.isAdmin ? DI<ColorConst>().redColor : DI<ColorConst>().chatAdminBubbleColor;
+    final textColor = !message.isAdmin ? Colors.white : DI<ColorConst>().chatAdminTextColor;
 
 
     return Align(

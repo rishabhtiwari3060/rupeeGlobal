@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rupeeglobal/model/AgreementModel.dart';
 import 'package:rupeeglobal/model/ChatDetailModel.dart';
 import 'package:rupeeglobal/model/TicketModel.dart';
 import 'package:rupeeglobal/model/news_model.dart';
@@ -245,5 +246,104 @@ class AccountController extends GetxController{
       log("Exception sendChatMessage :- ",error: e.toString());
     }
   }
+
+  // ========== AGREEMENT SECTION ==========
+  var agreementListModel = Rxn<AgreementListModel>();
+  var agreementList = <Agreement>[].obs;
+  var selectedAgreement = Rxn<Agreement>();
+  var isAgreementLoading = false.obs;
+  var isUploadingAgreement = false.obs;
+
+  Future<void> getAgreementsList() async {
+    isAgreementLoading.value = true;
+    agreementList.clear();
+    DI<CommonFunction>().showLoading();
+
+    try {
+      var response = await DI<AccountRepo>().getAgreementsRepo();
+
+      isAgreementLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+      agreementListModel.value = response;
+
+      agreementList.addAll(agreementListModel.value?.data.agreements ?? []);
+
+    } catch (e) {
+      isAgreementLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+      log("Exception getAgreementsList :- ", error: e.toString());
+    }
+  }
+
+  Future<void> getAgreementDetail(int id) async {
+    isAgreementLoading.value = true;
+    DI<CommonFunction>().showLoading();
+
+    try {
+      var response = await DI<AccountRepo>().getAgreementDetailRepo(id);
+
+      isAgreementLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+      
+      if (response != null && response is AgreementDetailModel) {
+        selectedAgreement.value = response.data.agreement;
+      }
+
+    } catch (e) {
+      isAgreementLoading.value = false;
+      DI<CommonFunction>().hideLoader();
+      log("Exception getAgreementDetail :- ", error: e.toString());
+    }
+  }
+
+  Future<String> getAgreementDownloadUrl(int id) async {
+    return await DI<AccountRepo>().getAgreementDownloadUrl(id);
+  }
+
+  Future<String> getAgreementViewSignedUrl(int id) async {
+    return await DI<AccountRepo>().getAgreementViewSignedUrl(id);
+  }
+
+  Future<bool> uploadSignedAgreement(int id, String filePath) async {
+    isUploadingAgreement.value = true;
+    DI<CommonFunction>().showLoading();
+
+    try {
+      var response = await DI<AccountRepo>().uploadSignedAgreementRepo(id, filePath);
+
+      isUploadingAgreement.value = false;
+      DI<CommonFunction>().hideLoader();
+
+      if (response != null && response["success"] == true) {
+        // Update the agreement in the list
+        int index = agreementList.indexWhere((a) => a.id == id);
+        if (index != -1) {
+          agreementList[index].status = "signed";
+          agreementList[index].hasSignedDocument = true;
+          agreementList.refresh();
+        }
+        
+        // Refresh agreement detail if viewing
+        if (selectedAgreement.value?.id == id) {
+          selectedAgreement.value?.status = "signed";
+          selectedAgreement.value?.hasSignedDocument = true;
+          selectedAgreement.refresh();
+        }
+        
+        return true;
+      }
+      return false;
+
+    } catch (e) {
+      isUploadingAgreement.value = false;
+      DI<CommonFunction>().hideLoader();
+      log("Exception uploadSignedAgreement :- ", error: e.toString());
+      return false;
+    }
+  }
+
+  // Helper getters for agreement stats
+  int get pendingAgreementsCount => agreementList.where((a) => a.isPending).length;
+  int get signedAgreementsCount => agreementList.where((a) => a.isSigned).length;
 
 }

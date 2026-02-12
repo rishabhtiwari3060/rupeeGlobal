@@ -102,7 +102,7 @@ class CommonWidget {
       ),
       automaticallyImplyLeading: false,
       elevation: 0.0,
-      backgroundColor: DI<ColorConst>().whiteColor,
+      backgroundColor: DI<ColorConst>().scaffoldBgColor,
       actions: [
         InkWell(
             onTap: () {
@@ -142,7 +142,7 @@ class CommonWidget {
       ),
       elevation: 0.0,
       automaticallyImplyLeading: false,
-      backgroundColor: DI<ColorConst>().whiteColor,
+      backgroundColor: DI<ColorConst>().scaffoldBgColor,
     );
   }
 
@@ -174,7 +174,7 @@ class CommonWidget {
                         Text(
                           DI<StringConst>().alert_txt,
                           style: TextStyle(
-                              color: Colors.black,
+                              color: DI<ColorConst>().blackColor,
                               fontSize: 17.sp,
                               fontWeight: FontWeight.w500),
                         ),
@@ -184,12 +184,12 @@ class CommonWidget {
                           },
                           child: Icon(
                             Icons.cancel,
-                            color: Colors.grey,
+                            color: DI<ColorConst>().darkGryColor,
                           ),
                         )
                       ],
                     ),
-                    Divider(),
+                    Divider(color: DI<ColorConst>().dividerColor, thickness: 0.6),
                     SizedBox(
                       height: 17.sp,
                     ),

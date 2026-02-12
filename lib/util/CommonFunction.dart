@@ -23,9 +23,9 @@ class CommonFunction {
     EasyLoading.show(
       dismissOnTap: false,
       maskType: EasyLoadingMaskType.black,
-      indicator: const CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-        backgroundColor: Colors.white,
+      indicator: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation<Color>(DI<ColorConst>().blackColor),
+        backgroundColor: DI<ColorConst>().whiteColor,
       ),
     );
   }
@@ -55,7 +55,7 @@ class CommonFunction {
                   padding: EdgeInsets.zero,
                   child: Icon(
                     Icons.cancel,
-                    color: Colors.grey,
+                    color: DI<ColorConst>().darkGryColor,
                     size: 22,
                   ),
                   onPressed: () {
@@ -211,7 +211,7 @@ class CommonFunction {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(00)),
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: DI<ColorConst>().whiteColor,
       isDismissible: false,
       builder: (context) {
         return SizedBox(
@@ -241,7 +241,7 @@ class CommonFunction {
                     style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().blackColor, 17.sp, FontWeight.w400),)
                 ],
               ),
-              Divider(),
+              Divider(color: DI<ColorConst>().dividerColor, thickness: 0.6),
               ListView.separated(
                 itemCount: 4,
                 shrinkWrap: true,
@@ -252,7 +252,7 @@ class CommonFunction {
                     leading:  Radio(
                       value: 1,
                       groupValue: 1,
-                      activeColor: Colors.blue,
+                      activeColor: DI<ColorConst>().secondColorPrimary,
                       onChanged: (value) {
                       },
                     ),

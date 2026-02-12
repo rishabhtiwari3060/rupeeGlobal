@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rupeeglobal/controller/home_tab/HomeTabController.dart';
-
+import 'package:sizer/sizer.dart';
 
 import '../../util/ColorConst.dart';
 import '../../util/CommonWidget.dart';
@@ -16,512 +16,468 @@ class PortfolioScreen extends StatefulWidget {
 }
 
 class _PortfolioScreenState extends State<PortfolioScreen> {
-
   HomeTabController homeTabController = Get.find<HomeTabController>();
 
   @override
   void initState() {
-    WidgetsFlutterBinding.ensureInitialized();
     super.initState();
 
-    Future.delayed(Duration.zero,() {
+    Future.delayed(Duration.zero, () {
       homeTabController.getPortfolio();
-    },);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: DI<ColorConst>().scaffoldBgColor,
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 10),
+        padding: EdgeInsets.symmetric(horizontal: 14),
         child: Obx(
-          () => homeTabController.isLoading.value?SizedBox(): Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                DI<StringConst>().portfolio_summary_text,
-                style: DI<CommonWidget>().myTextStyle(
-                    DI<ColorConst>().blackColor,
-                    20,
-                    FontWeight.w500),
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: cardOutLineView("Total Invested","₹${homeTabController.portfolioModel.value?.data.portfolio.totalInvested}",DI<ColorConst>().blackColor),
-                  ),
-                  Expanded(
-                    child: cardOutLineView("Current Value","₹${homeTabController.portfolioModel.value?.data.portfolio.totalValue}",DI<ColorConst>().blackColor),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: cardOutLineView("Total P&L","₹${homeTabController.portfolioModel.value?.data.portfolio.totalPnl}",DI<ColorConst>().dark_greenColor),
-                  ),
-                  Expanded(
-                    child: cardOutLineView("P&L %","${homeTabController.portfolioModel.value?.data.portfolio.pnlPercent}%",DI<ColorConst>().dark_greenColor),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-               "Profit & Loss",
-                style: DI<CommonWidget>().myTextStyle(
-                    DI<ColorConst>().blackColor,
-                    20,
-                    FontWeight.w500),
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: cardOutLineView("Today","₹${homeTabController.portfolioModel.value?.data.profitLoss.total}",DI<ColorConst>().dark_greenColor),
-                  ),
-                  Expanded(
-                    child: cardOutLineView("This Week","₹${homeTabController.portfolioModel.value?.data.profitLoss.week}",DI<ColorConst>().dark_greenColor),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: cardOutLineView("This Month","₹${homeTabController.portfolioModel.value?.data.profitLoss.month}",DI<ColorConst>().dark_greenColor),
-                  ),
-                  Expanded(
-                    child: cardOutLineView("This Year","₹${homeTabController.portfolioModel.value?.data.profitLoss.year}",DI<ColorConst>().dark_greenColor),
-                  ),
-                ],
-              ),
-             /* SizedBox(
-                height: 10,
-              ),
-              Text(
-                "Fund Statistics",
-                style: DI<CommonWidget>().myTextStyle(
-                    DI<ColorConst>().blackColor,
-                    20,
-                    FontWeight.w500),
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: cardOutLineView("Current Balance","₹1,000",DI<ColorConst>().dark_greenColor),
-                  ),
-                  Expanded(
-                    child: cardOutLineView("Total Added","₹0",DI<ColorConst>().dark_greenColor),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: cardOutLineView("Total Withdrawn","₹0",DI<ColorConst>().redColor),
-                  ),
-                  Expanded(
-                    child: cardOutLineView("Net Deposit","0",DI<ColorConst>().dark_greenColor),
-                  ),
-                ],
-              ),*/
+          () => homeTabController.isLoading.value
+              ? SizedBox()
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 8),
 
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                "Fund Flow",
-                style: DI<CommonWidget>().myTextStyle(
-                    DI<ColorConst>().blackColor,
-                    20,
-                    FontWeight.w500),
-              ),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: 5,
+                    /// ─── Portfolio Summary ─────────────────
+                    _sectionHeader(Icons.pie_chart_outline_rounded,
+                        DI<StringConst>().portfolio_summary_text),
+                    SizedBox(height: 10),
+                    Row(
                       children: [
-                        Text(
-                          "Period",
-                          style: DI<CommonWidget>().myTextStyle(
-                              DI<ColorConst>().darkGryColor,
-                              17,
-                              FontWeight.w700),
-                        ),
-
-                    Text(
-                      "Today",
-                      style: DI<CommonWidget>().myTextStyle(
-                          DI<ColorConst>().blackColor,
-                          15,
-                          FontWeight.w400),),
-
-                        Text(
-                          "This Month",
-                          style: DI<CommonWidget>().myTextStyle(
+                        Expanded(
+                          child: _statCard(
+                              "Total Invested",
+                              "₹${homeTabController.portfolioModel.value?.data.portfolio.totalInvested}",
                               DI<ColorConst>().blackColor,
-                              15,
-                              FontWeight.w400),),
-
-
-                        Text(
-                          "This Year",
-                          style: DI<CommonWidget>().myTextStyle(
+                              Icons.account_balance_wallet_outlined),
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: _statCard(
+                              "Current Value",
+                              "₹${homeTabController.portfolioModel.value?.data.portfolio.totalValue}",
                               DI<ColorConst>().blackColor,
-                              15,
-                              FontWeight.w400),),
-
-
-
-
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      spacing: 5,
-                      children: [
-                        Text(
-                          "Added",
-                          style: DI<CommonWidget>().myTextStyle(
-                              DI<ColorConst>().darkGryColor,
-                              17,
-                              FontWeight.w700),
+                              Icons.trending_up_rounded),
                         ),
-
-                        Text(
-                          "₹ ${homeTabController.portfolioModel.value?.data.funds.today.added}",
-                          style: DI<CommonWidget>().myTextStyle(
-                              DI<ColorConst>().dark_greenColor,
-                              15,
-                              FontWeight.w400),),
-
-                        Text(
-                          "₹ ${homeTabController.portfolioModel.value?.data.funds.month.added}",
-                          style: DI<CommonWidget>().myTextStyle(
-                              DI<ColorConst>().dark_greenColor,
-                              15,
-                              FontWeight.w400),),
-
-
-                        Text(
-                          "₹ ${homeTabController.portfolioModel.value?.data.funds.year.added}",
-                          style: DI<CommonWidget>().myTextStyle(
-                              DI<ColorConst>().dark_greenColor,
-                              15,
-                              FontWeight.w400),),
                       ],
                     ),
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      spacing: 5,
+                    SizedBox(height: 10),
+                    Row(
                       children: [
-                        Text(
-                          "Withdrawn",
-                          style: DI<CommonWidget>().myTextStyle(
-                              DI<ColorConst>().darkGryColor,
-                              17,
-                              FontWeight.w700),
+                        Expanded(
+                          child: _statCard(
+                              "Total P&L",
+                              "₹${homeTabController.portfolioModel.value?.data.portfolio.totalPnl}",
+                              DI<ColorConst>().dark_greenColor,
+                              Icons.show_chart_rounded),
                         ),
-
-                        Text(
-                          "₹ ${homeTabController.portfolioModel.value?.data.funds.today.withdrawn}",
-                          style: DI<CommonWidget>().myTextStyle(
-                              DI<ColorConst>().redColor,
-                              15,
-                              FontWeight.w400),),
-
-                        Text(
-                          "₹ ${homeTabController.portfolioModel.value?.data.funds.month.withdrawn}",
-                          style: DI<CommonWidget>().myTextStyle(
-                              DI<ColorConst>().redColor,
-                              15,
-                              FontWeight.w400),),
-
-
-                        Text(
-                          "₹ ${homeTabController.portfolioModel.value?.data.funds.year.withdrawn}",
-                          style: DI<CommonWidget>().myTextStyle(
-                              DI<ColorConst>().redColor,
-                              15,
-                              FontWeight.w400),),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: _statCard(
+                              "P&L %",
+                              "${_formatPercent(homeTabController.portfolioModel.value?.data.portfolio.pnlPercent)}%",
+                              DI<ColorConst>().dark_greenColor,
+                              Icons.percent_rounded),
+                        ),
                       ],
                     ),
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      spacing: 5,
+
+                    SizedBox(height: 24),
+
+                    /// ─── Profit & Loss ──────────────────────
+                    _sectionHeader(
+                        Icons.analytics_outlined, "Profit & Loss"),
+                    SizedBox(height: 10),
+                    Row(
                       children: [
-                        Text(
-                          "Net",
-                          style: DI<CommonWidget>().myTextStyle(
-                              DI<ColorConst>().darkGryColor,
-                              17,
-                              FontWeight.w700),
+                        Expanded(
+                          child: _statCard(
+                              "Today",
+                              "₹${homeTabController.portfolioModel.value?.data.profitLoss.total}",
+                              DI<ColorConst>().dark_greenColor,
+                              null),
                         ),
-
-                        Text(
-                          "₹ ${(homeTabController.portfolioModel.value?.data.funds.today.added??0 + (homeTabController.portfolioModel.value?.data.funds.today.withdrawn??0) )}",
-                          style: DI<CommonWidget>().myTextStyle(
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: _statCard(
+                              "This Week",
+                              "₹${homeTabController.portfolioModel.value?.data.profitLoss.week}",
                               DI<ColorConst>().dark_greenColor,
-                              15,
-                              FontWeight.w400),),
-
-                        Text(
-                          "₹ ${(homeTabController.portfolioModel.value?.data.funds.month.added??0 + homeTabController.portfolioModel.value!.data.funds.month.withdrawn )}",
-                          style: DI<CommonWidget>().myTextStyle(
-                              DI<ColorConst>().dark_greenColor,
-                              15,
-                              FontWeight.w400),),
-
-
-                        Text(
-                          "₹ ${(homeTabController.portfolioModel.value?.data.funds.year.added??0 + homeTabController.portfolioModel.value!.data.funds.year.withdrawn )}",
-                          style: DI<CommonWidget>().myTextStyle(
-                              DI<ColorConst>().dark_greenColor,
-                              15,
-                              FontWeight.w400),),
+                              null),
+                        ),
                       ],
                     ),
-                  ),
-                ],
-              ),
-
-
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                "Trade Statistics",
-                style: DI<CommonWidget>().myTextStyle(
-                    DI<ColorConst>().blackColor,
-                    20,
-                    FontWeight.w500),
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: cardOutLineView("Total Positions","₹${homeTabController.portfolioModel.value?.data.trades.total}",DI<ColorConst>().blackColor),
-                  ),
-                  Expanded(
-                    child: cardOutLineView("Profitable","₹${homeTabController.portfolioModel.value?.data.trades.winning}",DI<ColorConst>().dark_greenColor),
-                  ),
-                ],
-              ),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: cardOutLineView("Loss Making","₹${homeTabController.portfolioModel.value?.data.trades.losing}",DI<ColorConst>().redColor),
-                  ),
-                  Expanded(
-                    child: cardOutLineView("Success Rate","${homeTabController.portfolioModel.value?.data.trades.winRate}%",DI<ColorConst>().blackColor),
-                  ),
-                ],
-              ),
-
-              Text(
-                "Charges & Fees",
-                style: DI<CommonWidget>().myTextStyle(
-                    DI<ColorConst>().blackColor,
-                    20,
-                    FontWeight.w500),
-              ),
-
-              ListView.separated(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: (homeTabController.portfolioModel.value?.data.charges.length??0)+1,
-                itemBuilder: (context, index) {
-                  var listData = homeTabController.portfolioModel.value?.data.charges;
-                  return Card(
-                    color: DI<ColorConst>().whiteColor,
-                    elevation: 0.0,
-                    shape: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0),borderSide: BorderSide(color:Colors.transparent)),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
-                      child: index < homeTabController.portfolioModel.value!.data.charges.length?
-                        Column(
-                        spacing: 5,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                flex:0,
-                                child: Text(
-                                  "Charge Type :",
-                                  style: DI<CommonWidget>().myTextStyle(
-                                      DI<ColorConst>().darkGryColor,
-                                      15,
-                                      FontWeight.w500),
-                                ),
-                              ),
-                              SizedBox(width: 5,),
-                              Expanded(
-                                flex:1,
-                                child: Text(
-                                  "${listData?[index].chargeType}",
-                                  style: DI<CommonWidget>().myTextStyle(
-                                      DI<ColorConst>().blackColor,
-                                      16,
-                                      FontWeight.w600),
-                                ),
-                              ),
-                            ],
-                          ),
-
-
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Date :",
-                                style: DI<CommonWidget>().myTextStyle(
-                                    DI<ColorConst>().darkGryColor,
-                                    15,
-                                    FontWeight.w500),
-                              ),
-                              SizedBox(width: 5,),
-                              Text(
-                                "${listData?[index].date}",
-                                style: DI<CommonWidget>().myTextStyle(
-                                    DI<ColorConst>().secondColorPrimary,
-                                    16,
-                                    FontWeight.w500),
-                              ),
-                            ],
-                          ),
-
-                          Row(
-                            children: [
-                              Expanded(
-                                flex:0,
-                                child: Text(
-                                  "Amount :",
-                                  style: DI<CommonWidget>().myTextStyle(
-                                      DI<ColorConst>().darkGryColor,
-                                      15,
-                                      FontWeight.w500),
-                                ),
-                              ),
-                              SizedBox(width: 5,),
-                              Expanded(
-                                flex:1,
-                                child: Text(
-                                  "₹ ${listData?[index].amount}",
-                                  style: DI<CommonWidget>().myTextStyle(
-                                      DI<ColorConst>().blackColor,
-                                      16,
-                                      FontWeight.w500),
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          Row(
-                            children: [
-                              Expanded(
-                                flex:0,
-                                child: Text(
-                                  "Note :",
-                                  style: DI<CommonWidget>().myTextStyle(
-                                      DI<ColorConst>().darkGryColor,
-                                      15,
-                                      FontWeight.w500),
-                                ),
-                              ),
-                              SizedBox(width: 5,),
-                              Expanded(
-                                flex:1,
-                                child: Text(
-                                  "${listData?[index].note}",
-                                  style: DI<CommonWidget>().myTextStyle(
-                                      DI<ColorConst>().blackColor,
-                                      16,
-                                      FontWeight.w500),
-                                ),
-                              ),
-                            ],
-                          ),
-
-                        ],
-                      ) :Row(
-                        children: [
-                          Expanded(
-                            flex:0,
-                            child: Text(
-                              "Total Charges :",
-                              style: DI<CommonWidget>().myTextStyle(
-                                  DI<ColorConst>().darkGryColor,
-                                  15,
-                                  FontWeight.w500),
-                            ),
-                          ),
-                          SizedBox(width: 5,),
-                          Expanded(
-                            flex:1,
-                            child: Text(
-                              "${homeTabController.portfolioModel.value!.data.totalCharges}",
-                              style: DI<CommonWidget>().myTextStyle(
-                                  DI<ColorConst>().blackColor,
-                                  16,
-                                  FontWeight.w600),
-                            ),
-                          ),
-                        ],
-                      )
-
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _statCard(
+                              "This Month",
+                              "₹${homeTabController.portfolioModel.value?.data.profitLoss.month}",
+                              DI<ColorConst>().dark_greenColor,
+                              null),
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: _statCard(
+                              "This Year",
+                              "₹${homeTabController.portfolioModel.value?.data.profitLoss.year}",
+                              DI<ColorConst>().dark_greenColor,
+                              null),
+                        ),
+                      ],
                     ),
-                  );
-                }, separatorBuilder: (BuildContext context, int index) {
-                return SizedBox(
-                  height: 7,
-                );
-              },)
-            ],
-          ),
+
+                    SizedBox(height: 24),
+
+                    /// ─── Fund Flow ──────────────────────────
+                    _sectionHeader(
+                        Icons.swap_vert_rounded, "Fund Flow"),
+                    SizedBox(height: 10),
+                    _buildFundFlowTable(),
+
+                    SizedBox(height: 24),
+
+                    /// ─── Trade Statistics ───────────────────
+                    _sectionHeader(
+                        Icons.bar_chart_rounded, "Trade Statistics"),
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _statCard(
+                              "Total Positions",
+                              "₹${homeTabController.portfolioModel.value?.data.trades.total}",
+                              DI<ColorConst>().blackColor,
+                              Icons.list_alt_rounded),
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: _statCard(
+                              "Profitable",
+                              "₹${homeTabController.portfolioModel.value?.data.trades.winning}",
+                              DI<ColorConst>().dark_greenColor,
+                              Icons.thumb_up_alt_outlined),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _statCard(
+                              "Loss Making",
+                              "₹${homeTabController.portfolioModel.value?.data.trades.losing}",
+                              DI<ColorConst>().redColor,
+                              Icons.thumb_down_alt_outlined),
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: _statCard(
+                              "Success Rate",
+                              "${homeTabController.portfolioModel.value?.data.trades.winRate}%",
+                              DI<ColorConst>().blackColor,
+                              Icons.emoji_events_outlined),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(height: 24),
+
+                    /// ─── Charges & Fees ─────────────────────
+                    _sectionHeader(
+                        Icons.receipt_long_outlined, "Charges & Fees"),
+                    SizedBox(height: 10),
+                    _buildChargesList(),
+
+                    SizedBox(height: 20),
+                  ],
+                ),
         ),
       ),
     );
   }
 
-  Widget cardOutLineView(String title,String amount,Color textColor){
-    return Card(
-      elevation: 0.0,
-      color: DI<ColorConst>().whiteColor,
-      shape: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0),
-          borderSide: BorderSide(color: DI<ColorConst>().gryColor,width: 0.8)),
-      child: Padding(
-        padding: EdgeInsets.all(8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: DI<CommonWidget>().myTextStyle(
-                  DI<ColorConst>().darkGryColor,
-                  17,
-                  FontWeight.w500),
-            ),
+  /// ─── Section Header with Icon ────────────────────
+  Widget _sectionHeader(IconData icon, String title) {
+    return Row(
+      children: [
+        Icon(icon, color: DI<ColorConst>().secondColorPrimary, size: 22),
+        SizedBox(width: 8),
+        Text(
+          title,
+          style: DI<CommonWidget>()
+              .myTextStyle(DI<ColorConst>().blackColor, 20.sp, FontWeight.w600),
+        ),
+      ],
+    );
+  }
 
-            SizedBox(height: 7,),
-            Text(
-              amount,
-              style: DI<CommonWidget>().myTextStyle(
-                  textColor,
-                  19,
-                  FontWeight.w500),
-            ),
-          ],
+  /// ─── Stat Card with optional icon ────────────────
+  Widget _statCard(String title, String amount, Color valueColor, IconData? icon) {
+    return Container(
+      padding: EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: DI<ColorConst>().cardBgColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: DI<ColorConst>().dividerColor.withOpacity(0.4),
+          width: 0.8,
         ),
       ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              if (icon != null) ...[
+                Icon(icon, color: DI<ColorConst>().darkGryColor, size: 16),
+                SizedBox(width: 5),
+              ],
+              Expanded(
+                child: Text(
+                  title,
+                  style: DI<CommonWidget>().myTextStyle(
+                      DI<ColorConst>().darkGryColor, 14.sp, FontWeight.w400),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 8),
+          Text(
+            amount,
+            style: DI<CommonWidget>()
+                .myTextStyle(valueColor, 18.sp, FontWeight.w600),
+          ),
+        ],
+      ),
     );
+  }
+
+  /// ─── Fund Flow Table ─────────────────────────────
+  Widget _buildFundFlowTable() {
+    final data = homeTabController.portfolioModel.value?.data;
+    if (data == null) return SizedBox();
+
+    return Container(
+      decoration: BoxDecoration(
+        color: DI<ColorConst>().cardBgColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: DI<ColorConst>().dividerColor.withOpacity(0.4),
+          width: 0.8,
+        ),
+      ),
+      child: Column(
+        children: [
+          /// Header Row
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: DI<ColorConst>().secondColorPrimary.withOpacity(0.08),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+              ),
+            ),
+            child: Row(
+              children: [
+                Expanded(flex: 2, child: _tableHeaderText("Period")),
+                Expanded(flex: 2, child: _tableHeaderText("Added")),
+                Expanded(flex: 2, child: _tableHeaderText("Withdrawn")),
+                Expanded(flex: 2, child: _tableHeaderText("Net")),
+              ],
+            ),
+          ),
+          _fundFlowRow(
+            "Today",
+            "₹ ${data.funds.today.added}",
+            "₹ ${data.funds.today.withdrawn}",
+            "₹ ${(data.funds.today.added ?? 0) + (data.funds.today.withdrawn ?? 0)}",
+          ),
+          Divider(height: 0, thickness: 0.5, color: DI<ColorConst>().dividerColor.withOpacity(0.3), indent: 14, endIndent: 14),
+          _fundFlowRow(
+            "This Month",
+            "₹ ${data.funds.month.added}",
+            "₹ ${data.funds.month.withdrawn}",
+            "₹ ${(data.funds.month.added ?? 0) + (data.funds.month.withdrawn ?? 0)}",
+          ),
+          Divider(height: 0, thickness: 0.5, color: DI<ColorConst>().dividerColor.withOpacity(0.3), indent: 14, endIndent: 14),
+          _fundFlowRow(
+            "This Year",
+            "₹ ${data.funds.year.added}",
+            "₹ ${data.funds.year.withdrawn}",
+            "₹ ${(data.funds.year.added ?? 0) + (data.funds.year.withdrawn ?? 0)}",
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _tableHeaderText(String text) {
+    return Text(
+      text,
+      style: DI<CommonWidget>().myTextStyle(
+          DI<ColorConst>().secondColorPrimary, 14.sp, FontWeight.w600),
+    );
+  }
+
+  Widget _fundFlowRow(String period, String added, String withdrawn, String net) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(period,
+                style: DI<CommonWidget>().myTextStyle(
+                    DI<ColorConst>().blackColor, 14.sp, FontWeight.w400)),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(added,
+                style: DI<CommonWidget>().myTextStyle(
+                    DI<ColorConst>().dark_greenColor, 14.sp, FontWeight.w500)),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(withdrawn,
+                style: DI<CommonWidget>().myTextStyle(
+                    DI<ColorConst>().redColor, 14.sp, FontWeight.w500)),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(net,
+                style: DI<CommonWidget>().myTextStyle(
+                    DI<ColorConst>().dark_greenColor, 14.sp, FontWeight.w500)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// ─── Charges List ────────────────────────────────
+  Widget _buildChargesList() {
+    final charges = homeTabController.portfolioModel.value?.data.charges;
+    if (charges == null || charges.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: DI<ColorConst>().cardBgColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: DI<ColorConst>().dividerColor.withOpacity(0.4),
+            width: 0.8,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            "No charges yet",
+            style: DI<CommonWidget>().myTextStyle(
+                DI<ColorConst>().darkGryColor, 16.sp, FontWeight.w400),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        ...List.generate(charges.length, (index) {
+          final item = charges[index];
+          return Container(
+            margin: EdgeInsets.only(bottom: 10),
+            padding: EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: DI<ColorConst>().cardBgColor,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: DI<ColorConst>().dividerColor.withOpacity(0.4),
+                width: 0.8,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        "${item.chargeType}",
+                        style: DI<CommonWidget>().myTextStyle(
+                            DI<ColorConst>().blackColor, 16.sp, FontWeight.w600),
+                      ),
+                    ),
+                    Text(
+                      "₹ ${item.amount}",
+                      style: DI<CommonWidget>().myTextStyle(
+                          DI<ColorConst>().redColor, 16.sp, FontWeight.w600),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 6),
+                Row(
+                  children: [
+                    Icon(Icons.calendar_today_outlined,
+                        size: 14, color: DI<ColorConst>().darkGryColor),
+                    SizedBox(width: 4),
+                    Text(
+                      "${item.date}",
+                      style: DI<CommonWidget>().myTextStyle(
+                          DI<ColorConst>().secondColorPrimary,
+                          14.sp,
+                          FontWeight.w400),
+                    ),
+                  ],
+                ),
+                if (item.note != null && item.note.toString().isNotEmpty) ...[
+                  SizedBox(height: 4),
+                  Text(
+                    "${item.note}",
+                    style: DI<CommonWidget>().myTextStyle(
+                        DI<ColorConst>().darkGryColor, 14.sp, FontWeight.w400),
+                  ),
+                ],
+              ],
+            ),
+          );
+        }),
+
+        /// Total Charges
+        Container(
+          padding: EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: DI<ColorConst>().secondColorPrimary.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Total Charges",
+                style: DI<CommonWidget>().myTextStyle(
+                    DI<ColorConst>().blackColor, 16.sp, FontWeight.w600),
+              ),
+              Text(
+                "₹ ${homeTabController.portfolioModel.value?.data.totalCharges ?? 0}",
+                style: DI<CommonWidget>().myTextStyle(
+                    DI<ColorConst>().blackColor, 17.sp, FontWeight.w700),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Format long percentages
+  String _formatPercent(dynamic value) {
+    if (value == null) return "0.00";
+    double v = double.tryParse(value.toString()) ?? 0.0;
+    return v.toStringAsFixed(2);
   }
 }

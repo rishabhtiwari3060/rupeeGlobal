@@ -19,7 +19,6 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-
   AuthController authController = Get.find<AuthController>();
 
   var checkBoxValue = false.obs;
@@ -32,14 +31,12 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   void initState() {
-    WidgetsFlutterBinding.ensureInitialized();
     super.initState();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
     nameCtrl = TextEditingController();
     emailCtrl = TextEditingController();
     phoneCtrl = TextEditingController();
@@ -51,133 +48,152 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: DI<ColorConst>().scaffoldBgColor,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         leading: InkWell(
-            onTap: () {
-              Get.back();
-            },
-            child: Icon(
-              Icons.arrow_back_ios,
-              color: DI<ColorConst>().blackColor,
-            )),
+          onTap: () => Get.back(),
+          child: Icon(Icons.arrow_back_ios, color: DI<ColorConst>().blackColor),
+        ),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 10),
+        padding: EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Align(
-                alignment: Alignment.center,
-                child: Image.asset(
-                  DI<ImageConst>().APP_ICON,
-                  width: 70.w,
-                  height: 15.w,
-                  alignment: Alignment.center,
-                )),
-            SizedBox(
-              height: 20,
+            /// Logo
+            Image.asset(
+              DI<ImageConst>().APP_ICON,
+              width: 60.w,
+              height: 14.w,
             ),
+            SizedBox(height: 20),
+
             Text(
               DI<StringConst>().welcome_again_text,
               style: DI<CommonWidget>().myTextStyle(
-                  DI<ColorConst>().blackColor, 25.sp, FontWeight.w500),
+                  DI<ColorConst>().blackColor, 24.sp, FontWeight.w700),
             ),
+            SizedBox(height: 4),
             Text(
               DI<StringConst>().enter_Register_details_text,
               style: DI<CommonWidget>().myTextStyle(
-                  DI<ColorConst>().darkGryColor, 18.sp, FontWeight.w400),
+                  DI<ColorConst>().darkGryColor, 13.sp, FontWeight.w400),
             ),
-            SizedBox(
-              height: 20,
-            ),
-            DI<CommonWidget>().myTextFormField(
-                controller: nameCtrl,
-                DI<StringConst>().full_name_text,
-                icon: Icons.person, textInputAction: TextInputAction.next),
-            SizedBox(
-              height: 10,
-            ),
-            DI<CommonWidget>().myTextFormField(
-                controller: emailCtrl,
-                DI<StringConst>().email_address_text,
-                icon: Icons.email,
-                textInputType: TextInputType.emailAddress,
-                textInputAction: TextInputAction.next),
-            SizedBox(
-              height: 10,
-            ),
-            DI<CommonWidget>().myTextFormField(
-                controller: phoneCtrl,
-                DI<StringConst>().mobile_number_text,
-                icon: Icons.phone_android,
-                textInputType: TextInputType.phone,
-                textInputAction: TextInputAction.next),
-            SizedBox(
-              height: 10,
-            ),
-            DI<CommonWidget>().myTextFormField(
-                controller: panNumCtrl,
-                DI<StringConst>().pan_number_text,
-                icon: Icons.credit_card,
+            SizedBox(height: 20),
 
-                textInputAction: TextInputAction.next),
-            SizedBox(
-              height: 10,
+            /// Form Card
+            Container(
+              padding: EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: DI<ColorConst>().cardBgColor,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: DI<ColorConst>().dividerColor.withOpacity(0.4),
+                  width: 0.8,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _fieldLabel("Full Name"),
+                  DI<CommonWidget>().myTextFormField(
+                    controller: nameCtrl,
+                    DI<StringConst>().full_name_text,
+                    icon: Icons.person_outline_rounded,
+                    textInputAction: TextInputAction.next,
+                  ),
+                  SizedBox(height: 14),
+                  _fieldLabel("Email Address"),
+                  DI<CommonWidget>().myTextFormField(
+                    controller: emailCtrl,
+                    DI<StringConst>().email_address_text,
+                    icon: Icons.email_outlined,
+                    textInputType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+                  ),
+                  SizedBox(height: 14),
+                  _fieldLabel("Mobile Number"),
+                  DI<CommonWidget>().myTextFormField(
+                    controller: phoneCtrl,
+                    DI<StringConst>().mobile_number_text,
+                    icon: Icons.phone_android_outlined,
+                    textInputType: TextInputType.phone,
+                    textInputAction: TextInputAction.next,
+                  ),
+                  SizedBox(height: 14),
+                  _fieldLabel("PAN Number"),
+                  DI<CommonWidget>().myTextFormField(
+                    controller: panNumCtrl,
+                    DI<StringConst>().pan_number_text,
+                    icon: Icons.credit_card_outlined,
+                    textInputAction: TextInputAction.next,
+                  ),
+                  SizedBox(height: 14),
+                  _fieldLabel("Password"),
+                  DI<CommonWidget>().myTextFormField(
+                    controller: passwordCtrl,
+                    DI<StringConst>().password_text,
+                    icon: Icons.lock_outline_rounded,
+                    textInputAction: TextInputAction.next,
+                  ),
+                  SizedBox(height: 14),
+                  _fieldLabel("Confirm Password"),
+                  DI<CommonWidget>().myTextFormField(
+                    controller: confirmPassCtrl,
+                    DI<StringConst>().confirm_password_text,
+                    icon: Icons.lock_outline_rounded,
+                    textInputAction: TextInputAction.done,
+                  ),
+                ],
+              ),
             ),
-            DI<CommonWidget>().myTextFormField(
-                controller: passwordCtrl,
-                DI<StringConst>().password_text,
-                icon: Icons.password, textInputAction: TextInputAction.next),
-            SizedBox(
-              height: 10,
-            ),
-            DI<CommonWidget>().myTextFormField(
-                controller: confirmPassCtrl,
-                DI<StringConst>().confirm_password_text,
-                icon: Icons.password,
-                textInputAction: TextInputAction.done),
-            SizedBox(
-              height: 10,
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            termsNConditionCheckBox(),
-            SizedBox(
-              height: 30,
-            ),
-            DI<CommonWidget>().myButton(DI<StringConst>().createAccountText,
-                () {
+            SizedBox(height: 10),
 
-              if(validation()){
+            _termsCheckbox(),
+            SizedBox(height: 20),
 
-                authController.userRegister(nameCtrl.text.trim(),
-                    emailCtrl.text.trim(),
-                    phoneCtrl.text.trim(),
-                    panNumCtrl.text.trim(),
-                    passwordCtrl.text.trim(),
-                    confirmPassCtrl.text.trim());
-
+            DI<CommonWidget>()
+                .myButton(DI<StringConst>().createAccountText, () {
+              if (_validation()) {
+                authController.userRegister(
+                  nameCtrl.text.trim(),
+                  emailCtrl.text.trim(),
+                  phoneCtrl.text.trim(),
+                  panNumCtrl.text.trim(),
+                  passwordCtrl.text.trim(),
+                  confirmPassCtrl.text.trim(),
+                );
               }
-
             }),
+            SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
 
-  Widget termsNConditionCheckBox() {
+  Widget _fieldLabel(String text) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 4),
+      child: Text(
+        text,
+        style: DI<CommonWidget>().myTextStyle(
+            DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w400),
+      ),
+    );
+  }
+
+  Widget _termsCheckbox() {
     return Obx(() => CheckboxListTile(
           title: Text(
             DI<StringConst>().by_continue_you_agree_text,
             maxLines: 2,
             style: DI<CommonWidget>().myTextStyle(
-                DI<ColorConst>().blackColor, 15.sp, FontWeight.w400),
+                DI<ColorConst>().blackColor, 13.sp, FontWeight.w400),
           ),
           controlAffinity: ListTileControlAffinity.leading,
-          activeColor: DI<ColorConst>().redColor,
+          activeColor: DI<ColorConst>().secondColorPrimary,
           contentPadding: EdgeInsets.zero,
           value: checkBoxValue.value,
           onChanged: (value) {
@@ -186,56 +202,46 @@ class _SignupScreenState extends State<SignupScreen> {
         ));
   }
 
-  bool validation() {
+  bool _validation() {
     if (nameCtrl.text.trim().isEmpty) {
       DI<CommonFunction>()
           .showErrorSnackBar(DI<StringConst>().please_enter_full_name_text);
-
       return false;
     } else if (emailCtrl.text.trim().isEmpty) {
       DI<CommonFunction>()
           .showErrorSnackBar(DI<StringConst>().please_enter_email_text);
-
       return false;
     } else if (!emailCtrl.text.trim().isEmail) {
       DI<CommonFunction>()
           .showErrorSnackBar(DI<StringConst>().please_enter_valid_email_text);
-
       return false;
     } else if (phoneCtrl.text.trim().isEmpty) {
       DI<CommonFunction>()
           .showErrorSnackBar(DI<StringConst>().please_enter_phone_Text);
-
       return false;
     } else if (panNumCtrl.text.trim().isEmpty) {
       DI<CommonFunction>()
           .showErrorSnackBar(DI<StringConst>().please_enter_pan_num_text);
-
       return false;
     } else if (passwordCtrl.text.trim().isEmpty) {
       DI<CommonFunction>()
           .showErrorSnackBar(DI<StringConst>().please_enter_password_text);
-
       return false;
     } else if (passwordCtrl.text.trim().length < 8) {
       DI<CommonFunction>()
           .showErrorSnackBar(DI<StringConst>().password_grater_8_digit_text);
-
       return false;
     } else if (confirmPassCtrl.text.trim().isEmpty) {
-      DI<CommonFunction>()
-          .showErrorSnackBar(DI<StringConst>().please_enter_confirm_password_text);
-
+      DI<CommonFunction>().showErrorSnackBar(
+          DI<StringConst>().please_enter_confirm_password_text);
       return false;
     } else if (confirmPassCtrl.text.trim() != passwordCtrl.text.trim()) {
-      DI<CommonFunction>()
-          .showErrorSnackBar(DI<StringConst>().please_enter_same_password_text);
-
+      DI<CommonFunction>().showErrorSnackBar(
+          DI<StringConst>().please_enter_same_password_text);
       return false;
-    }else if (!checkBoxValue.value) {
-      DI<CommonFunction>()
-          .showErrorSnackBar(DI<StringConst>().please_accept_trems_condition_text);
-
+    } else if (!checkBoxValue.value) {
+      DI<CommonFunction>().showErrorSnackBar(
+          DI<StringConst>().please_accept_trems_condition_text);
       return false;
     }
     return true;
@@ -243,12 +249,12 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   void dispose() {
-    super.dispose();
     nameCtrl.dispose();
     emailCtrl.dispose();
     phoneCtrl.dispose();
     panNumCtrl.dispose();
     passwordCtrl.dispose();
     confirmPassCtrl.dispose();
+    super.dispose();
   }
 }

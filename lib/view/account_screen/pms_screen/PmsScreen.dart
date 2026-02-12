@@ -26,7 +26,6 @@ class _PmsScreenState extends State<PmsScreen> {
 
   @override
   void initState() {
-    WidgetsFlutterBinding.ensureInitialized();
     super.initState();
   }
 

@@ -6,6 +6,8 @@ import 'package:rupeeglobal/view/orders_screen/OrderScreen.dart';
 import 'package:rupeeglobal/view/portfolio_screen/PortfolioScreen.dart';
 import 'package:rupeeglobal/view/watchlist_screen/FundsScreen.dart';
 
+import '../view/account_screen/agreement_screen/AgreementDetailScreen.dart';
+import '../view/account_screen/agreement_screen/AgreementScreen.dart';
 import '../view/account_screen/edit_profile/EditProfileScreen.dart';
 import '../view/account_screen/news_screen/NewsScreen.dart';
 import '../view/account_screen/news_screen/news_detail_screen.dart';
@@ -49,6 +51,8 @@ class RouteHelper{
   String chatScreen = "/ChatScreen";
   String chartScreen = "/ChartScreen";
   String paymentQrDetailScreen = "/PaymentQrDetailScreen";
+  String agreementScreen = "/AgreementScreen";
+  String agreementDetailScreen = "/AgreementDetailScreen";
 
 
 
@@ -77,6 +81,8 @@ String getEditProfileScreen() => editProfileScreen;
 String getChatScreen() => chatScreen;
 String getChartScreen() => chartScreen;
 String getPaymentQrDetailScreen() => paymentQrDetailScreen;
+String getAgreementScreen() => agreementScreen;
+String getAgreementDetailScreen() => agreementDetailScreen;
 
 
 
@@ -107,6 +113,8 @@ List<GetPage> get routes =>[
   GetPage(name: chatScreen, page: () =>  SafeArea(child: ChatScreen()),),
   GetPage(name: chartScreen, page: () =>  SafeArea(child: ChartScreen()),),
   GetPage(name: paymentQrDetailScreen, page: () =>  SafeArea(child: PaymentQrDetailScreen()),),
+  GetPage(name: agreementScreen, page: () =>  SafeArea(child: AgreementScreen()),),
+  GetPage(name: agreementDetailScreen, page: () =>  SafeArea(child: AgreementDetailScreen()),),
 
 
 

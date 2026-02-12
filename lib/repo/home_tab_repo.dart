@@ -3,8 +3,12 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:rupeeglobal/model/FundModel.dart';
 import 'package:rupeeglobal/model/HoldingModel.dart';
+import 'package:rupeeglobal/model/ForexPairsModel.dart';
 import 'package:rupeeglobal/model/MarketIndicesModel.dart';
 import 'package:rupeeglobal/model/PortfolioModel.dart';
+import 'package:rupeeglobal/model/PositionModel.dart';
+import 'package:rupeeglobal/model/MarketIndexDetailModel.dart';
+import 'package:rupeeglobal/model/ForexPairDetailModel.dart';
 
 import '../network/ApiService.dart';
 import '../network/WebService.dart';
@@ -60,6 +64,54 @@ class HomeTabRepo extends GetxService{
 
     print("marketIndicesRepo response :-- $response");
     return marketIndicesModelFromJson(jsonEncode(response.data));
+  }
+
+  Future<dynamic> getForexPairsRepo()async{
+    var response = await DI<ApiService>().getMethod(DI<WebService>().FOREX_PARIS_POINT,
+        header: mainHeader());
+
+    print("getForexPairsRepo response :-- $response");
+    return forexPairsModelFromJson(jsonEncode(response.data));
+  }
+
+  // Market Index Detail API
+  Future<dynamic> getMarketIndexDetailRepo(String symbol)async{
+    var response = await DI<ApiService>().getMethod(
+        DI<WebService>().getMarketIndexDetailEndpoint(symbol),
+        header: mainHeader());
+
+    print("getMarketIndexDetailRepo response :-- $response");
+    return marketIndexDetailModelFromJson(jsonEncode(response.data));
+  }
+
+  // Forex Pair Detail API
+  Future<dynamic> getForexPairDetailRepo(String symbol)async{
+    var response = await DI<ApiService>().getMethod(
+        DI<WebService>().getForexPairDetailEndpoint(symbol),
+        header: mainHeader());
+
+    print("getForexPairDetailRepo response :-- $response");
+    return forexPairDetailModelFromJson(jsonEncode(response.data));
+  }
+
+  // Positions API with filters and pagination
+  Future<dynamic> getPositionsRepo(String query)async{
+    var response = await DI<ApiService>().getMethod(
+        "${DI<WebService>().POSITIONS_POINT}$query",
+        header: mainHeader());
+
+    print("getPositionsRepo response :-- $response");
+    return positionModelFromJson(jsonEncode(response.data));
+  }
+
+  // Position Detail API
+  Future<dynamic> getPositionDetailRepo(String id)async{
+    var response = await DI<ApiService>().getMethod(
+        DI<WebService>().getPositionDetailEndpoint(id),
+        header: mainHeader());
+
+    print("getPositionDetailRepo response :-- $response");
+    return response.data;
   }
 
 }

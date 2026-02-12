@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:rupeeglobal/controller/theme/ThemeController.dart';
 import 'package:rupeeglobal/util/BindingClass.dart';
 import 'package:rupeeglobal/util/Injection.dart';
 import 'package:rupeeglobal/util/RouteHelper.dart';
@@ -52,16 +53,74 @@ class MyApp extends StatelessWidget {
           child: GetMaterialApp(
             title: 'Rupee Global',
             debugShowCheckedModeBanner: false,
+
+            /// Light Theme
             theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+              brightness: Brightness.light,
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: Colors.deepPurple,
+                brightness: Brightness.light,
+              ),
               useMaterial3: true,
+              scaffoldBackgroundColor: Color(0xffffffff),
               appBarTheme: const AppBarTheme(
                 backgroundColor: Colors.transparent,
                 surfaceTintColor: Colors.transparent,
                 scrolledUnderElevation: 0,
                 elevation: 0,
+                iconTheme: IconThemeData(color: Colors.black),
+                titleTextStyle: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w500),
+              ),
+              cardTheme: CardThemeData(
+                color: Color(0xffffffff),
+                elevation: 0.5,
+              ),
+              dividerTheme: DividerThemeData(
+                color: Color(0xffe0e0e0),
+              ),
+              bottomNavigationBarTheme: BottomNavigationBarThemeData(
+                backgroundColor: Color(0xffffffff),
+              ),
+              dialogTheme: DialogThemeData(
+                backgroundColor: Color(0xffffffff),
               ),
             ),
+
+            /// Dark Theme
+            darkTheme: ThemeData(
+              brightness: Brightness.dark,
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: Colors.deepPurple,
+                brightness: Brightness.dark,
+              ),
+              useMaterial3: true,
+              scaffoldBackgroundColor: Color(0xff121220),
+              appBarTheme: AppBarTheme(
+                backgroundColor: Colors.transparent,
+                surfaceTintColor: Colors.transparent,
+                scrolledUnderElevation: 0,
+                elevation: 0,
+                iconTheme: IconThemeData(color: Color(0xffe0e0e0)),
+                titleTextStyle: TextStyle(color: Color(0xffe0e0e0), fontSize: 18, fontWeight: FontWeight.w500),
+              ),
+              cardTheme: CardThemeData(
+                color: Color(0xff1c1c2e),
+                elevation: 0.5,
+              ),
+              dividerTheme: DividerThemeData(
+                color: Color(0xff3a3a4e),
+              ),
+              bottomNavigationBarTheme: BottomNavigationBarThemeData(
+                backgroundColor: Color(0xff1c1c2e),
+              ),
+              dialogTheme: DialogThemeData(
+                backgroundColor: Color(0xff252538),
+              ),
+            ),
+
+            /// Follows system setting (light/dark)
+            themeMode: ThemeMode.dark,
+
             initialRoute: DI<RouteHelper>().getSplashscreen(),
             getPages: DI<RouteHelper>().routes,
             initialBinding: BindingClass(),
@@ -72,5 +131,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
