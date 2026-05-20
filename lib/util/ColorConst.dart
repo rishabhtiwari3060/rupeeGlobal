@@ -33,7 +33,7 @@ class ColorConst {
   Color get redColor => _isDark ? Color(0xffff4444) : Color(0xffe32526);
 
   /// Green accent - stays same
-  Color get greenColor => Color(0xff3eed0e);
+  Color get greenColor => Color(0xff02e88d);
 
   /// Dark green - stays same
   Color get dark_greenColor => Color(0xff379c40);

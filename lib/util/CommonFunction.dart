@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
+
 import 'package:sizer/sizer.dart';
 
 import 'ColorConst.dart';
@@ -80,7 +80,7 @@ class CommonFunction {
   }
 
   ///to Pick image from bottom sheet
-  Future<File?> selectImage() async {
+  /*Future<File?> selectImage() async {
     File? imageFile;
     await showModalBottomSheet(
       backgroundColor: DI<ColorConst>().whiteColor,
@@ -189,7 +189,7 @@ class CommonFunction {
       },
     );
     return imageFile;
-  }
+  }*/
 
   ///Show toast
   void showErrorSnackBar(String message) {
@@ -220,7 +220,7 @@ class CommonFunction {
   }
 
 
-  Future<dynamic> pickImage(ImageSource imageSource) async {
+ /* Future<dynamic> pickImage(ImageSource imageSource) async {
     XFile? imageFile =
     await ImagePicker().pickImage(source: imageSource, imageQuality: 40);
     print("pickImage File :--  ${imageFile?.path}");
@@ -237,7 +237,7 @@ class CommonFunction {
 
     }
     return null;
-  }
+  }*/
 
 
  /* Future<CroppedFile?> _cropImage(filePath) async {

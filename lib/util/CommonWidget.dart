@@ -79,7 +79,7 @@ class CommonWidget {
         style: ButtonStyle(
           elevation: WidgetStatePropertyAll(0.0),
             backgroundColor:
-                WidgetStatePropertyAll(DI<ColorConst>().redColor)),
+                WidgetStatePropertyAll(DI<ColorConst>().greenColor)),
         child: Text(
           buttonText,
           style: DI<CommonWidget>()

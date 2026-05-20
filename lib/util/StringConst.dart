@@ -1,7 +1,7 @@
 class StringConst{
 
 
-  String appName = "Rupee Global";
+  String appName = "Dhan Elite";
   String home_text = "Home";
   String watchlist_text = "Watchlist";
   String portfolio_text = "Portfolio";

@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 class WebService extends GetxService{
 
 
-  String BASE_URL = "https://www.rupeeglobal.in/api/v1/";
+  String BASE_URL = "https://www.dhanelite.in/api/v1/";
 
   String REGISTER_END_POINT = "register";
   String LOGIN_END_POINT = "login";
