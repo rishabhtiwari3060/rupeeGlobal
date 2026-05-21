@@ -9,6 +9,8 @@ import 'package:rupeeglobal/model/PortfolioModel.dart';
 import 'package:rupeeglobal/model/PositionModel.dart';
 import 'package:rupeeglobal/model/MarketIndexDetailModel.dart';
 import 'package:rupeeglobal/model/ForexPairDetailModel.dart';
+import 'package:rupeeglobal/model/PaymentQrModel.dart';
+import 'package:rupeeglobal/model/PaymentQrDetailModel.dart';
 
 import '../network/ApiService.dart';
 import '../network/WebService.dart';
@@ -55,6 +57,33 @@ class HomeTabRepo extends GetxService{
         header: mainHeader());
 
     print("withdrawFundRepo response :-- $response");
+    return response.data;
+  }
+
+  Future<dynamic> getPaymentQrRepo()async{
+    var response = await DI<ApiService>().getMethod(DI<WebService>().PAY_AMOUNT_POINT,
+        header: mainHeader());
+
+    print("getPaymentQrRepo response :-- $response");
+    return paymentQrModelFromJson(jsonEncode(response.data));
+  }
+
+  Future<dynamic> getPaymentQrDetailRepo(int id)async{
+    var response = await DI<ApiService>().getMethod(
+        DI<WebService>().getPaymentQrDetailEndpoint(id),
+        header: mainHeader());
+
+    print("getPaymentQrDetailRepo response :-- $response");
+    return paymentQrDetailModelFromJson(jsonEncode(response.data));
+  }
+
+  Future<dynamic> markPaymentQrPaidRepo(int id)async{
+    var response = await DI<ApiService>().postMethod(
+        DI<WebService>().getPaymentQrMarkPaidEndpoint(id),
+        {},
+        header: mainHeader());
+
+    print("markPaymentQrPaidRepo response :-- $response");
     return response.data;
   }
 

@@ -97,36 +97,52 @@ class Charge {
 }
 
 class Funds {
+  num currentBalance;
+  num totalAdded;
+  num totalWithdrawn;
+  num netDeposit;
   Month today;
-  Month week;
+  Month? week;
   Month month;
   Month year;
 
   Funds({
+    required this.currentBalance,
+    required this.totalAdded,
+    required this.totalWithdrawn,
+    required this.netDeposit,
     required this.today,
-    required this.week,
+    this.week,
     required this.month,
     required this.year,
   });
 
   factory Funds.fromJson(Map<String, dynamic> json) => Funds(
-    today: Month.fromJson(json["today"]),
-    week: Month.fromJson(json["week"]),
-    month: Month.fromJson(json["month"]),
-    year: Month.fromJson(json["year"]),
+    currentBalance: json["current_balance"] ?? 0,
+    totalAdded: json["total_added"] ?? 0,
+    totalWithdrawn: json["total_withdrawn"] ?? 0,
+    netDeposit: json["net_deposit"] ?? 0,
+    today: Month.fromJson(json["today"] ?? {"added": 0, "withdrawn": 0}),
+    week: json["week"] != null ? Month.fromJson(json["week"]) : null,
+    month: Month.fromJson(json["month"] ?? {"added": 0, "withdrawn": 0}),
+    year: Month.fromJson(json["year"] ?? {"added": 0, "withdrawn": 0}),
   );
 
   Map<String, dynamic> toJson() => {
+    "current_balance": currentBalance,
+    "total_added": totalAdded,
+    "total_withdrawn": totalWithdrawn,
+    "net_deposit": netDeposit,
     "today": today.toJson(),
-    "week": week.toJson(),
+    "week": week?.toJson(),
     "month": month.toJson(),
     "year": year.toJson(),
   };
 }
 
 class Month {
-  int added;
-  int withdrawn;
+  num added;
+  num withdrawn;
 
   Month({
     required this.added,
@@ -134,8 +150,8 @@ class Month {
   });
 
   factory Month.fromJson(Map<String, dynamic> json) => Month(
-    added: json["added"],
-    withdrawn: json["withdrawn"],
+    added: json["added"] ?? 0,
+    withdrawn: json["withdrawn"] ?? 0,
   );
 
   Map<String, dynamic> toJson() => {

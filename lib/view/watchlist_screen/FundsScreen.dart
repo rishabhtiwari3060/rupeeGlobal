@@ -72,7 +72,15 @@ class _FundsScreenState extends State<FundsScreen> {
 
               if (selectType.value == 1) _addFundColumn(),
               if (selectType.value == 2) _withdrawFundColumn(),
-              if (selectType.value == 3) _payAmountColumn(),
+              if (selectType.value == 3)
+                homeTabController.isPaymentQrLoading.value
+                    ? Padding(
+                        padding: EdgeInsets.symmetric(vertical: 40),
+                        child: Center(
+                            child: CircularProgressIndicator(
+                                color: DI<ColorConst>().secondColorPrimary)),
+                      )
+                    : _payAmountColumn(),
             ],
           ),
         ),
@@ -89,7 +97,7 @@ class _FundsScreenState extends State<FundsScreen> {
         Text(
           title,
           style: DI<CommonWidget>()
-              .myTextStyle(DI<ColorConst>().blackColor, 20.sp, FontWeight.w600),
+              .myTextStyle(DI<ColorConst>().blackColor, 22.sp, FontWeight.w600),
         ),
       ],
     );
@@ -125,7 +133,10 @@ class _FundsScreenState extends State<FundsScreen> {
     final isSelected = selectType.value == index;
     return Expanded(
       child: InkWell(
-        onTap: () => selectType.value = index,
+        onTap: () {
+          selectType.value = index;
+          if (index == 3) homeTabController.getPaymentQrList();
+        },
         borderRadius: BorderRadius.circular(10),
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 9),
@@ -140,7 +151,7 @@ class _FundsScreenState extends State<FundsScreen> {
               label,
               style: DI<CommonWidget>().myTextStyle(
                 isSelected ? Colors.white : DI<ColorConst>().blackColor,
-                12.sp,
+                13.sp,
                 FontWeight.w500,
               ),
               maxLines: 1,
@@ -165,7 +176,7 @@ class _FundsScreenState extends State<FundsScreen> {
             Expanded(
               child: _summaryCard(
                 "Available Balance",
-                "₹${homeTabController.fundsModel.value?.data.balance}",
+                "₹${DI<CommonFunction>().formatPrice(homeTabController.fundsModel.value?.data.balance)}",
                 DI<ColorConst>().dark_greenColor,
                 Icons.account_balance_outlined,
               ),
@@ -183,7 +194,7 @@ class _FundsScreenState extends State<FundsScreen> {
             Expanded(
               child: _summaryCard(
                 "Total Funds",
-                "₹${homeTabController.fundsModel.value?.data.totalAdded}",
+                "₹${DI<CommonFunction>().formatPrice(double.parse(homeTabController.fundsModel.value?.data.balance??"0.0") * double.parse(homeTabController.fundsModel.value?.data.margin??"0.0"))}",
                 DI<ColorConst>().blackColor,
                 Icons.savings_outlined,
               ),
@@ -201,7 +212,7 @@ class _FundsScreenState extends State<FundsScreen> {
             Text(
               DI<StringConst>().transaction_history_text,
               style: DI<CommonWidget>().myTextStyle(
-                  DI<ColorConst>().blackColor, 18.sp, FontWeight.w600),
+                  DI<ColorConst>().blackColor, 13.sp, FontWeight.w600),
             ),
           ],
         ),
@@ -243,13 +254,13 @@ class _FundsScreenState extends State<FundsScreen> {
           Text(
             title,
             style: DI<CommonWidget>().myTextStyle(
-                DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w400),
+                DI<ColorConst>().darkGryColor, 13.sp, FontWeight.w400),
           ),
           SizedBox(height: 4),
           Text(
             amount,
             style: DI<CommonWidget>()
-                .myTextStyle(valueColor, 15.sp, FontWeight.w700),
+                .myTextStyle(valueColor, 13.sp, FontWeight.w700),
           ),
         ],
       ),
@@ -281,7 +292,7 @@ class _FundsScreenState extends State<FundsScreen> {
                       size: 14, color: DI<ColorConst>().darkGryColor),
                   SizedBox(width: 4),
                   Text(
-                    "${item.createdAt}",
+                    "${DI<CommonFunction>().formatDate(item.createdAt)}",
                     style: DI<CommonWidget>().myTextStyle(
                         DI<ColorConst>().darkGryColor, 13.sp, FontWeight.w400),
                   ),
@@ -296,7 +307,7 @@ class _FundsScreenState extends State<FundsScreen> {
                 child: Text(
                   "${item.transactionType}",
                   style: DI<CommonWidget>().myTextStyle(
-                      DI<ColorConst>().dark_greenColor, 12.sp, FontWeight.w600),
+                      DI<ColorConst>().dark_greenColor, 13.sp, FontWeight.w600),
                 ),
               ),
             ],
@@ -313,34 +324,17 @@ class _FundsScreenState extends State<FundsScreen> {
                   Text(
                     "Amount",
                     style: DI<CommonWidget>().myTextStyle(
-                        DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w400),
+                        DI<ColorConst>().darkGryColor, 13.sp, FontWeight.w400),
                   ),
                   SizedBox(height: 2),
                   Text(
-                    "₹ ${item.amount}",
+                    "₹ ${DI<CommonFunction>().formatPrice(item.amount)}",
                     style: DI<CommonWidget>().myTextStyle(
-                        DI<ColorConst>().blackColor, 16.sp, FontWeight.w600),
+                        DI<ColorConst>().blackColor, 13.sp, FontWeight.w600),
                   ),
                 ],
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    "Position ID",
-                    style: DI<CommonWidget>().myTextStyle(
-                        DI<ColorConst>().darkGryColor, 12.sp, FontWeight.w400),
-                  ),
-                  SizedBox(height: 2),
-                  Text(
-                    "${item.positionId}",
-                    style: DI<CommonWidget>().myTextStyle(
-                        DI<ColorConst>().secondColorPrimary,
-                        14.sp,
-                        FontWeight.w500),
-                  ),
-                ],
-              ),
+             
             ],
           ),
         ],
@@ -368,7 +362,7 @@ class _FundsScreenState extends State<FundsScreen> {
           Text(
             DI<StringConst>().request_add_fund_text,
             style: DI<CommonWidget>().myTextStyle(
-                DI<ColorConst>().blackColor, 18.sp, FontWeight.w600),
+                DI<ColorConst>().blackColor, 13.sp, FontWeight.w600),
           ),
           SizedBox(height: 20),
 
@@ -411,9 +405,6 @@ class _FundsScreenState extends State<FundsScreen> {
     );
   }
 
-  /// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  /// ─── Withdraw Fund Tab ───────────────────────────
-  /// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   Widget _withdrawFundColumn() {
     return Container(
       padding: EdgeInsets.all(16),
@@ -431,7 +422,7 @@ class _FundsScreenState extends State<FundsScreen> {
           Text(
             DI<StringConst>().request_withdraw_fund_text,
             style: DI<CommonWidget>().myTextStyle(
-                DI<ColorConst>().blackColor, 18.sp, FontWeight.w600),
+                DI<ColorConst>().blackColor, 13.sp, FontWeight.w600),
           ),
           SizedBox(height: 10),
 
@@ -443,9 +434,9 @@ class _FundsScreenState extends State<FundsScreen> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              "${DI<StringConst>().available_balance_text} ₹${homeTabController.fundsModel.value?.data.balance}",
+              "${DI<StringConst>().available_balance_text} ₹${DI<CommonFunction>().formatPrice(homeTabController.fundsModel.value?.data.balance)}",
               style: DI<CommonWidget>().myTextStyle(
-                  DI<ColorConst>().dark_greenColor, 14.sp, FontWeight.w600),
+                  DI<ColorConst>().dark_greenColor, 13.sp, FontWeight.w600),
             ),
           ),
           SizedBox(height: 16),
@@ -492,7 +483,12 @@ class _FundsScreenState extends State<FundsScreen> {
             () {
               if (validationWithdrawFund()) {
                 homeTabController
-                    .withdrawFund(amountWithdrawCtrl.text.trim())
+                    .withdrawFund(
+                  amountWithdrawCtrl.text.trim(),
+                  upiIdWithdrawCtrl.text.trim(),
+                  upiNameWithdrawCtrl.text.trim(),
+                  noteWithdrawCtrl.text.trim(),
+                )
                     .then((value) {
                   if (value) {
                     amountWithdrawCtrl.clear();
@@ -513,15 +509,53 @@ class _FundsScreenState extends State<FundsScreen> {
   /// ─── Pay Amount Tab ──────────────────────────────
   /// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   Widget _payAmountColumn() {
+    final list = homeTabController.paymentQrList;
+    if (list.isEmpty) {
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: 40),
+        child: Center(
+          child: Column(
+            children: [
+              Icon(Icons.qr_code_2_outlined,
+                  size: 48, color: DI<ColorConst>().darkGryColor),
+              SizedBox(height: 12),
+              Text(
+                "No payment QR codes found",
+                style: DI<CommonWidget>().myTextStyle(
+                    DI<ColorConst>().darkGryColor, 14.sp, FontWeight.w500),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     return ListView.separated(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
-      itemCount: 10,
+      itemCount: list.length,
       separatorBuilder: (_, __) => SizedBox(height: 10),
       itemBuilder: (context, index) {
+        final item = list[index];
+        final statusText = item.status.isNotEmpty
+            ? (item.status[0].toUpperCase() + item.status.substring(1).toLowerCase())
+            : "Assigned";
+        final assignedDate =
+            DI<CommonFunction>().formatDate(item.createdAt);
+        final paymentDate = item.paymentDate == null ||
+                item.paymentDate!.isEmpty
+            ? "----"
+            : DI<CommonFunction>().formatDate(item.paymentDate);
+
         return InkWell(
           onTap: () {
-            Get.toNamed(DI<RouteHelper>().getPaymentQrDetailScreen());
+            Get.toNamed(
+              DI<RouteHelper>().getPaymentQrDetailScreen(),
+              arguments: {
+                "id": item.id,
+                "amount": item.amount,
+                "status": item.status,
+              },
+            );
           },
           borderRadius: BorderRadius.circular(12),
           child: Container(
@@ -542,9 +576,9 @@ class _FundsScreenState extends State<FundsScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "₹10,000.00",
+                      "₹${DI<CommonFunction>().formatPrice(item.amount, decimalPlaces: 2)}",
                       style: DI<CommonWidget>().myTextStyle(
-                          DI<ColorConst>().blackColor, 17.sp, FontWeight.w600),
+                          DI<ColorConst>().blackColor, 13.sp, FontWeight.w600),
                     ),
                     Container(
                       padding:
@@ -556,10 +590,10 @@ class _FundsScreenState extends State<FundsScreen> {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        "Assigned",
+                        statusText,
                         style: DI<CommonWidget>().myTextStyle(
                             DI<ColorConst>().secondColorPrimary,
-                            12.sp,
+                            13.sp,
                             FontWeight.w600),
                       ),
                     ),
@@ -578,11 +612,11 @@ class _FundsScreenState extends State<FundsScreen> {
                   children: [
                     Expanded(
                       child: _dateInfo(
-                          "Assigned Date", "04-02-2026", Icons.event_available),
+                          "Assigned Date", assignedDate, Icons.event_available),
                     ),
                     Expanded(
-                      child:
-                          _dateInfo("Payment Date", "----", Icons.event_note),
+                      child: _dateInfo(
+                          "Payment Date", paymentDate, Icons.event_note),
                     ),
                   ],
                 ),
@@ -606,7 +640,7 @@ class _FundsScreenState extends State<FundsScreen> {
             Text(
               label,
               style: DI<CommonWidget>().myTextStyle(
-                  DI<ColorConst>().darkGryColor, 11.sp, FontWeight.w400),
+                  DI<ColorConst>().darkGryColor, 13.sp, FontWeight.w400),
             ),
             Text(
               value,
@@ -626,7 +660,7 @@ class _FundsScreenState extends State<FundsScreen> {
       child: Text(
         text,
         style: DI<CommonWidget>().myTextStyle(
-            DI<ColorConst>().darkGryColor, 14.sp, FontWeight.w400),
+            DI<ColorConst>().darkGryColor, 13.sp, FontWeight.w400),
       ),
     );
   }

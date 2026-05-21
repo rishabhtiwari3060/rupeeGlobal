@@ -3,8 +3,10 @@ import 'package:get/get.dart';
 import 'package:rupeeglobal/controller/account/account_controller.dart';
 import 'package:rupeeglobal/model/ChatDetailModel.dart';
 import 'package:rupeeglobal/util/ColorConst.dart';
+import 'package:rupeeglobal/util/CommonFunction.dart';
 import 'package:rupeeglobal/util/CommonWidget.dart';
 import 'package:rupeeglobal/util/local_storage.dart';
+import 'package:sizer/sizer.dart';
 
 import '../../../util/Injection.dart';
 
@@ -21,7 +23,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  String ticketId = "";
+  String ticketId = "",chatStatus = "";
 
 
   @override
@@ -29,6 +31,7 @@ class _ChatScreenState extends State<ChatScreen> {
     super.initState();
     if(Get.parameters["id"]!= null){
       ticketId = Get.parameters["id"]??"";
+      chatStatus = Get.parameters["status"]??"";
     }
 
 
@@ -62,6 +65,24 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
           ),
+
+          chatStatus == "close"?
+    Container(
+      width: 100.w,
+    padding: EdgeInsets.symmetric(horizontal: 10, vertical:13),
+    margin: EdgeInsets.symmetric(vertical: 10),
+    decoration: BoxDecoration(
+    color: Colors.red.withOpacity(0.1),
+    borderRadius: BorderRadius.circular(8),
+    ),
+    child: Text(
+    "This ticket is closed. \nYou can change the status to \"Pending\" above to reopen this ticket.",
+      textAlign: TextAlign.center,
+      style: DI<CommonWidget>()
+        .myTextStyle(Colors.red, 15.sp, FontWeight.w600),
+    ),
+    )
+              :
           _buildInputArea(),
         ],
       ),
@@ -101,25 +122,31 @@ class _ChatScreenState extends State<ChatScreen> {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
 
-    await accountController.sendChatMessage(ticketId,text);
+    await accountController.sendChatMessage(ticketId,text).then((value) {
 
-    accountController.chatList.add(
-        Message(id: accountController.chatList.length,
-            message: text,
-            isAdmin: false,
-            userName: DI<MyLocalStorage>().userName,
-            createdAt: DateTime.now()));
+      print(value);
+      if(value){
+        accountController.chatList.add(
+            Message(id: accountController.chatList.length,
+                message: text,
+                isAdmin: false,
+                userName: DI<MyLocalStorage>().userName,
+                createdAt: DateTime.now()));
 
-    accountController.chatList.refresh();
-    _messageController.clear();
+        accountController.chatList.refresh();
+        _messageController.clear();
 
-    Future.delayed(const Duration(milliseconds: 100), () {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    });
+        Future.delayed(const Duration(milliseconds: 100), () {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        });
+      }
+    },);
+
+
   }
 
 }
@@ -165,7 +192,7 @@ class ChatBubble extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              "${message.createdAt}",
+              "${DI<CommonFunction>().formatDateTime(message.createdAt)}",
               style: TextStyle(color: textColor.withOpacity(0.7), fontSize: 10),
             ),
           ],

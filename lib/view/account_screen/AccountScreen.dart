@@ -145,7 +145,7 @@ class _AccountScreenState extends State<AccountScreen> {
                       _menuItem(Icons.shield_outlined,
                           DI<StringConst>().privacy_policy_text, () {
                         var data = {
-                          "url": "https://www.rupeeglobal.in/legal/privacy-policy",
+                          "url": "https://www.dhanelite.in/legal/privacy-policy",
                           "screenType": "Privacy Policy",
                         };
                         Get.toNamed(DI<RouteHelper>().getWebViewScreen(),
@@ -155,7 +155,7 @@ class _AccountScreenState extends State<AccountScreen> {
                           DI<StringConst>().terms_conditions_text, () {
                         var data = {
                           "url":
-                              "https://www.rupeeglobal.in/legal/terms-and-condition",
+                              "https://www.dhanelite.in/legal/terms-and-condition",
                           "screenType": "Terms & Conditions",
                         };
                         Get.toNamed(DI<RouteHelper>().getWebViewScreen(),
@@ -180,19 +180,19 @@ class _AccountScreenState extends State<AccountScreen> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
-                                color: DI<ColorConst>().redColor.withOpacity(0.4),
+                                color: DI<ColorConst>().greenColor.withOpacity(0.4),
                                 width: 1.2),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(Icons.logout_rounded,
-                                  color: DI<ColorConst>().redColor, size: 20),
+                                  color: DI<ColorConst>().greenColor, size: 20),
                               SizedBox(width: 8),
                               Text(
                                 DI<StringConst>().logout_text,
                                 style: DI<CommonWidget>().myTextStyle(
-                                    DI<ColorConst>().redColor,
+                                    DI<ColorConst>().greenColor,
                                     15.sp,
                                     FontWeight.w500),
                               ),

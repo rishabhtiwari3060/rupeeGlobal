@@ -1,10 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
+
 import 'package:sizer/sizer.dart';
 
 import 'ColorConst.dart';
@@ -13,6 +14,50 @@ import 'Injection.dart';
 import 'StringConst.dart';
 
 class CommonFunction {
+
+  String formatPrice(dynamic value, {int decimalPlaces = 0}) {
+    if (value == null) return "0";
+    num? n;
+    if (value is num) {
+      n = value;
+    } else if (value is String){
+      n = num.tryParse(value);
+    }
+    if (n == null) return "0";
+    final format = decimalPlaces > 0
+        ? NumberFormat('#,##0.${"0" * decimalPlaces}')
+        : NumberFormat('#,##0');
+    return format.format(n);
+  }
+
+  /// Format date/datetime as dd-MM-yyyy. Use throughout the app for displaying dates.
+  /// [value] - DateTime, String (ISO or "yyyy-MM-dd"), or null
+  /// Returns formatted string "dd-MM-yyyy" or "" for null/invalid
+  String formatDate(dynamic value) {
+    if (value == null) return "";
+    DateTime? dt;
+    if (value is DateTime) {
+      dt = value;
+    } else if (value is String && value.isNotEmpty) {
+      dt = DateTime.tryParse(value);
+    }
+    if (dt == null) return "";
+    return DateFormat('dd-MM-yyyy').format(dt);
+  }
+
+  /// Format date-time as dd-MM-yyyy HH:mm (date + time)
+  String formatDateTime(dynamic value) {
+    if (value == null) return "";
+    DateTime? dt;
+    if (value is DateTime) {
+      dt = value;
+    } else if (value is String && value.isNotEmpty) {
+      dt = DateTime.tryParse(value);
+    }
+    if (dt == null) return "";
+    return DateFormat('dd-MM-yyyy HH:mm').format(dt);
+  }
+
   /// hide key board
   void hideKeyboard() {
     FocusScope.of(Get.context!).requestFocus(FocusNode());
@@ -35,7 +80,7 @@ class CommonFunction {
   }
 
   ///to Pick image from bottom sheet
-  Future<File?> selectImage() async {
+  /*Future<File?> selectImage() async {
     File? imageFile;
     await showModalBottomSheet(
       backgroundColor: DI<ColorConst>().whiteColor,
@@ -144,14 +189,14 @@ class CommonFunction {
       },
     );
     return imageFile;
-  }
+  }*/
 
   ///Show toast
   void showErrorSnackBar(String message) {
     ScaffoldMessenger.of(Get.context!).showSnackBar(
       SnackBar(
         content: Text(message,
-          maxLines : 5,style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().whiteColor,
+          maxLines : 5,style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().blackColor,
             15.sp, FontWeight.w500),),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
@@ -175,7 +220,7 @@ class CommonFunction {
   }
 
 
-  Future<dynamic> pickImage(ImageSource imageSource) async {
+ /* Future<dynamic> pickImage(ImageSource imageSource) async {
     XFile? imageFile =
     await ImagePicker().pickImage(source: imageSource, imageQuality: 40);
     print("pickImage File :--  ${imageFile?.path}");
@@ -192,7 +237,7 @@ class CommonFunction {
 
     }
     return null;
-  }
+  }*/
 
 
  /* Future<CroppedFile?> _cropImage(filePath) async {

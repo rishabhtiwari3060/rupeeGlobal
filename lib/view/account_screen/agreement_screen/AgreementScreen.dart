@@ -6,6 +6,7 @@ import 'package:rupeeglobal/util/RouteHelper.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../util/ColorConst.dart';
+import '../../../util/CommonFunction.dart';
 import '../../../util/CommonWidget.dart';
 import '../../../util/Injection.dart';
 import '../../../util/StringConst.dart';
@@ -41,7 +42,7 @@ class _AgreementScreenState extends State<AgreementScreen> {
         title: Text(
           DI<StringConst>().agreements_text,
           style: DI<CommonWidget>()
-              .myTextStyle(DI<ColorConst>().blackColor, 18.sp, FontWeight.w600),
+              .myTextStyle(DI<ColorConst>().blackColor, 20.sp, FontWeight.w600),
         ),
       ),
       body: Obx(
@@ -121,7 +122,7 @@ class _AgreementScreenState extends State<AgreementScreen> {
           value,
           style: TextStyle(
             color: Colors.white,
-            fontSize: 24.sp,
+            fontSize: 26.sp,
             fontWeight: FontWeight.w700,
             fontFamily: "Roboto",
           ),
@@ -137,7 +138,7 @@ class _AgreementScreenState extends State<AgreementScreen> {
             title,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 11.sp,
+              fontSize: 12.sp,
               fontWeight: FontWeight.w500,
               fontFamily: "Roboto",
             ),
@@ -159,7 +160,7 @@ class _AgreementScreenState extends State<AgreementScreen> {
           Text(
             DI<StringConst>().no_agreements_found_text,
             style: DI<CommonWidget>().myTextStyle(
-                DI<ColorConst>().darkGryColor, 15.sp, FontWeight.w500),
+                DI<ColorConst>().darkGryColor, 16.sp, FontWeight.w500),
           ),
         ],
       ),
@@ -219,7 +220,7 @@ class _AgreementScreenState extends State<AgreementScreen> {
                         agreement.title,
                         style: DI<CommonWidget>().myTextStyle(
                             DI<ColorConst>().blackColor,
-                            14.sp,
+                            16.sp,
                             FontWeight.w600),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -231,10 +232,10 @@ class _AgreementScreenState extends State<AgreementScreen> {
                               size: 12, color: DI<ColorConst>().darkGryColor),
                           SizedBox(width: 4),
                           Text(
-                            agreement.createdAt,
+                            DI<CommonFunction>().formatDate(agreement.createdAt),
                             style: DI<CommonWidget>().myTextStyle(
                                 DI<ColorConst>().darkGryColor,
-                                10.sp,
+                                12.sp,
                                 FontWeight.w400),
                           ),
                         ],
@@ -261,10 +262,10 @@ class _AgreementScreenState extends State<AgreementScreen> {
                       size: 14, color: DI<ColorConst>().dark_greenColor),
                   SizedBox(width: 6),
                   Text(
-                    "${DI<StringConst>().signed_at_text}: ${agreement.signedAt}",
+                    "${DI<StringConst>().signed_at_text}: ${DI<CommonFunction>().formatDate(agreement.signedAt)}",
                     style: DI<CommonWidget>().myTextStyle(
                         DI<ColorConst>().dark_greenColor,
-                        10.sp,
+                        12.sp,
                         FontWeight.w500),
                   ),
                   Spacer(),
@@ -286,7 +287,7 @@ class _AgreementScreenState extends State<AgreementScreen> {
                   Text(
                     "Action required",
                     style: DI<CommonWidget>().myTextStyle(
-                        Colors.orange, 10.sp, FontWeight.w500),
+                        Colors.orange, 12.sp, FontWeight.w500),
                   ),
                   Icon(Icons.arrow_forward_ios_rounded,
                       size: 14, color: DI<ColorConst>().darkGryColor),
@@ -310,7 +311,7 @@ class _AgreementScreenState extends State<AgreementScreen> {
       child: Text(
         text,
         style:
-            DI<CommonWidget>().myTextStyle(color, 10.sp, FontWeight.w600),
+            DI<CommonWidget>().myTextStyle(color, 12.sp, FontWeight.w600),
       ),
     );
   }

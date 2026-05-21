@@ -10,6 +10,7 @@ import 'package:sizer/sizer.dart';
 
 import '../../util/BeepDot.dart';
 import '../../util/ColorConst.dart';
+import '../../util/CommonFunction.dart';
 import '../../util/CommonWidget.dart';
 import '../../util/FixedRangeIndicator.dart';
 import '../../util/ImageConst.dart';
@@ -24,25 +25,17 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final HomeTabController _ctrl = Get.find<HomeTabController>();
-  final PageController _bannerPageController = PageController();
-  Timer? _bannerTimer;
+
 
   @override
   void initState() {
     super.initState();
     print("token :-- ${DI<MyLocalStorage>().getStringValue(DI<MyLocalStorage>().authToken)}");
     Future.delayed(Duration.zero, () => _ctrl.getMarketIndices());
-    _bannerTimer = Timer.periodic(const Duration(seconds: 3), (_) {
-      if (!_bannerPageController.hasClients) return;
-      final next = ((_bannerPageController.page?.round() ?? 0) + 1) % 2;
-      _bannerPageController.animateToPage(next, duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
-    });
   }
 
   @override
   void dispose() {
-    _bannerTimer?.cancel();
-    _bannerPageController.dispose();
     super.dispose();
   }
 
@@ -50,66 +43,92 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(DI<StringConst>().home_text)),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(
-            height: 18.h,
-            child: PageView(
-              controller: _bannerPageController,
-              children: [
-                Image.asset(DI<ImageConst>().FIRST_BANNER, fit: BoxFit.cover),
-                Image.asset(DI<ImageConst>().SECOND_BANNER, fit: BoxFit.cover),
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0),
-            child: Obx(() => Row(
-              children: [
-                Expanded(child: _tabTile(DI<StringConst>().market_indices_text, 0)),
-                SizedBox(width: 5),
-                Expanded(child: _tabTile(DI<StringConst>().forex_pairs_text, 1)),
-              ],
-            )),
-          ),
-          Expanded(
-            child: Obx(() {
-              final isMarketIndices = _ctrl.selectedHomeTab.value == 0;
-              final list = isMarketIndices
-                  ? (_ctrl.marketIndicesModel.value?.data ?? [])
-                  : (_ctrl.forexPairsModel.value?.data ?? []);
-              return SingleChildScrollView(
-                child: list.isEmpty
-                    ? Padding(
-                        padding: EdgeInsets.all(24.0),
-                        child: Center(
-                          child: Text("No data yet", style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().darkGryColor, 16, FontWeight.w500)),
+      body: Obx(
+        () =>  Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildTopTabs(),
+            Expanded(
+              child: Obx(() {
+                final isMarketIndices = _ctrl.selectedHomeTab.value == 0;
+                final list = isMarketIndices
+                    ? (_ctrl.marketIndicesModel.value?.data ?? [])
+                    : (_ctrl.forexPairsModel.value?.data ?? []);
+                return SingleChildScrollView(
+                  child: list.isEmpty
+                      ? Padding(
+                          padding: EdgeInsets.all(24.0),
+                          child: Center(
+                            child: Text("No data yet", style: DI<CommonWidget>().myTextStyle(DI<ColorConst>().darkGryColor, 16, FontWeight.w500)),
+                          ),
+                        )
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: list.length,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, i) => _buildIndexCard(list[i]),
                         ),
-                      )
-                    : ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: list.length,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, i) => _buildIndexCard(list[i]),
-                      ),
-              );
-            }),
-          ),
+                );
+              }),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTopTabs() {
+    return Container(
+      decoration: BoxDecoration(
+        color: DI<ColorConst>().cardBgColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: DI<ColorConst>().dividerColor.withOpacity(0.4),
+          width: 0.8,
+        ),
+      ),
+      padding: EdgeInsets.all(4),
+      child: Row(
+        children: [
+          _tabItem(DI<StringConst>().market_indices_text, 0, _ctrl.selectedHomeTab),
+          SizedBox(width: 4),
+          _tabItem(DI<StringConst>().forex_pairs_text, 1, _ctrl.selectedHomeTab),
         ],
       ),
     );
   }
 
-  Widget _tabTile(String label, int tab) {
-    final selected = _ctrl.selectedHomeTab.value == tab;
-    return InkWell(
-      onTap: () {
-        _ctrl.selectedHomeTab.value = tab;
-        if (tab == 1 && _ctrl.forexPairsModel.value == null) _ctrl.getForexPairs();
-      },
-      child: Center(
-        child: Text(label, style: DI<CommonWidget>().myTextStyle(selected ? DI<ColorConst>().secondColorPrimary : DI<ColorConst>().blackColor, 20, FontWeight.w500)),
+  /// ─── Generic Tab Item ────────────────────────────
+  Widget _tabItem(String label, int index, RxInt selected) {
+    final isSelected = selected.value == index;
+    return Expanded(
+      child: InkWell(
+        onTap: () {
+          _ctrl.selectedHomeTab.value = index;
+          if (selected.value == 1 && _ctrl.forexPairsModel.value == null) _ctrl.getForexPairs();
+        },
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? DI<ColorConst>().secondColorPrimary
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Center(
+            child: Text(
+              label,
+              style: DI<CommonWidget>().myTextStyle(
+                isSelected
+                    ? Colors.white
+                    : DI<ColorConst>().blackColor,
+                12.sp,
+                FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -147,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               SizedBox(height: 10),
-              Text("${item.price}", style: DI<CommonWidget>().myTextStyle(changeColor, 20, FontWeight.w500)),
+              Text(DI<CommonFunction>().formatPrice(item.price, decimalPlaces: 2), style: DI<CommonWidget>().myTextStyle(changeColor, 20, FontWeight.w500)),
               SizedBox(height: 5),
               Row(
                 children: [
